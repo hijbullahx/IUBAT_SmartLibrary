@@ -72,7 +72,48 @@ def pc_status(request):
 # Other placeholder views remain unchanged for now
 @csrf_exempt
 def elibrary_checkin(request):
-    return JsonResponse({'status': 'Functionality to be implemented'})
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            student_id = data.get('student_id')
+            pc_number = data.get('pc_number')
+
+            # 1. Find the student
+            try:
+                student = Student.objects.get(student_id=student_id)
+            except Student.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
+
+            # 2. Find the PC
+            try:
+                pc = PC.objects.get(pc_number=pc_number)
+            except PC.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': f'PC {pc_number} not found.'}, status=404)
+            
+            # 3. Check if PC is dumb
+            if pc.is_dumb:
+                return JsonResponse({'status': 'error', 'message': f'PC {pc_number} is marked as dumb and cannot be used.'}, status=400)
+
+            # 4. Check if the PC is already in use
+            if ELibraryEntry.objects.filter(pc=pc, exit_time__isnull=True).exists():
+                return JsonResponse({'status': 'error', 'message': f'PC {pc_number} is already in use.'}, status=400)
+            
+            # 5. Check if the student is already checked in to another PC
+            if ELibraryEntry.objects.filter(student=student, exit_time__isnull=True).exists():
+                return JsonResponse({'status': 'error', 'message': f'{student.name} is already using another PC.'}, status=400)
+
+            # 6. If all checks pass, create a new ELibraryEntry
+            ELibraryEntry.objects.create(student=student, pc=pc)
+            message = f'{student.name} has successfully checked in to PC {pc.pc_number}.'
+            return JsonResponse({'status': 'success', 'message': message, 'student_name': student.name, 'pc_number': pc.pc_number})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
 
 @csrf_exempt
 def elibrary_checkout(request):
