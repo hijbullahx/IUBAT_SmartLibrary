@@ -46,6 +46,29 @@ def library_entry_exit(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
+
+@csrf_exempt
+def pc_status(request):
+    if request.method == 'GET':
+        all_pcs = PC.objects.all().order_by('pc_number')
+        pcs_in_use = ELibraryEntry.objects.filter(exit_time__isnull=True).values_list('pc__pc_number', flat=True)
+
+        pc_list = []
+        for pc in all_pcs:
+            status = "in use" if pc.pc_number in pcs_in_use else "available"
+            if pc.is_dumb:
+                status = "dumb"
+
+            pc_list.append({
+                'pc_number': pc.pc_number,
+                'status': status,
+            })
+        
+        return JsonResponse({'status': 'success', 'pcs': pc_list})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
 # Other placeholder views remain unchanged for now
 @csrf_exempt
 def elibrary_checkin(request):
@@ -53,8 +76,4 @@ def elibrary_checkin(request):
 
 @csrf_exempt
 def elibrary_checkout(request):
-    return JsonResponse({'status': 'Functionality to be implemented'})
-
-@csrf_exempt
-def pc_status(request):
     return JsonResponse({'status': 'Functionality to be implemented'})
