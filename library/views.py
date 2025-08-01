@@ -117,4 +117,33 @@ def elibrary_checkin(request):
 
 @csrf_exempt
 def elibrary_checkout(request):
-    return JsonResponse({'status': 'Functionality to be implemented'})
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            student_id = data.get('student_id')
+
+            # 1. Find the student
+            try:
+                student = Student.objects.get(student_id=student_id)
+            except Student.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
+            
+            # 2. Find the active e-library session for the student
+            active_session = ELibraryEntry.objects.filter(student=student, exit_time__isnull=True).first()
+
+            if active_session:
+                # 3. End the session by setting the exit time
+                active_session.exit_time = timezone.now()
+                active_session.save()
+                message = f'{student.name} has successfully checked out from PC {active_session.pc.pc_number}.'
+                return JsonResponse({'status': 'success', 'message': message, 'student_name': student.name, 'pc_number': active_session.pc.pc_number})
+            else:
+                # 4. Student is not checked in to any PC
+                return JsonResponse({'status': 'error', 'message': f'{student.name} is not currently checked in to any PC.'}, status=400)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
