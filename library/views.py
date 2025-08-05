@@ -11,6 +11,7 @@ import csv
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from django.db.models import Q
 
 @csrf_exempt
 def library_entry_exit(request):
@@ -248,5 +249,49 @@ def time_based_report(request):
             'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
             'location': 'E-Library'
         })
+
+    return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
+@login_required
+def student_based_report(request):
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    student_query = request.GET.get('student_query')
+    if not student_query:
+        return JsonResponse({'status': 'error', 'message': 'Student ID or Name is required.'}, status=400)
+
+    # Filter students by ID or name (case-insensitive)
+    students = Student.objects.filter(
+        Q(student_id__icontains=student_query) | Q(name__icontains=student_query)
+    )
+
+    report_data = []
+
+    for student in students:
+        main_library_entries = LibraryEntry.objects.filter(student=student).order_by('entry_time')
+        elibrary_entries = ELibraryEntry.objects.filter(student=student).order_by('entry_time')
+
+        for entry in main_library_entries:
+            report_data.append({
+                'student_name': entry.student.name,
+                'student_id': entry.student.student_id,
+                'pc_number': 'N/A',
+                'entry_time': entry.entry_time.isoformat(),
+                'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+                'location': 'Main Library'
+            })
+
+        for entry in elibrary_entries:
+            report_data.append({
+                'student_name': entry.student.name,
+                'student_id': entry.student.student_id,
+                'pc_number': entry.pc.pc_number,
+                'entry_time': entry.entry_time.isoformat(),
+                'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+                'location': 'E-Library'
+            })
+
+    # Sort all entries by entry_time
+    report_data.sort(key=lambda x: x['entry_time'])
 
     return JsonResponse({'status': 'success', 'report': report_data}, safe=False)

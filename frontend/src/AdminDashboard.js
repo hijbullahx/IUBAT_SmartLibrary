@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './AdminDashboard.css'; // We'll create this file next
+import './AdminDashboard.css';
 
 function AdminDashboard() {
     const [username, setUsername] = useState('');
@@ -10,8 +10,9 @@ function AdminDashboard() {
     const [reportData, setReportData] = useState(null);
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [studentQuery, setStudentQuery] = useState('');
+    const [studentReportData, setStudentReportData] = useState(null);
 
-    // We need to set up Axios to send the CSRF token with requests
     axios.defaults.withCredentials = true;
 
     const handleLogin = async (e) => {
@@ -38,20 +39,33 @@ function AdminDashboard() {
         }
     };
 
-    const handleFetchReport = async (e) => {
+    const handleFetchTimeReport = async (e) => {
         e.preventDefault();
         setMessage('Fetching report...');
+        setReportData(null); // Clear previous report
         try {
             const response = await axios.get('/api/admin/reports/time-based/', {
-                params: {
-                    start_date: startDate,
-                    end_date: endDate,
-                },
+                params: { start_date: startDate, end_date: endDate },
             });
             setReportData(response.data.report);
             setMessage('Report fetched successfully.');
         } catch (error) {
             setMessage(error.response?.data?.message || 'Failed to fetch report.');
+        }
+    };
+
+    const handleFetchStudentReport = async (e) => {
+        e.preventDefault();
+        setMessage('Fetching student report...');
+        setStudentReportData(null); // Clear previous report
+        try {
+            const response = await axios.get('/api/admin/reports/student-based/', {
+                params: { student_query: studentQuery },
+            });
+            setStudentReportData(response.data.report);
+            setMessage('Student report fetched successfully.');
+        } catch (error) {
+            setMessage(error.response?.data?.message || 'Failed to fetch student report.');
         }
     };
 
@@ -77,9 +91,9 @@ function AdminDashboard() {
             </div>
             <p className="status-message">{message}</p>
 
-            <div className="report-section">
+            <div className="report-section time-report-section">
                 <h3>Time-Based Entry Report</h3>
-                <form onSubmit={handleFetchReport}>
+                <form onSubmit={handleFetchTimeReport}>
                     <label>
                         Start Date:
                         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
@@ -90,8 +104,7 @@ function AdminDashboard() {
                     </label>
                     <button type="submit">Get Report</button>
                 </form>
-
-                {reportData && (
+                {reportData && reportData.length > 0 && (
                     <table className="report-table">
                         <thead>
                             <tr>
@@ -117,6 +130,51 @@ function AdminDashboard() {
                         </tbody>
                     </table>
                 )}
+                {reportData && reportData.length === 0 && <p>No entries found for the selected date range.</p>}
+            </div>
+
+            <div className="report-section student-report-section">
+                <h3>Student-Based Report</h3>
+                <form onSubmit={handleFetchStudentReport}>
+                    <label>
+                        Student ID or Name:
+                        <input
+                            type="text"
+                            value={studentQuery}
+                            onChange={(e) => setStudentQuery(e.target.value)}
+                            placeholder="e.g. 123456789 or 'John Doe'"
+                            required
+                        />
+                    </label>
+                    <button type="submit">Search</button>
+                </form>
+                {studentReportData && studentReportData.length > 0 && (
+                    <table className="report-table">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Student ID</th>
+                                <th>PC Number</th>
+                                <th>Entry Time</th>
+                                <th>Exit Time</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {studentReportData.map((entry, index) => (
+                                <tr key={index}>
+                                    <td>{entry.student_name}</td>
+                                    <td>{entry.student_id}</td>
+                                    <td>{entry.pc_number}</td>
+                                    <td>{new Date(entry.entry_time).toLocaleString()}</td>
+                                    <td>{entry.exit_time ? new Date(entry.exit_time).toLocaleString() : 'N/A'}</td>
+                                    <td>{entry.location}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+                {studentReportData && studentReportData.length === 0 && <p>No entries found for the selected student.</p>}
             </div>
         </div>
     );
