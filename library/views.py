@@ -6,6 +6,8 @@ from .models import Student, LibraryEntry, ELibraryEntry, PC
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 import json
+from django.http import HttpResponse
+import csv
 
 @csrf_exempt
 def library_entry_exit(request):
@@ -147,3 +149,41 @@ def elibrary_checkout(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+def export_data(request):
+    # We need to make sure this is only accessible to admins
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return HttpResponse("Unauthorized", status=401)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="library_entries.csv"'
+
+    writer = csv.writer(response)
+
+    # Write the header row
+    writer.writerow(['Student Name', 'Student ID', 'PC Number', 'Entry Time', 'Exit Time', 'Location'])
+
+    # Get all entries from the main library
+    library_entries = LibraryEntry.objects.all().order_by('entry_time')
+    for entry in library_entries:
+        writer.writerow([
+            entry.student.name,
+            entry.student.student_id,
+            'N/A', # No PC for main library
+            entry.entry_time.strftime('%Y-%m-%d %H:%M:%S'),
+            entry.exit_time.strftime('%Y-%m-%d %H:%M:%S') if entry.exit_time else '',
+            'Main Library'
+        ])
+
+    # Get all entries from the e-library
+    elibrary_entries = ELibraryEntry.objects.all().order_by('entry_time')
+    for entry in elibrary_entries:
+        writer.writerow([
+            entry.student.name,
+            entry.student.student_id,
+            entry.pc.pc_number,
+            entry.entry_time.strftime('%Y-%m-%d %H:%M:%S'),
+            entry.exit_time.strftime('%Y-%m-%d %H:%M:%S') if entry.exit_time else '',
+            'E-Library'
+        ])
+
+    return response
