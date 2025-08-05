@@ -9,6 +9,8 @@ import json
 from django.http import HttpResponse
 import csv
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 @csrf_exempt
 def library_entry_exit(request):
@@ -208,3 +210,43 @@ def admin_logout(request):
         logout(request)
         return JsonResponse({'status': 'success', 'message': 'Logged out successfully.'})
     return JsonResponse({'status': 'error', 'message': 'You are not logged in.'}, status=400)
+@login_required
+def time_based_report(request):
+    if not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+
+    try:
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
+    except (ValueError, TypeError):
+        return JsonResponse({'status': 'error', 'message': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
+
+    main_library_entries = LibraryEntry.objects.filter(entry_time__range=[start_date, end_date]).order_by('entry_time')
+    elibrary_entries = ELibraryEntry.objects.filter(entry_time__range=[start_date, end_date]).order_by('entry_time')
+
+    report_data = []
+
+    for entry in main_library_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'pc_number': 'N/A',
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'Main Library'
+        })
+
+    for entry in elibrary_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'pc_number': entry.pc.pc_number,
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'E-Library'
+        })
+
+    return JsonResponse({'status': 'success', 'report': report_data}, safe=False)

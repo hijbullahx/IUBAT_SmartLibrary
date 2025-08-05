@@ -12,4 +12,5 @@ urlpatterns = [
     path('admin/export-data/', views.export_data, name='export_data'),
     path('admin/login/', views.admin_login, name='admin_login'),
     path('admin/logout/', views.admin_logout, name='admin_logout'),
+     path('admin/reports/time-based/', views.time_based_report, name='time_based_report'),
 ]
