@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import axios from 'axios';
 import ELibrary from './ELibrary';
+import AdminDashboard from './AdminDashboard'; // Import the new component
 import './App.css';
 
 function App() {
   const [studentId, setStudentId] = useState('');
   const [message, setMessage] = useState('');
   const [showElibrary, setShowElibrary] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false); // New state for admin
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,14 +26,20 @@ function App() {
     }
   };
 
+  const handleNavigate = (view) => {
+    setShowElibrary(view === 'elibrary');
+    setShowAdmin(view === 'admin');
+  };
+
   return (
     <div className="App">
       <header className="header">
-        <button onClick={() => setShowElibrary(false)}>Main Library</button>
-        <button onClick={() => setShowElibrary(true)}>E-Library</button>
+        <button onClick={() => handleNavigate('main')}>Main Library</button>
+        <button onClick={() => handleNavigate('elibrary')}>E-Library</button>
+        <button onClick={() => handleNavigate('admin')}>Admin</button>
       </header>
 
-      {!showElibrary ? (
+      {!showElibrary && !showAdmin ? (
         <div>
           <h1>Main Library Entry/Exit</h1>
           <form onSubmit={handleSubmit}>
@@ -48,8 +56,10 @@ function App() {
             {message && <p>{message}</p>}
           </div>
         </div>
-      ) : (
+      ) : showElibrary ? (
         <ELibrary />
+      ) : (
+        <AdminDashboard />
       )}
     </div>
   );

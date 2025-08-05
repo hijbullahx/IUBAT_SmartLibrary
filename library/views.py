@@ -8,6 +8,7 @@ from django.utils import timezone
 import json
 from django.http import HttpResponse
 import csv
+from django.contrib.auth import authenticate, login, logout
 
 @csrf_exempt
 def library_entry_exit(request):
@@ -187,3 +188,23 @@ def export_data(request):
         ])
 
     return response
+@csrf_exempt
+def admin_login(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_superuser:
+            login(request, user)
+            return JsonResponse({'status': 'success', 'message': 'Logged in as Admin.'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid credentials or not a superuser.'}, status=401)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+def admin_logout(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        logout(request)
+        return JsonResponse({'status': 'success', 'message': 'Logged out successfully.'})
+    return JsonResponse({'status': 'error', 'message': 'You are not logged in.'}, status=400)
