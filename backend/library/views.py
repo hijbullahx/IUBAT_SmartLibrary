@@ -295,3 +295,18 @@ def student_based_report(request):
     report_data.sort(key=lambda x: x['entry_time'])
 
     return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
+def api_status(request):
+    """Simple API status endpoint"""
+    return JsonResponse({
+        'status': 'success',
+        'message': 'IUBAT Smart Library API is running',
+        'version': '1.0.0',
+        'endpoints': {
+            'library_entry': '/api/entry/library/',
+            'elibrary_checkin': '/api/entry/elibrary/checkin/',
+            'elibrary_checkout': '/api/entry/elibrary/checkout/',
+            'pc_status': '/api/elibrary/pc_status/',
+            'admin_login': '/api/admin/login/',
+            'admin_reports': '/api/admin/reports/time-based/'
+        }
+    })

@@ -1,12 +1,19 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.urls import re_path
-from django.views.generic import TemplateView
-from django.conf.urls.static import static
-from django.conf import settings
+from django.http import JsonResponse
+
+def api_root(request):
+    """Root API endpoint"""
+    return JsonResponse({
+        'message': 'IUBAT Smart Library API',
+        'status': 'running',
+        'documentation': '/api/status/',
+        'admin': '/admin/',
+        'version': '1.0.0'
+    })
 
 urlpatterns = [
+    path('', api_root, name='api_root'),
     path('admin/', admin.site.urls),
     path('api/', include('library.urls')),
-    re_path(r'^.*', TemplateView.as_view(template_name='index.html')),
 ]
