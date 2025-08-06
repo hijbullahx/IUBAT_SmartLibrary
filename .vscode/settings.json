@@ -1,14 +1,21 @@
 {
-    "python.pythonPath": "./backend/venv/Scripts/python.exe",
     "python.defaultInterpreterPath": "./backend/venv/Scripts/python.exe",
     "python.terminal.activateEnvironment": true,
     "python.terminal.activateEnvInCurrentTerminal": true,
-    "pylint.enabled": false,
-    "python.linting.enabled": false,
-    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.typeCheckingMode": "off",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.extraPaths": [
         "./backend",
-        "./backend/library_automation"
-    ]
+        "./backend/library_automation",
+        "./backend/venv/Lib/site-packages"
+    ],
+    "python.analysis.include": [
+        "./backend/**"
+    ],
+    "python.linting.enabled": false,
+    "pylint.enabled": false,
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.diagnosticMode": "workspace",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.pythonProjects": []
 }
