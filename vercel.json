@@ -19,8 +19,12 @@
       "dest": "library_automation/wsgi.py"
     },
     {
+      "src": "/static/(.*)",
+      "dest": "frontend/build/static/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "frontend/build"
+      "dest": "frontend/build/index.html"
     }
   ]
 }
