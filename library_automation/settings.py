@@ -25,7 +25,7 @@ import dj_database_url
 SECRET_KEY = "django-insecure-fmu_9e)i#ey-j_ny7#*&#54n9lpncu5og0*ge@6s846ww#w0@8"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
