@@ -12,3 +12,6 @@ cd ..
 
 # Install Python dependencies from requirements.txt
 pip3 install -r requirements.txt
+
+# Run Django's collectstatic to gather all static files
+python3 manage.py collectstatic --noinput
