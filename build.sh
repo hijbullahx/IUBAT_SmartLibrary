@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit immediately if a command exits with a non-zero status.
+set -e
+
 # Navigate into the frontend directory
 cd frontend
 
@@ -16,6 +19,6 @@ pip3 install -r requirements.txt
 # Run Django's collectstatic to gather all static files
 python3 manage.py collectstatic --noinput
 
-# Manually move the index.html file to a templates directory for Django to find
-mkdir -p templates
-mv frontend/build/index.html templates/index.html
+# Manually copy the index.html file to a templates directory for Django to find
+mkdir -p library_automation/templates
+cp frontend/build/index.html library_automation/templates/index.html
