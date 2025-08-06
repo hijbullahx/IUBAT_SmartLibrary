@@ -15,3 +15,7 @@ pip3 install -r requirements.txt
 
 # Run Django's collectstatic to gather all static files
 python3 manage.py collectstatic --noinput
+
+# Manually move the index.html file to a templates directory for Django to find
+mkdir -p templates
+mv frontend/build/index.html templates/index.html
