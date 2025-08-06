@@ -3,10 +3,7 @@
   "builds": [
     {
       "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "outputDirectory": "frontend/build"
-      }
+      "use": "@vercel/static-build"
     },
     {
       "src": "library_automation/wsgi.py",
@@ -19,36 +16,8 @@
       "dest": "library_automation/wsgi.py"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "frontend/build/static/$1"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "frontend/build/manifest.json"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "frontend/build/favicon.ico"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "frontend/build/robots.txt"
-    },
-    {
-      "src": "/asset-manifest.json",
-      "dest": "frontend/build/asset-manifest.json"
-    },
-    {
-      "src": "/logo192.png",
-      "dest": "frontend/build/logo192.png"
-    },
-    {
-      "src": "/logo512.png",
-      "dest": "frontend/build/logo512.png"
-    },
-    {
       "src": "/(.*)",
-      "dest": "frontend/build/index.html"
+      "dest": "frontend/build"
     }
   ]
 }
