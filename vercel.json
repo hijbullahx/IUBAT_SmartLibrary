@@ -2,8 +2,9 @@
   "version": 2,
   "builds": [
     {
-      "src": "build.sh",
-      "use": "@vercel/static-build"
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "outputDirectory": "frontend/build" }
     },
     {
       "src": "library_automation/wsgi.py",
@@ -13,7 +14,7 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "dest": "/frontend/build/static/$1"
     },
     {
       "src": "/(.*)",
