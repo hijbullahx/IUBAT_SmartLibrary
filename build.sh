@@ -11,4 +11,4 @@ npm run build
 cd ..
 
 # Run Django's collectstatic command
-python manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
