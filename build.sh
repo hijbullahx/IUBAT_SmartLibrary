@@ -10,5 +10,8 @@ npm run build
 # Navigate back to the root
 cd ..
 
-# Run Django's collectstatic command
+# Install Python dependencies from requirements.txt
+pip install -r requirements.txt
+
+# Run Django's collectstatic command with python3
 python3 manage.py collectstatic --noinput
