@@ -54,6 +54,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "library_automation.urls"
 
+# ... other settings
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -69,6 +71,8 @@ TEMPLATES = [
         },
     },
 ]
+
+# ... rest of your settings
 
 WSGI_APPLICATION = "library_automation.wsgi.application"
 
