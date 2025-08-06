@@ -1,49 +1,74 @@
-# Getting Started with Create React App
+# IUBAT Smart Library - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React.js frontend for the IUBAT Smart Library management system.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Main Library Interface**: Student entry/exit with real-time feedback
+- **E-Library Management**: PC selection and usage tracking
+- **Admin Dashboard**: Login, reports, and system management
+- **Modern UI**: Gradient designs, responsive layout, professional styling
 
-### `npm start`
+## Setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. **Start Development Server**:
+   ```bash
+   npm start
+   ```
 
-### `npm test`
+The frontend will be available at `http://localhost:3000/`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Note**: Make sure the Django backend is running on `http://127.0.0.1:8000/` before starting the frontend.
 
-### `npm run build`
+## Project Structure
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
+frontend/
+├── public/           # Static files
+├── src/
+│   ├── App.js       # Main application component
+│   ├── App.css      # Main styles with modern gradients
+│   ├── ELibrary.js  # E-Library PC management
+│   ├── AdminDashboard.js # Admin interface
+│   └── index.js     # Application entry point
+├── package.json     # Node.js dependencies
+└── README.md        # This file
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Components
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Main Library (`App.js`)
+- Student ID input with real-time validation
+- Entry/exit tracking with immediate feedback
+- Navigation between different sections
 
-### `npm run eject`
+### E-Library (`ELibrary.js`)
+- Visual PC status grid (Available/In Use/Out of Order)
+- PC selection and check-in/check-out functionality
+- Real-time status updates
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Admin Dashboard (`AdminDashboard.js`)
+- Secure admin login
+- Time-based and student-based reports
+- System statistics and data management
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## API Integration
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The frontend communicates with the Django backend via:
+- **Proxy Configuration**: All `/api/*` requests are forwarded to `http://127.0.0.1:8000/`
+- **Axios HTTP Client**: Handles all API communications
+- **Real-time Updates**: Components refresh data automatically
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Dependencies
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **React 19.1.1**: Core framework
+- **Axios**: HTTP client for API communications
+- **React Scripts**: Build and development tools
 
 ### Code Splitting
 
