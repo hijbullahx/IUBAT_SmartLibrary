@@ -10,7 +10,7 @@ import django
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Set Django settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'library_automation.settings_local')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'library_automation.settings')
 
 # Setup Django
 django.setup()
