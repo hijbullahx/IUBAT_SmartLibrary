@@ -5,7 +5,7 @@
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "outputDirectory": "build"
+        "outputDirectory": "frontend/build"
       }
     },
     {
@@ -19,8 +19,36 @@
       "dest": "library_automation/wsgi.py"
     },
     {
+      "src": "/static/(.*)",
+      "dest": "frontend/build/static/$1"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "frontend/build/manifest.json"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "frontend/build/favicon.ico"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "frontend/build/robots.txt"
+    },
+    {
+      "src": "/asset-manifest.json",
+      "dest": "frontend/build/asset-manifest.json"
+    },
+    {
+      "src": "/logo192.png",
+      "dest": "frontend/build/logo192.png"
+    },
+    {
+      "src": "/logo512.png",
+      "dest": "frontend/build/logo512.png"
+    },
+    {
       "src": "/(.*)",
-      "dest": "frontend/build"
+      "dest": "frontend/build/index.html"
     }
   ]
 }
