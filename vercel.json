@@ -15,12 +15,12 @@
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/frontend/build/static/$1"
+      "src": "/(admin|api)/(.*)",
+      "dest": "library_automation/wsgi.py"
     },
     {
       "src": "/(.*)",
-      "dest": "library_automation/wsgi.py"
+      "dest": "frontend/build"
     }
   ]
 }
