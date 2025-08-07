@@ -30,6 +30,7 @@ def add_real_students():
         {'student_id': '22303126', 'name': 'Md.Rakibul Hasan Roman'},
         {'student_id': '22303127', 'name': 'Marzia Khan Rinti'},
         {'student_id': '22303142', 'name': 'Md. Taher Bin Omar Hijbullah'},
+        {'student_id': '22303148', 'name': 'Rifah Tasnia Prova'},
         {'student_id': '22303191', 'name': 'Apurba Kumar Biswas'},
         {'student_id': '22303196', 'name': 'Abir Hossen'},
         {'student_id': '22303233', 'name': 'AMENA AFRIN ALO'},
