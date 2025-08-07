@@ -68,6 +68,11 @@ mkdir -p staticfiles/media
 if [ -d "../frontend/build" ]; then
     echo "📱 Copying React build files..."
     cp -rf ../frontend/build/* staticfiles/
+    # Copy the new JS file with the name expected by the manifest
+    if [ -f "../frontend/build/static/js/main.6e209e95.js" ]; then
+        echo "🔄 Copying new JS file as main.97e84a4f.js for manifest compatibility..."
+        cp ../frontend/build/static/js/main.6e209e95.js staticfiles/js/main.97e84a4f.js
+    fi
     cp ../frontend/build/index.html templates/
     echo "✅ React build files copied"
 fi
