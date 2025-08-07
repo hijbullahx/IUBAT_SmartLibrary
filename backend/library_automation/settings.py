@@ -145,6 +145,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static_src'),  # Additional static files
+    os.path.join(BASE_DIR, '../frontend/build/static'),  # React build files
 ]
 
 # For Render and other cloud deployments
