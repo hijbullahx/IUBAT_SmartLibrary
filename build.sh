@@ -55,12 +55,17 @@ fi
 
 # Collect static files
 echo "📁 Collecting static files..."
-# Copy React build files
+# Copy React build files and override existing ones
 if [ -d "../frontend/build" ]; then
     echo "📱 Copying React build files..."
-    cp -r ../frontend/build/* staticfiles/
+    cp -rf ../frontend/build/* staticfiles/
+    # Override the main.97e84a4f.js file specifically with the new one
+    if [ -f "../frontend/build/static/js/main.6e209e95.js" ]; then
+        echo "🔄 Overriding old JS file with new API URLs..."
+        cp ../frontend/build/static/js/main.6e209e95.js staticfiles/js/main.97e84a4f.js
+    fi
     cp ../frontend/build/index.html templates/
-    echo "✅ React build files copied"
+    echo "✅ React build files copied and JS file updated"
 fi
 python manage.py collectstatic --noinput --clear
 
