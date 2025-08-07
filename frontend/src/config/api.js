@@ -1,7 +1,7 @@
 // API Configuration
 const API_BASE_URL = process.env.REACT_APP_API_URL || 
   (process.env.NODE_ENV === 'production' 
-    ? 'https://your-backend-domain.vercel.app' 
+    ? 'https://iubat-smartlibrary.onrender.com' 
     : 'http://127.0.0.1:8000');
 
 export const API_ENDPOINTS = {

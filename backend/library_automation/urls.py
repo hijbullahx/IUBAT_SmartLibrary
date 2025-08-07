@@ -20,10 +20,7 @@ urlpatterns = [
     path('api/', include('library.urls')),
 ]
 
-# Serve static files in production
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-# Catch all other routes and serve React app (this must be last!)
+# Catch all routes EXCEPT static files and serve React app
 urlpatterns += [
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
+    re_path(r'^(?!static/).*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
 ]
