@@ -18,10 +18,12 @@ def api_root(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('library.urls')),
-    # Catch all other routes and serve React app
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
 ]
 
-# Serve static files
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Serve static files in production
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Catch all other routes and serve React app (this must be last!)
+urlpatterns += [
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
+]
