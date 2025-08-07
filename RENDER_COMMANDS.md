@@ -66,6 +66,24 @@ chmod +x build.sh
 cd backend
 python manage.py check
 python manage.py migrate --check
+
+# Test static files collection
+python manage.py collectstatic --noinput
+
+# Test template rendering (production mode)
+python -c "
+import os
+os.environ['DEBUG'] = 'False'
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'library_automation.settings')
+django.setup()
+from django.template.loader import render_to_string
+try:
+    result = render_to_string('index.html')
+    print('✅ Template rendered successfully')
+except Exception as e:
+    print('❌ Template error:', str(e))
+"
 ```
 
 ### Database Commands
