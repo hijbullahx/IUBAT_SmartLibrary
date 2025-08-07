@@ -27,7 +27,7 @@ urlpatterns = [
 if not settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# Catch specific routes only (not static files) and serve React app - this must be LAST
+# Catch specific routes only (not static files or API routes) and serve React app - this must be LAST
 urlpatterns += [
-    re_path(r'^(?!static/).*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
+    re_path(r'^(?!static/|api/|admin/).*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
 ]
