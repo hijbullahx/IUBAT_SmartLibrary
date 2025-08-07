@@ -55,6 +55,15 @@ fi
 
 # Collect static files
 echo "📁 Collecting static files..."
+# First run collectstatic to create the directory structure
+python manage.py collectstatic --noinput --clear
+
+# Ensure staticfiles directory exists and has proper structure
+mkdir -p staticfiles
+mkdir -p staticfiles/js
+mkdir -p staticfiles/css
+mkdir -p staticfiles/media
+
 # Copy React build files and override existing ones
 if [ -d "../frontend/build" ]; then
     echo "📱 Copying React build files..."
@@ -67,7 +76,10 @@ if [ -d "../frontend/build" ]; then
     cp ../frontend/build/index.html templates/
     echo "✅ React build files copied and JS file updated"
 fi
-python manage.py collectstatic --noinput --clear
+
+# Run collectstatic again to ensure everything is in place
+echo "📁 Final static files collection..."
+python manage.py collectstatic --noinput
 
 echo "✅ Build process completed successfully!"
 echo "🌐 Your application is ready for deployment on Render!"
