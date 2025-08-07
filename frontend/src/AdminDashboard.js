@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from './config/api';
 import './AdminDashboard.css';
 
 function AdminDashboard() {
@@ -19,7 +20,7 @@ function AdminDashboard() {
         e.preventDefault();
         setMessage('Logging in...');
         try {
-            const response = await axios.post('/api/admin/login/', { username, password });
+            const response = await axios.post(API_ENDPOINTS.ADMIN_LOGIN, { username, password });
             if (response.data.status === 'success') {
                 setIsLoggedIn(true);
                 setMessage('Login successful!');
@@ -44,7 +45,7 @@ function AdminDashboard() {
         setMessage('Fetching report...');
         setReportData(null); // Clear previous report
         try {
-            const response = await axios.get('/api/admin/reports/time-based/', {
+            const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_TIME, {
                 params: { start_date: startDate, end_date: endDate },
             });
             setReportData(response.data.report);
@@ -59,7 +60,7 @@ function AdminDashboard() {
         setMessage('Fetching student report...');
         setStudentReportData(null); // Clear previous report
         try {
-            const response = await axios.get('/api/admin/reports/student-based/', {
+            const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_STUDENT, {
                 params: { student_query: studentQuery },
             });
             setStudentReportData(response.data.report);

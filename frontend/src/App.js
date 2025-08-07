@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from './config/api';
 import ELibrary from './ELibrary';
 import AdminDashboard from './AdminDashboard';
 import './App.css';
@@ -17,7 +18,7 @@ function App() {
     e.preventDefault();
     setMessage('Processing...');
     try {
-      const response = await axios.post('/api/entry/library/', { student_id: studentId });
+      const response = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, { student_id: studentId });
       setMessage(response.data.message);
       setStudentName(response.data.student_name || '');
       setLastAction(response.data.action || '');

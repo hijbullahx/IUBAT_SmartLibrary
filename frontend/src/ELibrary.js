@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from './config/api';
 
 function ELibrary() {
   const [pcs, setPcs] = useState([]);
@@ -13,7 +14,7 @@ function ELibrary() {
   const fetchPCStatus = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/elibrary/pc_status/');
+      const response = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
       if (response.data.status === 'success') {
         setPcs(response.data.pcs);
         setError(null);
@@ -45,7 +46,7 @@ function ELibrary() {
       }
       setMessage('Processing check-in...');
       try {
-        const response = await axios.post('/api/entry/elibrary/checkin/', {
+        const response = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKIN, {
           student_id: studentId,
           pc_number: selectedPC.pc_number,
         });
@@ -75,7 +76,7 @@ function ELibrary() {
       
       setMessage('Processing check-out...');
       try {
-        const response = await axios.post('/api/entry/elibrary/checkout/', {
+        const response = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
           student_id: studentId,
         });
         

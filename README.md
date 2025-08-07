@@ -1,6 +1,8 @@
-# IUBAT Smart Library Management System
+# 🏛️ IUBAT Smart Library Management System
 
-A comprehensive library management system built with Django REST API backend and React.js frontend for IUBAT University.
+A comprehensive full-stack library management system built with Django REST API backend and React.js frontend for IUBAT University. **Deploy with one URL for both frontend and backend!**
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/hijbullahx/IUBAT_SmartLibrary)
 
 ## 🏗️ Project Structure
 
