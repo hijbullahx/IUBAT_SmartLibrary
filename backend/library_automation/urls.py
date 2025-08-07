@@ -18,9 +18,12 @@ def api_root(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('library.urls')),
+    # Serve manifest.json at root level
+    path('manifest.json', TemplateView.as_view(template_name='manifest.json', content_type='application/json'), name='manifest'),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
 ]
 
-# Catch all routes EXCEPT static files and serve React app
+# Catch all routes EXCEPT static files, admin, and api and serve React app
 urlpatterns += [
-    re_path(r'^(?!static/).*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
+    re_path(r'^(?!static/|admin/|api/).*$', TemplateView.as_view(template_name='index.html'), name='frontend'),
 ]
