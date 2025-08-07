@@ -148,7 +148,7 @@ STATICFILES_DIRS = [
 ]
 
 # For Render and other cloud deployments
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # WhiteNoise configuration
 WHITENOISE_MAX_AGE = 31536000  # 1 year cache
