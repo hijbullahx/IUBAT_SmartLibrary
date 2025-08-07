@@ -55,6 +55,13 @@ fi
 
 # Collect static files
 echo "📁 Collecting static files..."
+# Copy React build files
+if [ -d "../frontend/build" ]; then
+    echo "📱 Copying React build files..."
+    cp -r ../frontend/build/* staticfiles/
+    cp ../frontend/build/index.html templates/
+    echo "✅ React build files copied"
+fi
 python manage.py collectstatic --noinput --clear
 
 echo "✅ Build process completed successfully!"
