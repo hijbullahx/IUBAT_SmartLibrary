@@ -14,7 +14,7 @@ git push origin main
 ### Render Configuration
 ```bash
 # Build Command (copy to Render)
-chmod +x build.sh && ./build.sh
+./build.sh
 
 # Start Command (copy to Render)
 cd backend && gunicorn library_automation.wsgi:application --bind 0.0.0.0:$PORT
@@ -22,7 +22,7 @@ cd backend && gunicorn library_automation.wsgi:application --bind 0.0.0.0:$PORT
 
 ### Environment Variables (Set in Render Dashboard)
 ```
-SECRET_KEY=django-insecure-your-secret-key-here-change-this-in-production
+SECRET_KEY=django-insecure-8k2m9#x@f$v7n3q!w5r8z&p4j6h*s1a9c+e0l-b2y=u^t7k3m5
 DATABASE_URL=postgresql://neondb_owner:npg_BD48fmwROHWL@ep-bold-moon-ad14lfg1-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 DEBUG=False
 PYTHONPATH=/opt/render/project/src/backend

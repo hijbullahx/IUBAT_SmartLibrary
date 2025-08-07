@@ -4,19 +4,29 @@ set -e  # Exit on any error
 # IUBAT Smart Library Deployment Build Script for Render
 
 echo "🚀 Starting IUBAT Smart Library build process..."
+echo "🐍 Python version: $(python --version)"
 
 # Upgrade pip first
 echo "📦 Upgrading pip..."
-pip install --upgrade pip
+python -m pip install --upgrade pip
 
 # Install backend dependencies
 echo "📦 Installing backend dependencies..."
 cd backend
-pip install -r requirements.txt --no-cache-dir
+
+# Install requirements with specific flags for better compatibility
+pip install -r requirements.txt --no-cache-dir --force-reinstall
+
+# Verify psycopg2 installation
+echo "🔍 Testing database module..."
+python -c "import psycopg2; print('✅ psycopg2 imported successfully')" || echo "❌ psycopg2 import failed"
+
+# Set Django settings explicitly
+export DJANGO_SETTINGS_MODULE=library_automation.settings
 
 # Run database migrations
 echo "🗃️ Running database migrations..."
-python manage.py migrate --noinput
+python manage.py migrate --noinput --verbosity=2
 
 # Create superuser (only if doesn't exist)
 echo "👤 Creating superuser..."
