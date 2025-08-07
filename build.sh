@@ -21,6 +21,7 @@ mkdir -p staticfiles/css staticfiles/js staticfiles/media
 cp ../frontend/build/static/css/* staticfiles/css/ 2>/dev/null || true
 cp ../frontend/build/static/js/* staticfiles/js/ 2>/dev/null || true  
 cp ../frontend/build/static/media/* staticfiles/media/ 2>/dev/null || true
+cp ../frontend/src/assets/IUBAT2.png staticfiles/media/IUBAT2.png 2>/dev/null || true
 
 # Copy root level React files to static root
 cp ../frontend/build/favicon.ico staticfiles/ 2>/dev/null || true

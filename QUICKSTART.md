@@ -1,10 +1,10 @@
-# 🚀 Quick Start Guide - IUBAT Smart Library
+#  Quick Start Guide - IUBAT Smart Library
 
-## 📁 Project Structure (Clean & Separated)
+##  Project Structure (Clean & Separated)
 
 ```
 IUBAT_SmartLibrary/
-├── 🖥️ backend/              # Django REST API
+├── backend/              # Django REST API
 │   ├── library/             # Main Django app
 │   ├── library_automation/  # Django settings
 │   ├── venv/                # Python virtual environment
@@ -12,16 +12,16 @@ IUBAT_SmartLibrary/
 │   ├── manage.py            # Django management
 │   ├── db.sqlite3           # SQLite database
 │   └── README.md            # Backend documentation
-├── 🎨 frontend/             # React.js UI
+├── frontend/             # React.js UI
 │   ├── src/                 # React components
 │   ├── public/              # Static files
 │   ├── node_modules/        # Node dependencies
 │   ├── package.json         # Node.js dependencies
 │   └── README.md            # Frontend documentation
-└── 📚 README.md             # Main project documentation
+└── README.md             # Main project documentation
 ```
 
-## ⚡ Quick Start (2 Simple Steps)
+##  Quick Start (2 Simple Steps)
 
 ### 1. Start Backend (Django API)
 ```bash
@@ -32,7 +32,7 @@ venv\Scripts\activate          # Windows
 pip install -r requirements.txt
 python manage.py runserver
 ```
-✅ **Backend running at**: `http://127.0.0.1:8000/`
+**Backend running at**: `http://127.0.0.1:8000/`
 
 ### 2. Start Frontend (React UI)
 ```bash
@@ -40,11 +40,11 @@ cd frontend
 npm install
 npm start
 ```
-✅ **Frontend running at**: `http://localhost:3000/`
+ **Frontend running at**: `http://localhost:3000/`
 
-## 🎯 What's Working
+## What's Working
 
-### ✅ Backend Features
+### Backend Features
 - **Django REST API** running on port 8000
 - **41 Real IUBAT Students** pre-loaded
 - **SQLite Database** with all models
@@ -53,7 +53,7 @@ npm start
 - **Entry/Exit Tracking** for main library
 - **E-Library PC Management** APIs
 
-### ✅ Frontend Features
+### Frontend Features
 - **React.js Interface** on port 3000
 - **Modern Gradient Design** with professional styling
 - **Main Library Interface** for student entry/exit
@@ -61,13 +61,13 @@ npm start
 - **Admin Dashboard** with login and reports
 - **Real-time API Integration** via proxy
 
-### ✅ System Integration
+###  System Integration
 - **Proxy Configuration**: Frontend automatically forwards `/api/*` to backend
 - **Real Student Data**: 41 IUBAT students from user's list
 - **CORS Configuration**: Proper backend-frontend communication
 - **Database Models**: Student, LibraryEntry, ELibraryEntry, PC
 
-## 🔧 Development Ready
+##  Development Ready
 
 ### Backend Development
 ```bash
@@ -85,22 +85,22 @@ npm start                       # Development server
 npm run build                   # Production build
 ```
 
-## 🌐 API Endpoints Working
+##  API Endpoints Working
 
-- `GET /api/elibrary/pc_status/` - PC status (✅ Tested)
+- `GET /api/elibrary/pc_status/` - PC status ( Tested)
 - `POST /api/entry/library/` - Student entry/exit
 - `POST /api/entry/elibrary/checkin/` - PC check-in
 - `POST /api/entry/elibrary/checkout/` - PC check-out
 - `POST /api/admin/login/` - Admin authentication
 - `GET /api/admin/reports/time-based/` - Activity reports
 
-## 🎊 Project Status: **COMPLETE & READY**
+##  Project Status: **COMPLETE & READY**
 
-✅ **Backend-Frontend Separation**: ✓ Complete  
-✅ **Clean Project Structure**: ✓ Complete  
-✅ **Database with Real Data**: ✓ Complete  
-✅ **Modern React UI**: ✓ Complete  
-✅ **API Integration**: ✓ Complete  
-✅ **Documentation**: ✓ Complete  
+ **Backend-Frontend Separation**: ✓ Complete  
+ **Clean Project Structure**: ✓ Complete  
+ **Database with Real Data**: ✓ Complete  
+ **Modern React UI**: ✓ Complete  
+ **API Integration**: ✓ Complete  
+ **Documentation**: ✓ Complete  
 
 **Ready for development, testing, and deployment!**
