@@ -57,31 +57,6 @@ fi
 echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput --clear
 
-# Go back to root
-cd ..
-
-# Check if Node.js is available
-if command -v node &> /dev/null; then
-    echo "⚛️ Node.js found, building frontend..."
-    
-    # Install frontend dependencies and build
-    echo "📦 Installing frontend dependencies..."
-    cd frontend
-    npm install --production=false
-    
-    # Build frontend
-    echo "🏗️ Building frontend for production..."
-    npm run build
-    
-    # Move built files to backend static directory
-    echo "📦 Moving frontend build to backend..."
-    mkdir -p ../backend/staticfiles/frontend
-    cp -r build/* ../backend/staticfiles/frontend/
-    
-    cd ..
-else
-    echo "⚠️ Node.js not found, skipping frontend build"
-fi
-
 echo "✅ Build process completed successfully!"
 echo "🌐 Your application is ready for deployment on Render!"
+echo "� Frontend files are pre-built and included in the repository"

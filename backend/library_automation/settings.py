@@ -71,8 +71,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'staticfiles', 'frontend'),  # For built React app
-            os.path.join(BASE_DIR, 'library_automation', 'templates'),
+            os.path.join(BASE_DIR, 'templates'),  # For built React app
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -164,7 +163,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
     "https://iubat-smart-library.vercel.app",  # Vercel domain
-    "https://iubat-smart-library.onrender.com",  # Render domain
+    "https://iubat-smartlibrary.onrender.com",  # Render domain (correct URL)
 ]
 
 CORS_ALLOW_CREDENTIALS = True
