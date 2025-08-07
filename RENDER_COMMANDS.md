@@ -32,25 +32,25 @@ PYTHONPATH=/opt/render/project/src/backend
 
 ### Test API Endpoints
 ```bash
-# Replace YOUR_APP_URL with your actual Render URL
+# Replace with your actual Render URL: https://iubat-smartlibrary.onrender.com
 
 # Test student entry
-curl -X POST https://YOUR_APP_URL/api/entry/library/ \
+curl -X POST https://iubat-smartlibrary.onrender.com/api/entry/library/ \
   -H "Content-Type: application/json" \
   -d '{"student_id": "001"}'
 
 # Test PC status
-curl https://YOUR_APP_URL/api/elibrary/pc_status/
+curl https://iubat-smartlibrary.onrender.com/api/elibrary/pc_status/
 
 # Test API root
-curl https://YOUR_APP_URL/api/
+curl https://iubat-smartlibrary.onrender.com/api/
 ```
 
 ### Browser Testing
 ```
-Main App: https://YOUR_APP_URL/
-Admin: https://YOUR_APP_URL/admin/
-API: https://YOUR_APP_URL/api/
+Main App: https://iubat-smartlibrary.onrender.com/
+Admin: https://iubat-smartlibrary.onrender.com/admin/
+API: https://iubat-smartlibrary.onrender.com/api/
 ```
 
 ## 🔧 Troubleshooting Commands
@@ -104,10 +104,10 @@ git push origin main
 ### Check Application Health
 ```bash
 # Health check
-curl https://YOUR_APP_URL/api/
+curl https://iubat-smartlibrary.onrender.com/api/
 
 # Admin login test
-curl -X POST https://YOUR_APP_URL/api/admin/login/ \
+curl -X POST https://iubat-smartlibrary.onrender.com/api/admin/login/ \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "admin123"}'
 ```
@@ -115,10 +115,10 @@ curl -X POST https://YOUR_APP_URL/api/admin/login/ \
 ### Performance Testing
 ```bash
 # Response time test
-time curl https://YOUR_APP_URL/
+time curl https://iubat-smartlibrary.onrender.com/
 
 # Load test (install apache2-utils first)
-ab -n 100 -c 10 https://YOUR_APP_URL/
+ab -n 100 -c 10 https://iubat-smartlibrary.onrender.com/
 ```
 
 ## 🎯 Quick Checklist
