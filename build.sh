@@ -67,11 +67,20 @@ mkdir -p staticfiles/media
 # Copy React build files and override existing ones
 if [ -d "../frontend/build" ]; then
     echo "📱 Copying React build files..."
+    # Remove any existing nested static directories to avoid confusion
+    rm -rf staticfiles/static/ 2>/dev/null || true
+    
     # Copy the React build static files to the correct locations
     cp -rf ../frontend/build/static/* staticfiles/
+    
     # Copy other React build files (manifest.json, favicon.ico, etc.) to staticfiles root
     cp ../frontend/build/*.ico ../frontend/build/*.json ../frontend/build/*.txt staticfiles/ 2>/dev/null || true
+    
     echo "✅ React build files copied to correct staticfiles structure"
+    echo "📁 Listing copied files:"
+    ls -la staticfiles/css/ 2>/dev/null || echo "No CSS directory"
+    ls -la staticfiles/js/ 2>/dev/null || echo "No JS directory" 
+    ls -la staticfiles/media/ 2>/dev/null || echo "No media directory"
 fi
 
 # Run collectstatic again to ensure everything is in place
