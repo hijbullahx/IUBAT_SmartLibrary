@@ -153,13 +153,18 @@ STATICFILES_DIRS = [
 # For Render and other cloud deployments
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 # CORS settings for React frontend
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://localhost:3001",
+    "http://localhost:3001", 
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
-    "https://iubat-smart-library.vercel.app",  # Add your frontend domain
+    "https://iubat-smart-library.vercel.app",  # Vercel domain
+    "https://iubat-smart-library.onrender.com",  # Render domain
 ]
 
 CORS_ALLOW_CREDENTIALS = True

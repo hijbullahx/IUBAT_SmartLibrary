@@ -57,7 +57,7 @@ git push origin main
 #### Build and Deploy Settings
 - **Build Command**: 
   ```bash
-  chmod +x build.sh && ./build.sh
+  ./build.sh
   ```
 - **Start Command**: 
   ```bash

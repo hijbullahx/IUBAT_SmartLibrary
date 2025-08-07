@@ -31,7 +31,7 @@ git push origin main
 **Build & Deploy:**
 - **Build Command**: 
   ```
-  chmod +x build.sh && ./build.sh
+  ./build.sh
   ```
 - **Start Command**: 
   ```
