@@ -67,14 +67,11 @@ mkdir -p staticfiles/media
 # Copy React build files and override existing ones
 if [ -d "../frontend/build" ]; then
     echo "📱 Copying React build files..."
-    cp -rf ../frontend/build/* staticfiles/
-    # Copy the new JS file with the name expected by the manifest
-    if [ -f "../frontend/build/static/js/main.6e209e95.js" ]; then
-        echo "🔄 Copying new JS file as main.97e84a4f.js for manifest compatibility..."
-        cp ../frontend/build/static/js/main.6e209e95.js staticfiles/js/main.97e84a4f.js
-    fi
-    # Don't overwrite our Django template - keep the existing one
-    echo "✅ React build files copied (keeping Django template)"
+    # Copy the React build static files to the correct locations
+    cp -rf ../frontend/build/static/* staticfiles/
+    # Copy other React build files (manifest.json, favicon.ico, etc.) to staticfiles root
+    cp ../frontend/build/*.ico ../frontend/build/*.json ../frontend/build/*.txt staticfiles/ 2>/dev/null || true
+    echo "✅ React build files copied to correct staticfiles structure"
 fi
 
 # Run collectstatic again to ensure everything is in place
