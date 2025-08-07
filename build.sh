@@ -68,24 +68,18 @@ mkdir -p staticfiles/media
 if [ -d "../frontend/build" ]; then
     echo "📱 Copying React build files..."
     
-    # Clean previous React files to avoid conflicts
-    echo "🧹 Cleaning previous React files..."
-    rm -rf staticfiles/css staticfiles/js staticfiles/media 2>/dev/null || true
-    rm -rf staticfiles/static/ 2>/dev/null || true
+    # Ensure staticfiles directories exist
+    mkdir -p staticfiles/css staticfiles/js staticfiles/media
     
-    # Copy the React build static files directly to staticfiles
-    echo "📂 Copying static files..."
-    cp -r ../frontend/build/static/* staticfiles/
+    # Copy React build files directly
+    cp ../frontend/build/static/css/* staticfiles/css/ 2>/dev/null || true
+    cp ../frontend/build/static/js/* staticfiles/js/ 2>/dev/null || true
+    cp ../frontend/build/static/media/* staticfiles/media/ 2>/dev/null || true
     
-    # Copy other React build files (manifest.json, favicon.ico, etc.) to staticfiles root
-    echo "📄 Copying root files..."
+    # Copy other React build files to staticfiles root
     cp ../frontend/build/*.ico ../frontend/build/*.json ../frontend/build/*.txt staticfiles/ 2>/dev/null || true
     
     echo "✅ React build files copied successfully"
-    echo "📁 Directory structure:"
-    ls -la staticfiles/css/ 2>/dev/null && echo "CSS files found" || echo "❌ No CSS directory"
-    ls -la staticfiles/js/ 2>/dev/null && echo "JS files found" || echo "❌ No JS directory" 
-    ls -la staticfiles/media/ 2>/dev/null && echo "Media files found" || echo "❌ No media directory"
 fi
 
 # Run collectstatic again to ensure everything is in place
