@@ -146,8 +146,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # No STATICFILES_DIRS - we'll copy files manually in build script
 STATICFILES_DIRS = []
 
-# Use simple static files storage that works with manual copying
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# Use WhiteNoise static files storage for production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# WhiteNoise configuration
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
