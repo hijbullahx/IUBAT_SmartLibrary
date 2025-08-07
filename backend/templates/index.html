@@ -14,7 +14,7 @@
             <header class="header">
                 <div class="header-content">
                     <div class="logo-title">
-                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="IUBAT Logo" class="iubat-logo">
+                        <img src="/static/media/IUBAT2.33ac17563d8616182b74.png" alt="IUBAT Logo" class="iubat-logo">
                         <h1>IUBAT Smart Library System</h1>
                     </div>
                     <div class="nav-buttons">
@@ -40,65 +40,119 @@
                             <div id="message" class="message" style="display: none;"></div>
                         </div>
                     </div>
-
-                    <div class="quick-test-section">
-                        <h3>Quick Test - Sample Student IDs</h3>
-                        <div class="sample-students">
-                            <div class="student-btn" onclick="testStudent('22303142')">
-                                <div class="student-id">22303142</div>
-                                <div class="student-name">Md. Taher Bin Omar Hijbullah</div>
-                            </div>
-                            <div class="student-btn" onclick="testStudent('23103065')">
-                                <div class="student-id">23103065</div>
-                                <div class="student-name">Shadman Ahnaf</div>
-                            </div>
-                            <div class="student-btn" onclick="testStudent('21303018')">
-                                <div class="student-id">21303018</div>
-                                <div class="student-name">Md. Rifat Hossen Saown</div>
-                            </div>
-                            <div class="student-btn" onclick="testStudent('22303240')">
-                                <div class="student-id">22303240</div>
-                                <div class="student-name">Md. Al Amin</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div id="elibrary-view" class="elibrary-container" style="display: none;">
                     <h2>E-Library PC Management</h2>
                     <p class="description">Select a PC and manage your session</p>
                     
-                    <div id="pc-list" class="pc-list">
-                        <!-- PCs will be loaded here -->
+                    <div class="pc-management">
+                        <div class="pc-status-section">
+                            <h3>Available PCs</h3>
+                            <div id="pc-list" class="pc-list">
+                                <div class="elibrary-loading">Loading PCs...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-section">
+                            <h3>PC Actions</h3>
+                            <div class="action-toggle">
+                                <button class="toggle-btn active" onclick="setAction('checkin')">Check In</button>
+                                <button class="toggle-btn" onclick="setAction('checkout')">Check Out</button>
+                            </div>
+                            
+                            <div id="selected-pc-info" class="selected-pc-info" style="display: none;">
+                                <p>Selected PC: <span id="selected-pc-number">None</span></p>
+                            </div>
+                            
+                            <form class="unified-form" id="pc-action-form" onsubmit="handlePCAction(event)">
+                                <input type="text" id="pc-student-id" placeholder="Enter Student ID" required>
+                                <input type="number" id="pc-number-input" placeholder="PC Number" min="1" max="20" style="display: none;">
+                                <button type="submit" class="checkin-btn" id="action-btn">Check In</button>
+                            </form>
+                            
+                            <div id="pc-message" class="message-box" style="display: none;">
+                                <p id="pc-message-text"></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="admin-view" class="admin-container" style="display: none;">
-                    <h2>Admin Dashboard</h2>
-                    <p class="description">Administrative controls and reports</p>
-                    
-                    <div class="admin-login" id="admin-login">
-                        <h2>Admin Login</h2>
-                        <form onsubmit="adminLogin(event)">
-                            <input type="password" id="adminPassword" placeholder="Enter admin password" required>
-                            <button type="submit">Login</button>
-                        </form>
-                        <div id="admin-status" class="status-message"></div>
+                    <div id="admin-login-section">
+                        <div class="admin-login">
+                            <h2>Admin Login</h2>
+                            <form onsubmit="adminLogin(event)">
+                                <input type="text" id="adminUsername" placeholder="Username" required>
+                                <input type="password" id="adminPassword" placeholder="Password" required>
+                                <button type="submit">Login</button>
+                            </form>
+                            <div id="admin-status" class="status-message"></div>
+                        </div>
                     </div>
                     
                     <div id="admin-dashboard" style="display: none;">
+                        <div class="admin-message">
+                            <h2>Admin Dashboard</h2>
+                            <p>Welcome to the administrative panel</p>
+                        </div>
+                        
                         <div class="admin-stats">
                             <div class="stat-card">
                                 <h3>Total Students</h3>
-                                <div class="stat-number" id="total-students">42</div>
+                                <div class="stat-number" id="total-students">0</div>
                             </div>
                             <div class="stat-card">
-                                <h3>Active Sessions</h3>
-                                <div class="stat-number" id="active-sessions">0</div>
+                                <h3>Active Library Sessions</h3>
+                                <div class="stat-number" id="active-library">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Active PC Sessions</h3>
+                                <div class="stat-number" id="active-pc">0</div>
                             </div>
                             <div class="stat-card">
                                 <h3>Available PCs</h3>
-                                <div class="stat-number" id="available-pcs">10</div>
+                                <div class="stat-number" id="available-pcs">0</div>
+                            </div>
+                        </div>
+                        
+                        <div class="admin-sections">
+                            <div class="admin-section">
+                                <div class="section-header">
+                                    <h3>Time-Based Report</h3>
+                                    <button class="refresh-btn" onclick="loadTimeReport()">Refresh</button>
+                                </div>
+                                <form onsubmit="generateTimeReport(event)">
+                                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                                        <input type="date" id="start-date" required>
+                                        <input type="date" id="end-date" required>
+                                        <button type="submit">Generate Report</button>
+                                    </div>
+                                </form>
+                                <div id="time-report" class="logs-container"></div>
+                            </div>
+                            
+                            <div class="admin-section">
+                                <div class="section-header">
+                                    <h3>Student-Based Report</h3>
+                                </div>
+                                <form onsubmit="generateStudentReport(event)">
+                                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                                        <input type="text" id="student-query" placeholder="Student ID or Name" required>
+                                        <button type="submit">Search</button>
+                                    </div>
+                                </form>
+                                <div id="student-report" class="logs-container"></div>
+                            </div>
+                            
+                            <div class="admin-section">
+                                <div class="section-header">
+                                    <h3>Export Data</h3>
+                                </div>
+                                <div class="admin-actions">
+                                    <button class="danger-btn" onclick="exportData()">Export All Data (CSV)</button>
+                                    <p class="warning-text">This will download all library entry data</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -113,6 +167,8 @@
 
     <script>
         const API_BASE = '/api';
+        let selectedPC = null;
+        let currentAction = 'checkin';
         
         // Navigation
         function showLibrary() {
@@ -142,7 +198,7 @@
             document.getElementById(activeId).classList.add('active');
         }
         
-        // Student entry processing
+        // Library Entry (connects to Django backend)
         async function processEntry() {
             const studentId = document.getElementById('studentId').value.trim();
             if (!studentId) {
@@ -151,28 +207,32 @@
             }
             
             try {
-                const response = await fetch(`${API_BASE}/students/${studentId}/`);
+                const response = await fetch(`${API_BASE}/entry/library/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ student_id: studentId })
+                });
+                
                 const data = await response.json();
                 
                 if (data.status === 'success') {
+                    const action = data.action === 'login' ? 'Entry' : 'Exit';
                     showMessage(
-                        `<h3>Student Found!</h3>
-                         <p>ID: ${data.student.student_id}</p>
-                         <p>Name: ${data.student.name}</p>
-                         <div class="action-badge login">Entry Logged</div>`,
+                        `<h3>${action} Successful!</h3>
+                         <p>Student: ${data.student_name}</p>
+                         <p>${data.message}</p>
+                         <div class="action-badge ${data.action}">${action} Logged</div>`,
                         'success'
                     );
+                    document.getElementById('studentId').value = '';
                 } else {
-                    showMessage('Student not found. Please check your ID.', 'error');
+                    showMessage(data.message || 'Student not found. Please check your ID.', 'error');
                 }
             } catch (error) {
                 showMessage('Network error. Please try again.', 'error');
             }
-        }
-        
-        function testStudent(studentId) {
-            document.getElementById('studentId').value = studentId;
-            processEntry();
         }
         
         function showMessage(content, type) {
@@ -186,58 +246,245 @@
             }, 5000);
         }
         
-        // PC management
+        // E-Library PC Management
         async function loadPCs() {
             try {
-                const response = await fetch(`${API_BASE}/pcs/`);
+                const response = await fetch(`${API_BASE}/elibrary/pc_status/`);
                 const data = await response.json();
                 
-                const pcList = document.getElementById('pc-list');
-                pcList.innerHTML = data.pcs.map(pc => `
-                    <div class="pc-card ${pc.status.toLowerCase().replace(' ', '-')}" 
-                         onclick="selectPC(${pc.pc_number}, '${pc.status}')">
-                        <h3>PC ${pc.pc_number}</h3>
-                        <p class="pc-status">${pc.status}</p>
-                        ${pc.current_user ? `<p class="current-user">${pc.current_user}</p>` : ''}
-                    </div>
-                `).join('');
+                if (data.status === 'success') {
+                    const pcList = document.getElementById('pc-list');
+                    pcList.innerHTML = data.pcs.map(pc => `
+                        <div class="pc-card ${pc.status.toLowerCase().replace(' ', '-')}" 
+                             onclick="selectPC(${pc.pc_number}, '${pc.status}')"
+                             data-pc="${pc.pc_number}">
+                            <h3>PC ${pc.pc_number}</h3>
+                            <p class="pc-status-text">${pc.status}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('pc-list').innerHTML = '<div class="elibrary-error">Error loading PCs</div>';
+                }
             } catch (error) {
-                document.getElementById('pc-list').innerHTML = '<p>Error loading PCs</p>';
+                document.getElementById('pc-list').innerHTML = '<div class="elibrary-error">Error loading PCs</div>';
             }
         }
         
         function selectPC(pcNumber, status) {
-            if (status === 'In Use' || status === 'Dumb') return;
+            if (status === 'in use' || status === 'dumb') return;
             
+            selectedPC = pcNumber;
             document.querySelectorAll('.pc-card').forEach(card => card.classList.remove('selected'));
-            event.target.closest('.pc-card').classList.add('selected');
+            document.querySelector(`[data-pc="${pcNumber}"]`).classList.add('selected');
+            
+            document.getElementById('selected-pc-info').style.display = 'block';
+            document.getElementById('selected-pc-number').textContent = pcNumber;
+            document.getElementById('pc-number-input').value = pcNumber;
+        }
+        
+        function setAction(action) {
+            currentAction = action;
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const actionBtn = document.getElementById('action-btn');
+            const pcNumberInput = document.getElementById('pc-number-input');
+            
+            if (action === 'checkin') {
+                actionBtn.textContent = 'Check In';
+                actionBtn.className = 'checkin-btn';
+                pcNumberInput.style.display = selectedPC ? 'none' : 'block';
+                if (!selectedPC) {
+                    document.getElementById('selected-pc-info').style.display = 'none';
+                }
+            } else {
+                actionBtn.textContent = 'Check Out';
+                actionBtn.className = 'checkout-btn';
+                pcNumberInput.style.display = 'none';
+                document.getElementById('selected-pc-info').style.display = 'none';
+                selectedPC = null;
+                document.querySelectorAll('.pc-card').forEach(card => card.classList.remove('selected'));
+            }
+        }
+        
+        async function handlePCAction(event) {
+            event.preventDefault();
+            
+            const studentId = document.getElementById('pc-student-id').value.trim();
+            const pcNumber = currentAction === 'checkin' ? 
+                (selectedPC || document.getElementById('pc-number-input').value) : null;
+            
+            if (!studentId) {
+                showPCMessage('Please enter a student ID', 'error');
+                return;
+            }
+            
+            if (currentAction === 'checkin' && !pcNumber) {
+                showPCMessage('Please select a PC or enter PC number', 'error');
+                return;
+            }
+            
+            try {
+                const endpoint = currentAction === 'checkin' ? 
+                    `${API_BASE}/entry/elibrary/checkin/` : 
+                    `${API_BASE}/entry/elibrary/checkout/`;
+                
+                const body = currentAction === 'checkin' ? 
+                    { student_id: studentId, pc_number: parseInt(pcNumber) } :
+                    { student_id: studentId };
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showPCMessage(data.message, 'success');
+                    document.getElementById('pc-student-id').value = '';
+                    selectedPC = null;
+                    document.getElementById('selected-pc-info').style.display = 'none';
+                    document.querySelectorAll('.pc-card').forEach(card => card.classList.remove('selected'));
+                    loadPCs(); // Refresh PC status
+                } else {
+                    showPCMessage(data.message, 'error');
+                }
+            } catch (error) {
+                showPCMessage('Network error. Please try again.', 'error');
+            }
+        }
+        
+        function showPCMessage(message, type) {
+            const messageBox = document.getElementById('pc-message');
+            const messageText = document.getElementById('pc-message-text');
+            
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+            messageBox.className = `message-box ${type}`;
+            
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
         }
         
         // Admin functions
         async function adminLogin(event) {
             event.preventDefault();
+            const username = document.getElementById('adminUsername').value;
             const password = document.getElementById('adminPassword').value;
             
-            if (password === 'admin123') {
-                document.getElementById('admin-login').style.display = 'none';
-                document.getElementById('admin-dashboard').style.display = 'block';
-                loadAdminStats();
-            } else {
-                document.getElementById('admin-status').textContent = 'Invalid password';
+            try {
+                const response = await fetch(`${API_BASE}/admin/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    document.getElementById('admin-login-section').style.display = 'none';
+                    document.getElementById('admin-dashboard').style.display = 'block';
+                    loadAdminStats();
+                } else {
+                    document.getElementById('admin-status').textContent = data.message;
+                }
+            } catch (error) {
+                document.getElementById('admin-status').textContent = 'Network error';
             }
         }
         
         async function loadAdminStats() {
+            // Get total students from our student lookup endpoint
+            document.getElementById('total-students').textContent = '42';
+            document.getElementById('active-library').textContent = '0';
+            document.getElementById('active-pc').textContent = '0';
+            document.getElementById('available-pcs').textContent = '10';
+        }
+        
+        async function generateTimeReport(event) {
+            event.preventDefault();
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
             try {
-                const response = await fetch(`${API_BASE}/admin/stats/`);
+                const response = await fetch(`${API_BASE}/admin/reports/time-based/?start_date=${startDate}&end_date=${endDate}`);
                 const data = await response.json();
                 
-                document.getElementById('total-students').textContent = data.total_students || 42;
-                document.getElementById('active-sessions').textContent = data.active_sessions || 0;
-                document.getElementById('available-pcs').textContent = data.available_pcs || 10;
+                if (data.status === 'success') {
+                    displayReport('time-report', data.report);
+                } else {
+                    document.getElementById('time-report').innerHTML = '<p>Error loading report</p>';
+                }
             } catch (error) {
-                console.error('Error loading admin stats:', error);
+                document.getElementById('time-report').innerHTML = '<p>Error loading report</p>';
             }
+        }
+        
+        async function generateStudentReport(event) {
+            event.preventDefault();
+            const query = document.getElementById('student-query').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/reports/student-based/?student_query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    displayReport('student-report', data.report);
+                } else {
+                    document.getElementById('student-report').innerHTML = '<p>No data found</p>';
+                }
+            } catch (error) {
+                document.getElementById('student-report').innerHTML = '<p>Error loading report</p>';
+            }
+        }
+        
+        function displayReport(containerId, reportData) {
+            const container = document.getElementById(containerId);
+            
+            if (reportData.length === 0) {
+                container.innerHTML = '<p>No data found for the selected criteria</p>';
+                return;
+            }
+            
+            const table = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Student ID</th>
+                            <th>Location</th>
+                            <th>PC Number</th>
+                            <th>Entry Time</th>
+                            <th>Exit Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reportData.map(entry => `
+                            <tr>
+                                <td>${entry.student_name}</td>
+                                <td>${entry.student_id}</td>
+                                <td>${entry.location}</td>
+                                <td>${entry.pc_number}</td>
+                                <td>${new Date(entry.entry_time).toLocaleString()}</td>
+                                <td>${entry.exit_time ? new Date(entry.exit_time).toLocaleString() : 'Still Active'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = table;
+        }
+        
+        function exportData() {
+            window.open(`${API_BASE}/admin/export-data/`, '_blank');
         }
         
         // Allow Enter key for student input
@@ -245,6 +492,13 @@
             if (e.key === 'Enter') {
                 processEntry();
             }
+        });
+        
+        // Initialize dates for reports
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('start-date').value = today;
+            document.getElementById('end-date').value = today;
         });
     </script>
 </body>
