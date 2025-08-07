@@ -321,10 +321,8 @@ def student_lookup(request, student_id):
             return JsonResponse({
                 'status': 'success',
                 'student': {
-                    'id': student.student_id,
-                    'name': student.name,
-                    'email': student.email,
-                    'phone': student.phone
+                    'student_id': student.student_id,
+                    'name': student.name
                 }
             })
         except Student.DoesNotExist:

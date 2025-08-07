@@ -143,13 +143,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# WhiteNoise static files configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Include React build files directly
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, '../frontend/build/static'),
+]
 
-# Additional static files directories  
-STATICFILES_DIRS = []
-
-# Let's add frontend build files to the static directory manually via build script
+# Use simple static files storage for Render
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

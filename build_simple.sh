@@ -10,9 +10,4 @@ cd backend
 
 # Run Django commands
 python manage.py migrate
-
-# Setup initial data (students, PCs, etc.)
-python add_real_students.py
-
-# Collect static files (this will include React files from STATICFILES_DIRS)
 python manage.py collectstatic --noinput
