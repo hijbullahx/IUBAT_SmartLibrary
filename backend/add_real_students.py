@@ -16,7 +16,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'library_automation.settings')
 django.setup()
 
 from library.models import Student, PC, LibraryEntry, ELibraryEntry
-from django.contrib.auth.models import User
 
 def add_real_students():
     print("Adding real IUBAT student data...")
@@ -77,13 +76,16 @@ def add_real_students():
             defaults={'name': student_data['name']}
         )
         if created:
-            print(f"✅ Created student: {student.name} ({student.student_id})")
+            print(f"Created student: {student.name} ({student.student_id})")
         else:
-            print(f"📝 Student already exists: {student.name} ({student.student_id})")
+            print(f"Student already exists: {student.name} ({student.student_id})")
     
-    print(f"\n🎉 Successfully added {len(students_data)} real IUBAT students!")
-    print("\n📚 You can now test with real student IDs:")
+    print(f"\nSuccessfully processed {len(students_data)} real IUBAT students!")
+    print("\nYou can now test with real student IDs:")
     print("Examples: 21303018, 22303142, 23103065")
+
+if __name__ == '__main__':
+    add_real_students()
 
 if __name__ == '__main__':
     add_real_students()
