@@ -307,6 +307,29 @@ def api_status(request):
             'elibrary_checkout': '/api/entry/elibrary/checkout/',
             'pc_status': '/api/elibrary/pc_status/',
             'admin_login': '/api/admin/login/',
-            'admin_reports': '/api/admin/reports/time-based/'
+            'admin_reports': '/api/admin/reports/time-based/',
+            'student_lookup': '/api/students/<student_id>/'
         }
     })
+
+@csrf_exempt
+def student_lookup(request, student_id):
+    """API endpoint to look up a specific student"""
+    if request.method == 'GET':
+        try:
+            student = Student.objects.get(student_id=student_id)
+            return JsonResponse({
+                'status': 'success',
+                'student': {
+                    'id': student.student_id,
+                    'name': student.name,
+                    'email': student.email,
+                    'phone': student.phone
+                }
+            })
+        except Student.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)

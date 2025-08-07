@@ -16,4 +16,6 @@ urlpatterns = [
     path('admin/reports/student-based/', views.student_based_report, name='student_based_report'),
     # API Status
     path('status/', views.api_status, name='api_status'),
+    # Student lookup
+    path('students/<str:student_id>/', views.student_lookup, name='student_lookup'),
 ]

@@ -143,18 +143,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# WhiteNoise static files configuration
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Additional static files directories
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static_src'),  # Additional static files
-    os.path.join(BASE_DIR, '../frontend/build'),  # React build files
+    os.path.join(BASE_DIR, '../frontend/build/static'),  # React static files
 ]
-
-# For Render and other cloud deployments
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-# WhiteNoise configuration
-WHITENOISE_MAX_AGE = 31536000  # 1 year cache
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz', 'br']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -162,20 +157,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS settings for React frontend
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001", 
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-    "https://iubat-smartlibrary.onrender.com",  # Render domain
+    "https://iubat-smartlibrary.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-
-# Only allow all origins in development
-if DEBUG:
-    CORS_ALLOW_ALL_ORIGINS = True
-else:
-    CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all in development only
 
 # Security settings for production
 if not DEBUG:
