@@ -2,11 +2,15 @@
 # exit on error
 set -o errexit
 
-# Install Python dependencies
-pip install -r backend/requirements.txt
+# Build React frontend first
+echo "Building React frontend..."
+cd ../frontend
+npm ci
+npm run build
+cd ../backend
 
-# Navigate to backend directory
-cd backend
+# Install Python dependencies
+pip install -r requirements.txt
 
 # Run Django commands
 python manage.py migrate
@@ -14,7 +18,7 @@ python manage.py migrate
 # Setup initial data (students, PCs, etc.)
 python add_real_students.py
 
-# Create static directories and copy React files
+# Create static directories and copy React build files
 mkdir -p staticfiles/css staticfiles/js staticfiles/media
 
 # Copy React build files to Django static directories
