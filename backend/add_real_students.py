@@ -64,6 +64,8 @@ def add_real_students():
         {'student_id': '23103297', 'name': 'Md. Abdula Al Mamun'},
         {'student_id': '23103300', 'name': 'Md. Makhmudul Haque Shawon'},
         {'student_id': '23103406', 'name': 'FATEMA TAJ MIM'},
+        {'student_id': '22303089', 'name': 'Hasibur Rahman'},
+        {'student_id': '22303296', 'name': 'Hasibur Md.Rony Mia'},
     ]
     
     # Clear existing dummy data
