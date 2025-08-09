@@ -148,7 +148,41 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React development server
     "http://127.0.0.1:3000",  # Alternative React dev server
+    "http://localhost:3001",  # React development server (alt port)
+    "http://localhost:3002",  # React development server (alt port)
+    "http://127.0.0.1:3001",  # Alternative React dev server (alt port)
+    "http://127.0.0.1:3002",  # Alternative React dev server (alt port)
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all in development only
+
+# Additional CORS settings for browser compatibility
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Session settings for cross-origin cookies
+SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cross-origin cookies
+SESSION_COOKIE_SECURE = False     # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = False   # Allow JavaScript access to session cookies
+SESSION_COOKIE_DOMAIN = None      # Allow for localhost variations
+
+# CSRF settings for cross-origin requests
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = False        # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = False      # Allow JavaScript access to CSRF cookies
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+]

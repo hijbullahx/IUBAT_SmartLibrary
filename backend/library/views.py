@@ -233,6 +233,7 @@ def time_based_report(request):
         report_data.append({
             'student_name': entry.student.name,
             'student_id': entry.student.student_id,
+            'department': entry.student.department,  # Add department field
             'pc_number': 'N/A',
             'entry_time': entry.entry_time.isoformat(),
             'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -243,6 +244,7 @@ def time_based_report(request):
         report_data.append({
             'student_name': entry.student.name,
             'student_id': entry.student.student_id,
+            'department': entry.student.department,  # Add department field
             'pc_number': entry.pc.pc_number,
             'entry_time': entry.entry_time.isoformat(),
             'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -259,9 +261,11 @@ def student_based_report(request):
     if not student_query:
         return JsonResponse({'status': 'error', 'message': 'Student ID or Name is required.'}, status=400)
 
-    # Filter students by ID or name (case-insensitive)
+    # Filter students by ID, name, or department (case-insensitive)
     students = Student.objects.filter(
-        Q(student_id__icontains=student_query) | Q(name__icontains=student_query)
+        Q(student_id__icontains=student_query) | 
+        Q(name__icontains=student_query) |
+        Q(department__icontains=student_query)  # Add department search
     )
 
     report_data = []
@@ -274,6 +278,7 @@ def student_based_report(request):
             report_data.append({
                 'student_name': entry.student.name,
                 'student_id': entry.student.student_id,
+                'department': entry.student.department,  # Add department field
                 'pc_number': 'N/A',
                 'entry_time': entry.entry_time.isoformat(),
                 'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -284,6 +289,7 @@ def student_based_report(request):
             report_data.append({
                 'student_name': entry.student.name,
                 'student_id': entry.student.student_id,
+                'department': entry.student.department,  # Add department field
                 'pc_number': entry.pc.pc_number,
                 'entry_time': entry.entry_time.isoformat(),
                 'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -294,6 +300,47 @@ def student_based_report(request):
     report_data.sort(key=lambda x: x['entry_time'])
 
     return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
+
+@csrf_exempt
+def department_statistics(request):
+    """Get department-wise library usage statistics"""
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    from django.db.models import Count
+    
+    # Get department statistics for students
+    dept_stats = Student.objects.values('department').annotate(
+        total_students=Count('id')
+    ).order_by('-total_students')
+    
+    # Get department-wise library usage
+    usage_stats = []
+    for dept in dept_stats:
+        department = dept['department']
+        
+        # Count library entries for this department
+        main_library_count = LibraryEntry.objects.filter(
+            student__department=department
+        ).count()
+        
+        elibrary_count = ELibraryEntry.objects.filter(
+            student__department=department
+        ).count()
+        
+        usage_stats.append({
+            'department': department,
+            'total_students': dept['total_students'],
+            'main_library_visits': main_library_count,
+            'elibrary_visits': elibrary_count,
+            'total_visits': main_library_count + elibrary_count
+        })
+    
+    # Sort by total visits
+    usage_stats.sort(key=lambda x: x['total_visits'], reverse=True)
+    
+    return JsonResponse({'status': 'success', 'statistics': usage_stats}, safe=False)
+
 def api_status(request):
     """Simple API status endpoint"""
     return JsonResponse({

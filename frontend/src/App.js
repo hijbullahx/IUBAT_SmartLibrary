@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import axios from 'axios';
+import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
-import ELibrary from './ELibrary';
-import AdminDashboard from './AdminDashboard';
+import ELibrary from './ELibrary.js';
+import AdminDashboard from './AdminDashboardSimple.js';
 import './App.css';
 import IubatLogo from './assets/IUBAT2.png';
 

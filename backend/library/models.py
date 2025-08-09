@@ -4,9 +4,10 @@ from django.db import models
 class Student(models.Model):
     student_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
-    # You can add more fields here later, like department, etc.
+    department = models.CharField(max_length=100, default='Unknown')  # Add department field
+    # You can add more fields here later, like email, phone, etc.
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.department}"
 # library/models.py
 
 class PC(models.Model):

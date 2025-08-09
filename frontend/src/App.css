@@ -1033,3 +1033,340 @@ body {
   background: rgba(255, 255, 255, 0.1);
   color: white;
 }
+
+/* Admin Dashboard Styles */
+.admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.admin-dashboard {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.dashboard-header h2 {
+  color: #333;
+  margin: 0;
+}
+
+.logout-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  background: #dc3545;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #c82333;
+}
+
+.loading {
+  text-align: center;
+  padding: 1rem;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.message {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 5px;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+.message.warning {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffeaa7;
+}
+
+.message.info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border-color: #bee5eb;
+}
+
+/* Statistics Section */
+.stats-section {
+  margin-bottom: 2rem;
+}
+
+.stats-section h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.available {
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.stat-card.in-use {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.stat-card.dumb {
+  background: linear-gradient(135deg, #dc3545, #e83e8c);
+}
+
+.stat-card h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: white; /* Ensure white text on colored stat cards */
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white; /* Ensure white text for numbers on colored stat cards */
+}
+
+/* PC Status Section */
+.pc-status-section {
+  margin-bottom: 2rem;
+}
+
+.pc-status-section h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.pc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.pc-card {
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  color: #495057; /* Dark text for readability */
+}
+
+.pc-card.available {
+  background: #d4edda;
+  border-color: #28a745;
+  color: #155724; /* Dark green text for better contrast */
+}
+
+.pc-card.in-use {
+  background: #fff3cd;
+  border-color: #ffc107;
+  color: #856404; /* Dark yellow/brown text for better contrast */
+}
+
+.pc-card.dumb {
+  background: #f8d7da;
+  border-color: #dc3545;
+  color: #721c24; /* Dark red text for better contrast */
+}
+
+.pc-number {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: inherit; /* Inherit color from parent .pc-card */
+}
+
+.pc-status {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: inherit; /* Inherit color from parent .pc-card for proper contrast */
+}
+
+/* Reports Section */
+.reports-section {
+  margin-top: 2rem;
+}
+
+.reports-section h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.report-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #dee2e6;
+  color: #212529; /* Ensure dark text for readability */
+}
+
+.report-card h4 {
+  color: #495057;
+  margin-bottom: 1rem;
+}
+
+.report-card p {
+  color: #6c757d;
+  margin: 0.5rem 0;
+}
+
+.report-card .message {
+  color: #495057;
+  background: #e9ecef;
+  padding: 0.75rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
+
+.report-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.report-controls input {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: #495057; /* Dark text for input fields */
+  background: white; /* Ensure white background */
+}
+
+.report-controls input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
+.report-controls input::placeholder {
+  color: #6c757d; /* Gray placeholder text */
+}
+
+.report-controls button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  background: #667eea;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.report-controls button:hover:not(:disabled) {
+  background: #5a6fd8;
+}
+
+.report-controls button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.report-table {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.report-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.report-table th,
+.report-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+  color: #212529; /* Ensure dark text for readability */
+}
+
+.report-table th {
+  background: #667eea;
+  color: white;
+  font-weight: 600;
+}
+
+.report-table td {
+  color: #495057; /* Dark gray text for table data */
+  background: white; /* Ensure white background for table cells */
+}
+
+.report-table tr:hover {
+  background: #f8f9fa;
+}
+
+.report-table tr:hover td {
+  color: #212529; /* Ensure text is visible on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pc-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .report-controls {
+    flex-direction: column;
+  }
+  
+  .report-table {
+    font-size: 0.8rem;
+  }
+}
