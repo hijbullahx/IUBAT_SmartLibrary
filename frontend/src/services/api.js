@@ -13,4 +13,6 @@ export const endpoints = {
   ELIBRARY_CHECKIN: '/api/entry/elibrary/checkin/',
   ELIBRARY_CHECKOUT: '/api/entry/elibrary/checkout/',
   ADMIN_LOGIN: '/api/admin/login/',
+  ACTIVATE_PC: '/api/elibrary/pc/activate/',
+  DEACTIVATE_PC: '/api/elibrary/pc/deactivate/',
 };

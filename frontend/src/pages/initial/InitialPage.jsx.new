@@ -1,0 +1,21 @@
+import ScannerBox from '../../components/scanner/ScannerBox';
+import './InitialPage.css';
+
+const InitialPage = () => {
+  return (
+    <div className="initial-page">
+      <div className="initial-content">
+        <div className="header">
+          <h1>Smart Library</h1>
+          <p>Welcome to the Digital Library Management System</p>
+        </div>
+        <div className="scanner-grid">
+          <ScannerBox mode="entry" title="Entry Scanner" />
+          <ScannerBox mode="exit" title="Exit Scanner" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InitialPage;

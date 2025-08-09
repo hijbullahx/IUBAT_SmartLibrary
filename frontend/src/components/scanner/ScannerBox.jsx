@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, endpoints } from '../../services/api';
 import './ScannerBox.css';
 
-const ScannerBox = ({ type = 'entry' }) => {
+const ScannerBox = ({ mode = 'entry', title }) => {
   const [studentId, setStudentId] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -13,7 +13,7 @@ const ScannerBox = ({ type = 'entry' }) => {
     try {
       const response = await api.post(endpoints.LIBRARY_ENTRY, { student_id: studentId });
       if (response.data.status === 'success') {
-        if (type === 'entry') {
+        if (mode === 'entry') {
           navigate('/default', { state: { studentData: response.data } });
         } else {
           setMessage(response.data.message);
@@ -27,12 +27,11 @@ const ScannerBox = ({ type = 'entry' }) => {
   return (
     <div className="scanner-box">
       <div className="scan-area">
+        <h2>{title}</h2>
         <div className="scan-frame">
-          {/* Scanner UI */}
           <div className="scan-lines"></div>
         </div>
-        <h2>Please !!!</h2>
-        <h3>Scan Your ID Card</h3>
+        <h3>Please Scan Your ID Card</h3>
         
         <form onSubmit={handleSubmit}>
           <input
