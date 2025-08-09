@@ -1,5 +1,5 @@
-// API Configuration - Updated
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://iubat-smartlibrary.onrender.com';
+// API Configuration - Development
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
 
 export const API_ENDPOINTS = {
   // Admin endpoints
