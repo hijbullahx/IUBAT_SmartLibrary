@@ -57,7 +57,6 @@ def add_real_students():
         {'student_id': '23103219', 'name': 'Sheikh Tasfiq Hasan Midul'},
         {'student_id': '23103239', 'name': 'Hasina Parvin Toma'},
         {'student_id': '23103255', 'name': 'Raian Siddique'},
-        {'student_id': '23103268', 'name': 'Fardin Kabir Ruhan'},
         {'student_id': '23103281', 'name': 'Md. Abdul Gaffar'},
         {'student_id': '23103286', 'name': 'Tasfia Islam Prapty'},
         {'student_id': '23103289', 'name': 'Arobi Islam Borsha'},
