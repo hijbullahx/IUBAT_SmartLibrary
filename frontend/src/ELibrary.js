@@ -12,7 +12,11 @@ function ELibrary({ scannedStudent }) {
 
   useEffect(() => {
     loadPCs();
-  }, []);
+    // Auto-fill student ID from scanned student
+    if (scannedStudent) {
+      setStudentId(scannedStudent.student_id);
+    }
+  }, [scannedStudent]);
 
   const loadPCs = async () => {
     try {
@@ -34,8 +38,8 @@ function ELibrary({ scannedStudent }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!studentId) {
-      setMessage('Please enter a student ID');
+    if (!scannedStudent) {
+      setMessage('No student information available');
       return;
     }
     if (!selectedPc) {
@@ -46,12 +50,11 @@ function ELibrary({ scannedStudent }) {
     try {
       const endpoint = isCheckingIn ? API_ENDPOINTS.ELIBRARY_CHECKIN : API_ENDPOINTS.ELIBRARY_CHECKOUT;
       const response = await axios.post(endpoint, {
-        student_id: studentId,
+        student_id: scannedStudent.student_id,
         pc_number: selectedPc.pc_number
       });
       
       setMessage(response.data.message);
-      setStudentId('');
       setSelectedPc(null);
       loadPCs(); // Refresh PC status
     } catch (error) {
@@ -122,13 +125,9 @@ function ELibrary({ scannedStudent }) {
           </div>
 
           <form onSubmit={handleSubmit} className="unified-form">
-            <input
-              type="text"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              placeholder={scannedStudent ? scannedStudent.student_id : "Enter Student ID"}
-              required
-            />
+            <div className="current-student-info">
+              <span>Current Student: <strong>{scannedStudent ? `${scannedStudent.name} (${scannedStudent.student_id})` : 'No student selected'}</strong></span>
+            </div>
             
             {selectedPc && (
               <div className="selected-pc-info">
@@ -139,7 +138,7 @@ function ELibrary({ scannedStudent }) {
             <button
               type="submit"
               className={isCheckingIn ? 'checkin-btn' : 'checkout-btn'}
-              disabled={!selectedPc}
+              disabled={!selectedPc || !scannedStudent}
             >
               {isCheckingIn ? 'Check In to PC' : 'Check Out from PC'}
             </button>

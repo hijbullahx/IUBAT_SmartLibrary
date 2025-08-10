@@ -94,19 +94,15 @@ function App() {
     }
   };
 
-  const resetForNextStudent = () => {
-    setStudentId('');
-    setMessage('');
-    setStudentName('');
-    setStudentDepartment('');
-    setScannedStudent(null);
-    setShowElibrary(false);
-    setLastAction('');
-  };
-
   const handleNavigate = (view) => {
     if (view === 'main') {
-      resetForNextStudent();
+      setStudentId('');
+      setMessage('');
+      setStudentName('');
+      setStudentDepartment('');
+      setScannedStudent(null);
+      setShowElibrary(false);
+      setLastAction('');
     } else if (view === 'admin') {
       setShowElibrary(false);
       setShowAdmin(true);
@@ -161,9 +157,18 @@ function App() {
                     </div>
                   )}
                 </div>
-                <button className="new-student-btn" onClick={resetForNextStudent}>
-                  New Student
-                </button>
+                <div className="scan-for-next">
+                  <form onSubmit={handleStudentScan} className="next-scan-form">
+                    <input
+                      type="text"
+                      value={studentId}
+                      onChange={(e) => setStudentId(e.target.value)}
+                      placeholder="Scan next student ID..."
+                      className="next-student-input"
+                      autoComplete="off"
+                    />
+                  </form>
+                </div>
               </div>
             </div>
             <ELibrary scannedStudent={scannedStudent} />

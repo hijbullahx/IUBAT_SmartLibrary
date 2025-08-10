@@ -1505,6 +1505,54 @@ body {
   transform: translateY(-2px);
 }
 
+/* Next Student Scanning Interface */
+.scan-for-next {
+  display: flex;
+  align-items: center;
+}
+
+.next-scan-form {
+  margin: 0;
+}
+
+.next-student-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1em;
+  color: #2c3e50;
+  width: 300px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.next-student-input:focus {
+  background: white;
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.next-student-input::placeholder {
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* Current Student Info in E-Library */
+.current-student-info {
+  background: #ecf0f1;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.1em;
+  color: #2c3e50;
+}
+
+.current-student-info strong {
+  color: #27ae60;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .student-info-bar {
