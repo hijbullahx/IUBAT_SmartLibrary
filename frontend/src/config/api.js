@@ -1,19 +1,24 @@
-// API Configuration - Updated
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://iubat-smartlibrary.onrender.com';
-
+// API Configuration - Development
+// Note: These are relative URLs since axios instance has baseURL configured
 export const API_ENDPOINTS = {
   // Admin endpoints
-  ADMIN_LOGIN: `${API_BASE_URL}/api/admin/login/`,
-  ADMIN_REPORTS_TIME: `${API_BASE_URL}/api/admin/reports/time-based/`,
-  ADMIN_REPORTS_STUDENT: `${API_BASE_URL}/api/admin/reports/student-based/`,
+  ADMIN_LOGIN: '/api/admin/login/',
+  ADMIN_REPORTS_TIME: '/api/admin/reports/time-based/',
+  ADMIN_REPORTS_STUDENT: '/api/admin/reports/student-based/',
+  ADMIN_REPORTS_DEPT_STATS: '/api/admin/reports/department-stats/',
   
   // Library endpoints
-  LIBRARY_ENTRY: `${API_BASE_URL}/api/entry/library/`,
+  LIBRARY_ENTRY: '/api/entry/library/',
   
   // E-Library endpoints
-  ELIBRARY_PC_STATUS: `${API_BASE_URL}/api/elibrary/pc_status/`,
-  ELIBRARY_CHECKIN: `${API_BASE_URL}/api/entry/elibrary/checkin/`,
-  ELIBRARY_CHECKOUT: `${API_BASE_URL}/api/entry/elibrary/checkout/`,
+  ELIBRARY_PC_STATUS: '/api/elibrary/pc_status/',
+  ELIBRARY_CHECKIN: '/api/entry/elibrary/checkin/',
+  ELIBRARY_CHECKOUT: '/api/entry/elibrary/checkout/',
+  
+  // Student endpoints
+  STUDENTS: '/api/students/',
 };
 
+// For backward compatibility
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
 export default API_BASE_URL;

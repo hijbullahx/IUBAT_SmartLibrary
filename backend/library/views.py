@@ -1,6 +1,5 @@
 # library/views.py
 
-from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Student, LibraryEntry, ELibraryEntry, PC
 from django.views.decorators.csrf import csrf_exempt
@@ -57,18 +56,37 @@ def library_entry_exit(request):
 def pc_status(request):
     if request.method == 'GET':
         all_pcs = PC.objects.all().order_by('pc_number')
-        pcs_in_use = ELibraryEntry.objects.filter(exit_time__isnull=True).values_list('pc__pc_number', flat=True)
+        pcs_in_use = ELibraryEntry.objects.filter(exit_time__isnull=True).select_related('student', 'pc')
 
         pc_list = []
         for pc in all_pcs:
-            status = "in use" if pc.pc_number in pcs_in_use else "available"
+            # Find if this PC is currently in use
+            current_entry = pcs_in_use.filter(pc=pc).first()
+            
+            if current_entry:
+                status = "in-use"
+                current_user = current_entry.student.student_id
+                current_user_name = current_entry.student.name
+            else:
+                status = "available"
+                current_user = None
+                current_user_name = None
+            
             if pc.is_dumb:
                 status = "dumb"
 
-            pc_list.append({
+            pc_data = {
                 'pc_number': pc.pc_number,
                 'status': status,
-            })
+                'is_dumb': pc.is_dumb,
+            }
+            
+            # Only add user info if PC is in use
+            if current_user:
+                pc_data['current_user'] = current_user
+                pc_data['current_user_name'] = current_user_name
+                
+            pc_list.append(pc_data)
         
         return JsonResponse({'status': 'success', 'pcs': pc_list})
 
@@ -234,6 +252,7 @@ def time_based_report(request):
         report_data.append({
             'student_name': entry.student.name,
             'student_id': entry.student.student_id,
+            'department': entry.student.department,  # Add department field
             'pc_number': 'N/A',
             'entry_time': entry.entry_time.isoformat(),
             'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -244,6 +263,7 @@ def time_based_report(request):
         report_data.append({
             'student_name': entry.student.name,
             'student_id': entry.student.student_id,
+            'department': entry.student.department,  # Add department field
             'pc_number': entry.pc.pc_number,
             'entry_time': entry.entry_time.isoformat(),
             'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -260,9 +280,11 @@ def student_based_report(request):
     if not student_query:
         return JsonResponse({'status': 'error', 'message': 'Student ID or Name is required.'}, status=400)
 
-    # Filter students by ID or name (case-insensitive)
+    # Filter students by ID, name, or department (case-insensitive)
     students = Student.objects.filter(
-        Q(student_id__icontains=student_query) | Q(name__icontains=student_query)
+        Q(student_id__icontains=student_query) | 
+        Q(name__icontains=student_query) |
+        Q(department__icontains=student_query)  # Add department search
     )
 
     report_data = []
@@ -275,6 +297,7 @@ def student_based_report(request):
             report_data.append({
                 'student_name': entry.student.name,
                 'student_id': entry.student.student_id,
+                'department': entry.student.department,  # Add department field
                 'pc_number': 'N/A',
                 'entry_time': entry.entry_time.isoformat(),
                 'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -285,6 +308,7 @@ def student_based_report(request):
             report_data.append({
                 'student_name': entry.student.name,
                 'student_id': entry.student.student_id,
+                'department': entry.student.department,  # Add department field
                 'pc_number': entry.pc.pc_number,
                 'entry_time': entry.entry_time.isoformat(),
                 'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
@@ -295,6 +319,47 @@ def student_based_report(request):
     report_data.sort(key=lambda x: x['entry_time'])
 
     return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
+
+@csrf_exempt
+def department_statistics(request):
+    """Get department-wise library usage statistics"""
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    from django.db.models import Count
+    
+    # Get department statistics for students
+    dept_stats = Student.objects.values('department').annotate(
+        total_students=Count('id')
+    ).order_by('-total_students')
+    
+    # Get department-wise library usage
+    usage_stats = []
+    for dept in dept_stats:
+        department = dept['department']
+        
+        # Count library entries for this department
+        main_library_count = LibraryEntry.objects.filter(
+            student__department=department
+        ).count()
+        
+        elibrary_count = ELibraryEntry.objects.filter(
+            student__department=department
+        ).count()
+        
+        usage_stats.append({
+            'department': department,
+            'total_students': dept['total_students'],
+            'main_library_visits': main_library_count,
+            'elibrary_visits': elibrary_count,
+            'total_visits': main_library_count + elibrary_count
+        })
+    
+    # Sort by total visits
+    usage_stats.sort(key=lambda x: x['total_visits'], reverse=True)
+    
+    return JsonResponse({'status': 'success', 'statistics': usage_stats}, safe=False)
+
 def api_status(request):
     """Simple API status endpoint"""
     return JsonResponse({
@@ -322,7 +387,8 @@ def student_lookup(request, student_id):
                 'status': 'success',
                 'student': {
                     'student_id': student.student_id,
-                    'name': student.name
+                    'name': student.name,
+                    'department': student.department
                 }
             })
         except Student.DoesNotExist:

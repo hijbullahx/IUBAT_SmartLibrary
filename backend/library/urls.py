@@ -14,6 +14,7 @@ urlpatterns = [
     path('admin/logout/', views.admin_logout, name='admin_logout'),
     path('admin/reports/time-based/', views.time_based_report, name='time_based_report'),
     path('admin/reports/student-based/', views.student_based_report, name='student_based_report'),
+    path('admin/reports/department-stats/', views.department_statistics, name='department_statistics'),
     # API Status
     path('status/', views.api_status, name='api_status'),
     # Student lookup
