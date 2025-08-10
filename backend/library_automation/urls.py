@@ -62,14 +62,30 @@ class ReactAppView(TemplateView):
             traceback.print_exc()
             return api_root(request)
 
+def debug_info(request):
+    """Debug endpoint to check system state"""
+    import os
+    return JsonResponse({
+        'message': 'Debug Info',
+        'base_dir': settings.BASE_DIR,
+        'static_root': settings.STATIC_ROOT,
+        'static_url': settings.STATIC_URL,
+        'debug': settings.DEBUG,
+        'files_in_static_root': os.listdir(settings.STATIC_ROOT) if os.path.exists(settings.STATIC_ROOT) else 'Not found',
+        'files_in_static_js': os.listdir(os.path.join(settings.STATIC_ROOT, 'static', 'js')) if os.path.exists(os.path.join(settings.STATIC_ROOT, 'static', 'js')) else 'Not found',
+        'index_html_exists': os.path.exists(os.path.join(settings.STATIC_ROOT, 'index.html')),
+        'index_html_size': os.path.getsize(os.path.join(settings.STATIC_ROOT, 'index.html')) if os.path.exists(os.path.join(settings.STATIC_ROOT, 'index.html')) else 'Not found',
+    })
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('library.urls')),
     path('api-info/', api_root, name='api_root'),  # API info moved to /api-info/
+    path('debug-info/', debug_info, name='debug_info'),  # Debug endpoint
     path('test-react/', ReactAppView.as_view(), name='test_react'),  # Test endpoint
     
     # React App - catch all other routes except API and admin
-    re_path(r'^(?!api/|admin/).*$', ReactAppView.as_view(), name='react_app'),
+    re_path(r'^(?!api/|admin/|debug-info/).*$', ReactAppView.as_view(), name='react_app'),
 ]
 
 # Serve static files
