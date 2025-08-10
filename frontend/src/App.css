@@ -1370,3 +1370,473 @@ body {
     font-size: 0.8rem;
   }
 }
+
+/* Welcome Screen Styles */
+.scan-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  margin: 20px;
+}
+
+.scan-container {
+  text-align: center;
+  background: white;
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.barcode-icon {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.scan-title {
+  font-size: 3em;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.scan-subtitle {
+  font-size: 2em;
+  color: #34495e;
+  margin-bottom: 40px;
+  font-weight: 500;
+}
+
+/* Library Selection Interface */
+.library-selection {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.student-welcome-card {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+  padding: 40px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(39, 174, 96, 0.2);
+}
+
+.student-welcome-card h2 {
+  font-size: 2.5em;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+.student-info {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 25px;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  display: inline-block;
+  min-width: 300px;
+}
+
+.student-info h3 {
+  font-size: 1.8em;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.student-info p {
+  font-size: 1.2em;
+  margin: 8px 0;
+  opacity: 0.95;
+}
+
+.service-selection {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.service-selection h3 {
+  font-size: 2.2em;
+  color: #2c3e50;
+  margin-bottom: 40px;
+  font-weight: 600;
+}
+
+.service-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.service-btn {
+  background: white;
+  border: 3px solid #ecf0f1;
+  border-radius: 20px;
+  padding: 50px 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.service-btn:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.main-library-btn {
+  border-color: #3498db;
+}
+
+.main-library-btn:hover {
+  border-color: #2980b9;
+  background: linear-gradient(135deg, #ffffff, #f8fcff);
+}
+
+.elibrary-btn {
+  border-color: #9b59b6;
+}
+
+.elibrary-btn:hover {
+  border-color: #8e44ad;
+  background: linear-gradient(135deg, #ffffff, #faf8ff);
+}
+
+.service-icon {
+  font-size: 4em;
+  margin-bottom: 20px;
+}
+
+.service-btn h4 {
+  font-size: 1.8em;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.service-btn p {
+  font-size: 1.1em;
+  color: #7f8c8d;
+  line-height: 1.5;
+}
+
+/* E-Library Section */
+.elibrary-section {
+  padding: 20px;
+}
+
+.elibrary-header {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+  padding: 25px 40px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.elibrary-header h2 {
+  font-size: 2.2em;
+  margin: 0;
+  font-weight: 600;
+}
+
+.student-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px 25px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.student-info-bar span {
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .service-buttons {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  
+  .service-btn {
+    padding: 40px 25px;
+  }
+  
+  .elibrary-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .student-info-bar {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .scan-container {
+    margin: 20px;
+    padding: 40px 30px;
+  }
+  
+  .scan-title {
+    font-size: 2.5em;
+  }
+  
+  .scan-subtitle {
+    font-size: 1.8em;
+  }
+}
+
+.scan-form {
+  margin-top: 30px;
+}
+
+.student-input-large {
+  width: 100%;
+  padding: 20px;
+  font-size: 1.3em;
+  border: 3px solid #3498db;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.student-input-large:focus {
+  border-color: #2980b9;
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+}
+
+.scan-btn {
+  background: linear-gradient(45deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  padding: 20px 40px;
+  font-size: 1.2em;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  width: 100%;
+}
+
+.scan-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+/* Student Info Header in E-Library */
+.student-info-header {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 25px rgba(39, 174, 96, 0.2);
+}
+
+.student-card h2 {
+  margin-bottom: 20px;
+  font-size: 2.2em;
+  text-align: center;
+}
+
+.student-details {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.student-details h3 {
+  margin-bottom: 15px;
+  font-size: 1.4em;
+}
+
+.student-details p {
+  margin: 10px 0;
+  font-size: 1.1em;
+}
+
+/* Enhanced PC Cards with Visual Representation */
+.pc-visual {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.monitor {
+  width: 60px;
+  height: 40px;
+  border: 3px solid #34495e;
+  border-radius: 5px;
+  position: relative;
+  background: #2c3e50;
+}
+
+.monitor.available {
+  background: #27ae60;
+  border-color: #2ecc71;
+  box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
+}
+
+.monitor.in-use {
+  background: #e74c3c;
+  border-color: #c0392b;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+}
+
+.monitor.offline {
+  background: #7f8c8d;
+  border-color: #95a5a6;
+}
+
+.cpu {
+  width: 25px;
+  height: 35px;
+  background: #34495e;
+  border-radius: 3px;
+  border: 2px solid #2c3e50;
+}
+
+/* Enhanced PC Card hover effects */
+.pc-card.available:hover {
+  border-color: #2ecc71;
+  box-shadow: 0 10px 30px rgba(39, 174, 96, 0.2);
+  transform: translateY(-5px);
+}
+
+.pc-card.selected {
+  border-color: #3498db;
+  background: linear-gradient(135deg, #ffffff, #f8fcff);
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+}
+
+/* Action Section Enhancements */
+.action-section {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.action-section h3 {
+  color: #2c3e50;
+  font-size: 1.6em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Form Enhancements */
+.unified-form input {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.1em;
+  border: 2px solid #bdc3c7;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.unified-form input:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+}
+
+.checkin-btn, .checkout-btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.checkin-btn {
+  background: linear-gradient(45deg, #27ae60, #2ecc71);
+  color: white;
+}
+
+.checkout-btn {
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+.checkin-btn:hover, .checkout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.checkin-btn:disabled, .checkout-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.selected-pc-info {
+  background: #ecf0f1;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Welcome Screen Responsive Design */
+@media (max-width: 768px) {
+  .welcome-container {
+    margin: 20px;
+    padding: 40px 30px;
+  }
+  
+  .welcome-title {
+    font-size: 2.5em;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1.8em;
+  }
+  
+  .student-info-header {
+    padding: 20px;
+  }
+}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
 
-function ELibrary() {
+function ELibrary({ scannedStudent }) {
   const [pcs, setPcs] = useState([]);
   const [selectedPc, setSelectedPc] = useState(null);
   const [studentId, setStudentId] = useState('');
@@ -76,12 +76,9 @@ function ELibrary() {
 
   return (
     <div className="elibrary-container">
-      <h2>E-Library PC Management</h2>
-      <p className="description">Select a PC and manage your session</p>
-      
       <div className="pc-management">
         <div className="pc-status-section">
-          <h3>PC Status Grid</h3>
+          <h3>Computer Lab Status</h3>
           <div className="pc-list">
             {pcs.map(pc => (
               <div
@@ -95,13 +92,17 @@ function ELibrary() {
                    pc.status === 'in-use' ? `In Use${pc.current_user ? ` by ${pc.current_user}` : ''}` : 
                    'Available'}
                 </p>
+                <div className="pc-visual">
+                  <div className={`monitor ${pc.is_dumb ? 'offline' : pc.status}`}></div>
+                  <div className="cpu"></div>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         <div className="action-section">
-          <h3>PC Action</h3>
+          <h3>PC Management</h3>
           
           <div className="action-toggle">
             <button
@@ -125,7 +126,7 @@ function ELibrary() {
               type="text"
               value={studentId}
               onChange={(e) => setStudentId(e.target.value)}
-              placeholder="Enter Student ID"
+              placeholder={scannedStudent ? scannedStudent.student_id : "Enter Student ID"}
               required
             />
             

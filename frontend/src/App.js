@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
 import ELibrary from './ELibrary.js';
@@ -10,9 +10,19 @@ function App() {
   const [studentId, setStudentId] = useState('');
   const [message, setMessage] = useState('');
   const [studentName, setStudentName] = useState('');
+  const [studentDepartment, setStudentDepartment] = useState('');
   const [showElibrary, setShowElibrary] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [lastAction, setLastAction] = useState('');
+  const [scannedStudent, setScannedStudent] = useState(null);
+  const [showLibrarySection, setShowLibrarySection] = useState(false);
+
+  // Initialize student ID based on scanned student
+  useEffect(() => {
+    if (scannedStudent && showElibrary) {
+      setStudentId(scannedStudent.student_id);
+    }
+  }, [scannedStudent, showElibrary]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,12 +44,83 @@ function App() {
     }
   };
 
-  const handleNavigate = (view) => {
-    setShowElibrary(view === 'elibrary');
-    setShowAdmin(view === 'admin');
+  const handleStudentScan = async (e) => {
+    e.preventDefault();
+    if (!studentId.trim()) {
+      setMessage('Please enter a student ID');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API_ENDPOINTS.STUDENTS}${studentId}/`);
+      const student = response.data;
+      
+      setScannedStudent(student);
+      setStudentName(student.name);
+      setStudentDepartment(student.department);
+      setShowLibrarySection(true);
+      setMessage(`Welcome ${student.name}! Choose your library service.`);
+    } catch (error) {
+      setMessage('Student not found. Please check the ID and try again.');
+      setScannedStudent(null);
+      setStudentName('');
+      setStudentDepartment('');
+      setShowLibrarySection(false);
+    }
+  };
+
+  const handleMainLibraryAccess = async () => {
+    if (!scannedStudent) return;
+
+    try {
+      const response = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+        student_id: scannedStudent.student_id
+      });
+      
+      setMessage(response.data.message);
+      setLastAction(response.data.action);
+      
+      // Reset for next student after 3 seconds
+      setTimeout(() => {
+        resetForNextStudent();
+      }, 3000);
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'Error processing library entry');
+    }
+  };
+
+  const goToElibrary = () => {
+    setShowElibrary(true);
+    setShowLibrarySection(false);
+  };
+
+  const resetForNextStudent = () => {
+    setStudentId('');
     setMessage('');
     setStudentName('');
+    setStudentDepartment('');
+    setScannedStudent(null);
+    setShowLibrarySection(false);
+    setShowElibrary(false);
     setLastAction('');
+  };
+
+  const handleNavigate = (view) => {
+    if (view === 'main') {
+      resetForNextStudent();
+    } else if (view === 'elibrary') {
+      // If student is already scanned, go to e-library directly
+      if (scannedStudent) {
+        goToElibrary();
+      } else {
+        // Reset to scan screen
+        resetForNextStudent();
+      }
+    } else if (view === 'admin') {
+      setShowElibrary(false);
+      setShowLibrarySection(false);
+      setShowAdmin(true);
+    }
   };
 
   const getMessageClass = () => {
@@ -57,22 +138,22 @@ function App() {
             <img src={IubatLogo} alt="IUBAT Logo" className="iubat-logo" />
             <h1>IUBAT Smart Library</h1>
           </div>
-          <nav className="nav-buttons">
+                    <nav className="nav-menu">
             <button 
+              className={`nav-btn ${!showElibrary && !showAdmin ? 'active' : ''}`}
               onClick={() => handleNavigate('main')}
-              className={!showElibrary && !showAdmin ? 'active' : ''}
             >
               Main Library
             </button>
             <button 
+              className={`nav-btn ${showElibrary ? 'active' : ''}`}
               onClick={() => handleNavigate('elibrary')}
-              className={showElibrary ? 'active' : ''}
             >
               E-Library
             </button>
             <button 
+              className={`nav-btn ${showAdmin ? 'active' : ''}`}
               onClick={() => handleNavigate('admin')}
-              className={showAdmin ? 'active' : ''}
             >
               Admin
             </button>
@@ -81,52 +162,111 @@ function App() {
       </header>
 
       <main className="main-content">
-        {!showElibrary && !showAdmin ? (
-          <div className="main-library">
-            <div className="entry-section">
-              <h2>Main Library Entry/Exit System</h2>
-              <p className="description">
-                Scan your student ID barcode or enter manually to check in/out of the main library
-              </p>
+        {showLibrarySection ? (
+          <div className="library-selection">
+            <div className="student-welcome-card">
+              <h2>Welcome to IUBAT Smart Library</h2>
+              <div className="student-info">
+                <h3>{scannedStudent.name}</h3>
+                <p><strong>ID:</strong> {scannedStudent.student_id}</p>
+                <p><strong>Department:</strong> {scannedStudent.department}</p>
+              </div>
+            </div>
+            
+            <div className="service-selection">
+              <h3>Choose Your Library Service</h3>
+              <div className="service-buttons">
+                <button 
+                  className="service-btn main-library-btn"
+                  onClick={handleMainLibraryAccess}
+                >
+                  <div className="service-icon">📚</div>
+                  <h4>Main Library</h4>
+                  <p>Access the main library for books and study area</p>
+                </button>
+                
+                <button 
+                  className="service-btn elibrary-btn"
+                  onClick={goToElibrary}
+                >
+                  <div className="service-icon">💻</div>
+                  <h4>E-Library</h4>
+                  <p>Use computers for research and digital resources</p>
+                </button>
+              </div>
+            </div>
+
+            {message && (
+              <div className={getMessageClass()}>
+                <div className="message-content">
+                  <p>{message}</p>
+                  {lastAction && (
+                    <span className={`action-badge ${lastAction}`}>
+                      {lastAction === 'login' ? 'CHECKED IN' : 'CHECKED OUT'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : showElibrary ? (
+          <div className="elibrary-section">
+            <div className="elibrary-header">
+              <h2>E-Library - Computer Lab</h2>
+              <div className="student-info-bar">
+                <span><strong>{scannedStudent.name}</strong> ({scannedStudent.student_id}) - {scannedStudent.department}</span>
+                <button className="back-btn" onClick={() => setShowLibrarySection(true)}>
+                  ← Back to Services
+                </button>
+              </div>
+            </div>
+            <ELibrary scannedStudent={scannedStudent} />
+          </div>
+        ) : showAdmin ? (
+          <AdminDashboard />
+        ) : (
+          <div className="scan-screen">
+            <div className="scan-container">
+              <div className="barcode-icon">
+                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="4" width="2" height="16" fill="#2c3e50"/>
+                  <rect x="5" y="4" width="1" height="16" fill="#2c3e50"/>
+                  <rect x="7" y="4" width="2" height="16" fill="#2c3e50"/>
+                  <rect x="10" y="4" width="1" height="16" fill="#2c3e50"/>
+                  <rect x="12" y="4" width="3" height="16" fill="#2c3e50"/>
+                  <rect x="16" y="4" width="1" height="16" fill="#2c3e50"/>
+                  <rect x="18" y="4" width="2" height="16" fill="#2c3e50"/>
+                  <rect x="21" y="4" width="1" height="16" fill="#2c3e50"/>
+                </svg>
+              </div>
+              <h1 className="scan-title">Please !!!</h1>
+              <h2 className="scan-subtitle">Scan Your ID Card</h2>
               
-              <form onSubmit={handleSubmit} className="entry-form">
+              <form onSubmit={handleStudentScan} className="scan-form">
                 <div className="input-group">
                   <input
                     type="text"
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value)}
-                    placeholder="Enter Student ID (e.g., 21303018)"
+                    placeholder="Enter Student ID (e.g., 22303089)"
                     required
-                    className="student-input"
+                    className="student-input-large"
                     autoComplete="off"
+                    autoFocus
                   />
-                  <button type="submit" className="submit-btn">
-                    Submit
+                  <button type="submit" className="scan-btn">
+                    Verify Student
                   </button>
                 </div>
               </form>
 
-              {message && (
+              {message && !showLibrarySection && (
                 <div className={getMessageClass()}>
-                  <div className="message-content">
-                    {studentName && (
-                      <h3>{studentName}</h3>
-                    )}
-                    <p>{message}</p>
-                    {lastAction && (
-                      <span className={`action-badge ${lastAction}`}>
-                        {lastAction === 'login' ? 'CHECKED IN' : 'CHECKED OUT'}
-                      </span>
-                    )}
-                  </div>
+                  <p>{message}</p>
                 </div>
               )}
             </div>
           </div>
-        ) : showElibrary ? (
-          <ELibrary />
-        ) : (
-          <AdminDashboard />
         )}
       </main>
     </div>
