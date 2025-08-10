@@ -83,10 +83,12 @@ urlpatterns = [
     path('api-info/', api_root, name='api_root'),  # API info moved to /api-info/
     path('debug-info/', debug_info, name='debug_info'),  # Debug endpoint
     path('test-react/', ReactAppView.as_view(), name='test_react'),  # Test endpoint
-    
-    # React App - catch all other routes except API, admin, static files, and debug endpoints
-    re_path(r'^(?!api/|admin/|static/|debug-info/).*$', ReactAppView.as_view(), name='react_app'),
 ]
 
-# Serve static files
+# Serve static files FIRST - this is critical
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# React App - catch all remaining routes (put this LAST)
+urlpatterns += [
+    re_path(r'^.*$', ReactAppView.as_view(), name='react_app'),
+]
