@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 // Create a custom axios instance with proper configuration
-// Use relative baseURL when proxy is configured in package.json
+// Use current domain in production, proxy in development
 const axiosInstance = axios.create({
-  baseURL: process.env.NODE_ENV === 'development' ? '' : (process.env.REACT_APP_API_URL || 'http://localhost:8000'),
+  baseURL: process.env.NODE_ENV === 'production' ? '' : (process.env.REACT_APP_API_URL || 'http://localhost:8000'),
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
