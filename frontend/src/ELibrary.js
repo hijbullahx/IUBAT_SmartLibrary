@@ -40,6 +40,12 @@ function ELibrary({ scannedStudent, onReturnToService }) {
   };
 
   const handlePcSelect = async (pc) => {
+    // If user already has a PC, prevent new selection
+    if (currentUserPc) {
+      setMessage(`You are already using PC ${currentUserPc.pc_number}. Please check out first to select a different PC.`);
+      return;
+    }
+
     // Only allow selection of available PCs
     if (pc.status !== 'available' || pc.is_dumb) {
       setMessage(pc.is_dumb ? 'This PC is out of order' : 'This PC is currently in use');
@@ -118,15 +124,27 @@ function ELibrary({ scannedStudent, onReturnToService }) {
         <p>Welcome {scannedStudent?.name}! Select an available PC to get started.</p>
       </div>
 
-      {currentUserPc && (
-        <div className="current-pc-section">
-          <h3>Your Current PC</h3>
-          <div className="current-pc-info">
-            <span>You are currently using PC {currentUserPc.pc_number}</span>
-            <button onClick={handleCheckOut} className="checkout-btn">
-              Check Out from PC {currentUserPc.pc_number}
-            </button>
+      {currentUserPc ? (
+        <div className="current-pc-alert">
+          <div className="alert-content">
+            <div className="alert-icon">💻</div>
+            <div className="alert-text">
+              <h3>You are currently using PC {currentUserPc.pc_number}</h3>
+              <p>You have an active session on PC {currentUserPc.pc_number}. You can continue using it or check out to select a different PC.</p>
+            </div>
+            <div className="alert-actions">
+              <button onClick={handleCheckOut} className="checkout-alert-btn">
+                Check Out from PC {currentUserPc.pc_number}
+              </button>
+              <button onClick={onReturnToService} className="continue-btn">
+                Continue Current Session
+              </button>
+            </div>
           </div>
+        </div>
+      ) : (
+        <div className="no-pc-message">
+          <p>You don't have any active PC session. Select an available PC below to get started.</p>
         </div>
       )}
 
@@ -136,10 +154,11 @@ function ELibrary({ scannedStudent, onReturnToService }) {
           {pcs.map(pc => (
             <div
               key={pc.pc_number}
-              className={`${getPcStatusClass(pc)} ${pc.status === 'available' ? 'clickable' : ''}`}
-              onClick={() => handlePcSelect(pc)}
+              className={`${getPcStatusClass(pc)} ${pc.status === 'available' && !currentUserPc ? 'clickable' : ''}`}
+              onClick={() => currentUserPc ? null : handlePcSelect(pc)}
               style={{
-                cursor: pc.status === 'available' && !pc.is_dumb ? 'pointer' : 'not-allowed'
+                cursor: pc.status === 'available' && !pc.is_dumb && !currentUserPc ? 'pointer' : 'not-allowed',
+                opacity: currentUserPc && pc.pc_number !== currentUserPc.pc_number ? 0.6 : 1
               }}
             >
               <div className="pc-header">
@@ -152,11 +171,14 @@ function ELibrary({ scannedStudent, onReturnToService }) {
               <div className="pc-visual">
                 <div className={`monitor ${pc.is_dumb ? 'offline' : pc.status}`}>
                   <div className="screen">
-                    {pc.status === 'available' && !pc.is_dumb && (
+                    {pc.status === 'available' && !pc.is_dumb && !currentUserPc && (
                       <span className="click-hint">Click to select</span>
                     )}
                     {pc.status === 'in-use' && pc.current_user === scannedStudent?.student_id && (
-                      <span className="user-indicator">YOU</span>
+                      <span className="user-indicator">YOUR PC</span>
+                    )}
+                    {currentUserPc && pc.status === 'available' && (
+                      <span className="disabled-hint">Check out first</span>
                     )}
                   </div>
                 </div>
