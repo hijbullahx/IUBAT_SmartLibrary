@@ -1399,17 +1399,139 @@ body {
 }
 
 .scan-title {
-  font-size: 3em;
+  font-size: 2.8em;
   color: #2c3e50;
   margin-bottom: 10px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .scan-subtitle {
-  font-size: 2em;
+  font-size: 2.2em;
   color: #34495e;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   font-weight: 500;
+}
+
+.scan-description {
+  font-size: 1.2em;
+  color: #7f8c8d;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+/* E-Library Section */
+.elibrary-section {
+  padding: 20px;
+}
+
+.elibrary-header {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+  padding: 25px 40px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 25px rgba(39, 174, 96, 0.2);
+}
+
+.elibrary-header h2 {
+  font-size: 2.2em;
+  margin: 0 0 20px 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+.student-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px 25px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.student-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.student-details span {
+  font-size: 1.2em;
+  font-weight: 500;
+}
+
+.entry-status {
+  margin-top: 8px;
+}
+
+.status-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.status-badge.login {
+  background: rgba(46, 204, 113, 0.8);
+  border-color: rgba(46, 204, 113, 0.6);
+}
+
+.status-badge.logout {
+  background: rgba(231, 76, 60, 0.8);
+  border-color: rgba(231, 76, 60, 0.6);
+}
+
+.new-student-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 15px 25px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.new-student-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .student-info-bar {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .scan-container {
+    margin: 20px;
+    padding: 40px 30px;
+  }
+  
+  .scan-title {
+    font-size: 2.3em;
+  }
+  
+  .scan-subtitle {
+    font-size: 1.8em;
+  }
+  
+  .elibrary-header {
+    padding: 20px;
+  }
+  
+  .elibrary-header h2 {
+    font-size: 1.8em;
+  }
 }
 
 /* Library Selection Interface */

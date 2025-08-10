@@ -15,7 +15,6 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [lastAction, setLastAction] = useState('');
   const [scannedStudent, setScannedStudent] = useState(null);
-  const [showLibrarySection, setShowLibrarySection] = useState(false);
 
   // Initialize student ID based on scanned student
   useEffect(() => {
@@ -52,11 +51,11 @@ function App() {
     }
 
     try {
-      const response = await axios.get(`${API_ENDPOINTS.STUDENTS}${studentId}/`);
+      // First, verify the student exists
+      const studentResponse = await axios.get(`${API_ENDPOINTS.STUDENTS}${studentId}/`);
       
-      // Handle the response format from backend
-      if (response.data.status === 'success') {
-        const student = response.data.student;
+      if (studentResponse.data.status === 'success') {
+        const student = studentResponse.data.student;
         setScannedStudent({
           student_id: student.student_id,
           name: student.name,
@@ -64,48 +63,35 @@ function App() {
         });
         setStudentName(student.name);
         setStudentDepartment(student.department || 'CSE');
-        setShowLibrarySection(true);
-        setMessage(`Welcome ${student.name}! Choose your library service.`);
+
+        // Automatically process main library entry
+        try {
+          const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+            student_id: student.student_id
+          });
+          
+          setMessage(entryResponse.data.message);
+          setLastAction(entryResponse.data.action);
+          
+          // Show e-library interface after successful main library entry
+          setShowElibrary(true);
+          setStudentId(''); // Clear the input for e-library use
+          
+        } catch (entryError) {
+          setMessage(entryError.response?.data?.message || 'Error processing main library entry');
+        }
       } else {
-        setMessage(response.data.message || 'Student verification failed');
+        setMessage(studentResponse.data.message || 'Student verification failed');
         setScannedStudent(null);
         setStudentName('');
         setStudentDepartment('');
-        setShowLibrarySection(false);
       }
     } catch (error) {
       setMessage('Student not found. Please check the ID and try again.');
       setScannedStudent(null);
       setStudentName('');
       setStudentDepartment('');
-      setShowLibrarySection(false);
     }
-  };
-
-  const handleMainLibraryAccess = async () => {
-    if (!scannedStudent) return;
-
-    try {
-      const response = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
-        student_id: scannedStudent.student_id
-      });
-      
-      setMessage(response.data.message);
-      setStudentName(response.data.student_name || scannedStudent.name);
-      setLastAction(response.data.action);
-      
-      // Reset for next student after 4 seconds
-      setTimeout(() => {
-        resetForNextStudent();
-      }, 4000);
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Error processing library entry');
-    }
-  };
-
-  const goToElibrary = () => {
-    setShowElibrary(true);
-    setShowLibrarySection(false);
   };
 
   const resetForNextStudent = () => {
@@ -114,7 +100,6 @@ function App() {
     setStudentName('');
     setStudentDepartment('');
     setScannedStudent(null);
-    setShowLibrarySection(false);
     setShowElibrary(false);
     setLastAction('');
   };
@@ -124,7 +109,6 @@ function App() {
       resetForNextStudent();
     } else if (view === 'admin') {
       setShowElibrary(false);
-      setShowLibrarySection(false);
       setShowAdmin(true);
     }
   };
@@ -162,61 +146,23 @@ function App() {
       </header>
 
       <main className="main-content">
-        {showLibrarySection ? (
-          <div className="library-selection">
-            <div className="student-welcome-card">
-              <h2>Welcome to IUBAT Smart Library</h2>
-              <div className="student-info">
-                <h3>{scannedStudent.name}</h3>
-                <p><strong>ID:</strong> {scannedStudent.student_id}</p>
-                <p><strong>Department:</strong> {scannedStudent.department}</p>
-              </div>
-            </div>
-            
-            <div className="service-selection">
-              <h3>Choose Your Library Service</h3>
-              <div className="service-buttons">
-                <button 
-                  className="service-btn main-library-btn"
-                  onClick={handleMainLibraryAccess}
-                >
-                  <div className="service-icon">📚</div>
-                  <h4>Main Library</h4>
-                  <p>Access the main library for books and study area</p>
-                </button>
-                
-                <button 
-                  className="service-btn elibrary-btn"
-                  onClick={goToElibrary}
-                >
-                  <div className="service-icon">💻</div>
-                  <h4>E-Library</h4>
-                  <p>Use computers for research and digital resources</p>
-                </button>
-              </div>
-            </div>
-
-            {message && (
-              <div className={getMessageClass()}>
-                <div className="message-content">
-                  <p>{message}</p>
-                  {lastAction && (
-                    <span className={`action-badge ${lastAction}`}>
-                      {lastAction === 'login' ? 'CHECKED IN' : 'CHECKED OUT'}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        ) : showElibrary ? (
+        {showElibrary ? (
           <div className="elibrary-section">
             <div className="elibrary-header">
-              <h2>E-Library - Computer Lab</h2>
+              <h2>IUBAT Smart Library - E-Library Section</h2>
               <div className="student-info-bar">
-                <span><strong>{scannedStudent.name}</strong> ({scannedStudent.student_id}) - {scannedStudent.department}</span>
-                <button className="back-btn" onClick={() => setShowLibrarySection(true)}>
-                  ← Back to Services
+                <div className="student-details">
+                  <span><strong>{scannedStudent.name}</strong> ({scannedStudent.student_id}) - {scannedStudent.department}</span>
+                  {message && (
+                    <div className="entry-status">
+                      <span className={`status-badge ${lastAction}`}>
+                        {lastAction === 'login' ? '✓ ENTERED MAIN LIBRARY' : '✓ EXITED MAIN LIBRARY'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <button className="new-student-btn" onClick={resetForNextStudent}>
+                  New Student
                 </button>
               </div>
             </div>
@@ -239,8 +185,9 @@ function App() {
                   <rect x="21" y="4" width="1" height="16" fill="#2c3e50"/>
                 </svg>
               </div>
-              <h1 className="scan-title">Please !!!</h1>
-              <h2 className="scan-subtitle">Scan Your ID Card</h2>
+              <h1 className="scan-title">Welcome to</h1>
+              <h2 className="scan-subtitle">IUBAT Smart Library</h2>
+              <p className="scan-description">Please scan your ID card to enter the library</p>
               
               <form onSubmit={handleStudentScan} className="scan-form">
                 <div className="input-group">
@@ -248,19 +195,19 @@ function App() {
                     type="text"
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value)}
-                    placeholder="Enter Student ID (e.g., 22303089)"
+                    placeholder="Enter Student ID (e.g., 22303142)"
                     required
                     className="student-input-large"
                     autoComplete="off"
                     autoFocus
                   />
                   <button type="submit" className="scan-btn">
-                    Verify Student
+                    Enter Library
                   </button>
                 </div>
               </form>
 
-              {message && !showLibrarySection && (
+              {message && !showElibrary && (
                 <div className={getMessageClass()}>
                   <p>{message}</p>
                 </div>
