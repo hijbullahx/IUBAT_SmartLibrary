@@ -4,9 +4,8 @@ import './GoodbyePage.css';
 const GoodbyePage = ({ scannedStudent, lastAction, onReturn }) => {
   const [complaint, setComplaint] = useState('');
   const [complaintType, setComplaintType] = useState('pc');
-  const [countdown, setCountdown] = useState(10);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [isComplaintActive, setIsComplaintActive] = useState(false);
+  const [countdown, setCountdown] = useState(5);
   const [timerPaused, setTimerPaused] = useState(false);
 
   useEffect(() => {
@@ -42,36 +41,19 @@ const GoodbyePage = ({ scannedStudent, lastAction, onReturn }) => {
       timestamp: new Date().toISOString()
     });
 
-    setShowSuccess(true);
-    setComplaint('');
-    
-    // After successful submission, start auto-return to service monitor
-    setTimeout(() => {
-      setShowSuccess(false);
-      setIsComplaintActive(false);
-      setTimerPaused(false);
-      
-      // Give 3 seconds before returning to service monitor
-      setTimeout(() => {
-        onReturn();
-      }, 3000);
-    }, 2000);
+    // Immediately return to service monitor after submission
+    onReturn();
   };
 
   const handleComplaintFocus = () => {
-    // When user starts interacting with complaint section, pause timer
-    if (!isComplaintActive) {
-      setIsComplaintActive(true);
-      setTimerPaused(true);
-    }
+    setIsComplaintActive(true);
+    setTimerPaused(true); // Pause timer when student starts reporting
   };
 
   const handleCancelComplaint = () => {
-    // User cancels complaint, resume timer
     setComplaint('');
     setIsComplaintActive(false);
-    setTimerPaused(false);
-    setShowSuccess(false);
+    setTimerPaused(false); // Resume timer if cancelled
   };
 
   return (
@@ -141,108 +123,102 @@ const GoodbyePage = ({ scannedStudent, lastAction, onReturn }) => {
           <h3>🛠️ Report an Issue</h3>
           <p className="complaint-subtitle">Found a problem? Let us know!</p>
           
-          {showSuccess && (
-            <div className="success-message">
-              <span className="success-icon">✅</span>
-              Thank you for your feedback! We'll address this issue soon.
-              <div style={{marginTop: '10px', fontSize: '0.9rem', color: '#155724'}}>
-                Returning to service monitor shortly...
+          <form onSubmit={handleComplaintSubmit} className="complaint-form">
+            <div className="complaint-type">
+              <label>Issue Type:</label>
+              <div className="type-buttons">
+                <button 
+                  type="button"
+                  className={`type-btn ${complaintType === 'pc' ? 'active' : ''}`}
+                  onClick={() => {
+                    setComplaintType('pc');
+                    handleComplaintFocus();
+                  }}
+                >
+                  💻 PC Issue
+                </button>
+                <button 
+                  type="button"
+                  className={`type-btn ${complaintType === 'facility' ? 'active' : ''}`}
+                  onClick={() => {
+                    setComplaintType('facility');
+                    handleComplaintFocus();
+                  }}
+                >
+                  🏢 Facility Issue
+                </button>
+                <button 
+                  type="button"
+                  className={`type-btn ${complaintType === 'other' ? 'active' : ''}`}
+                  onClick={() => {
+                    setComplaintType('other');
+                    handleComplaintFocus();
+                  }}
+                >
+                  ❓ Other
+                </button>
               </div>
             </div>
-          )}
-          
-          {!showSuccess && (
-            <form onSubmit={handleComplaintSubmit} className="complaint-form">
-              <div className="complaint-type">
-                <label>Issue Type:</label>
-                <div className="type-buttons">
-                  <button 
-                    type="button"
-                    className={`type-btn ${complaintType === 'pc' ? 'active' : ''}`}
-                    onClick={() => {
-                      setComplaintType('pc');
-                      handleComplaintFocus();
-                    }}
-                  >
-                    💻 PC Issue
-                  </button>
-                  <button 
-                    type="button"
-                    className={`type-btn ${complaintType === 'facility' ? 'active' : ''}`}
-                    onClick={() => {
-                      setComplaintType('facility');
-                      handleComplaintFocus();
-                    }}
-                  >
-                    🏢 Facility Issue
-                  </button>
-                  <button 
-                    type="button"
-                    className={`type-btn ${complaintType === 'other' ? 'active' : ''}`}
-                    onClick={() => {
-                      setComplaintType('other');
-                      handleComplaintFocus();
-                    }}
-                  >
-                    ❓ Other
-                  </button>
-                </div>
-              </div>
-              
-              <div className="complaint-input">
-                <textarea
-                  value={complaint}
-                  onChange={(e) => setComplaint(e.target.value)}
-                  onFocus={handleComplaintFocus}
-                  placeholder={`Describe the ${complaintType === 'pc' ? 'PC' : complaintType} issue you encountered...`}
-                  rows="3"
-                  maxLength="500"
-                />
-                <div className="char-count">{complaint.length}/500</div>
-              </div>
-              
-              <div className="complaint-actions">
-                <button type="submit" className="submit-complaint-btn" disabled={!complaint.trim()}>
-                  Submit Report
+            
+            <div className="complaint-input">
+              <textarea
+                value={complaint}
+                onChange={(e) => setComplaint(e.target.value)}
+                onFocus={handleComplaintFocus}
+                placeholder={`Describe the ${complaintType === 'pc' ? 'PC' : complaintType} issue you encountered...`}
+                rows="3"
+                maxLength="500"
+              />
+              <div className="char-count">{complaint.length}/500</div>
+            </div>
+            
+            <div className="complaint-actions">
+              <button type="submit" className="submit-complaint-btn" disabled={!complaint.trim()}>
+                Submit Report
+              </button>
+              {isComplaintActive && (
+                <button 
+                  type="button" 
+                  className="cancel-complaint-btn"
+                  onClick={handleCancelComplaint}
+                >
+                  Cancel
                 </button>
-                {isComplaintActive && (
-                  <button 
-                    type="button" 
-                    className="cancel-complaint-btn"
-                    onClick={handleCancelComplaint}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </form>
-          )}
+              )}
+            </div>
+          </form>
         </div>
 
-        {/* Auto Return Section */}
-        <div className="auto-return-section">
-          {timerPaused ? (
-            <div className="timer-paused">
-              <span className="pause-icon">⏸️</span>
-              <span className="pause-text">Timer paused - Take your time with the report</span>
-            </div>
-          ) : (
-            <>
-              <div className="countdown-display">
-                <span className="countdown-text">Returning to service monitor in</span>
-                <span className="countdown-number">{countdown}</span>
-                <span className="countdown-text">seconds</span>
+        {/* Auto Return Timer Section - Only show when not actively reporting */}
+        {!isComplaintActive && (
+          <div className="auto-return-section">
+            {timerPaused ? (
+              <div className="timer-paused">
+                <span className="pause-icon">⏸️</span>
+                <span className="pause-text">Timer paused - Take your time with the report</span>
               </div>
-              <div className="countdown-bar">
-                <div 
-                  className="countdown-progress" 
-                  style={{width: `${(countdown / 10) * 100}%`}}
-                ></div>
-              </div>
-            </>
-          )}
+            ) : (
+              <>
+                <div className="countdown-display">
+                  <span className="countdown-text">Returning to service monitor in</span>
+                  <span className="countdown-number">{countdown}</span>
+                  <span className="countdown-text">seconds</span>
+                </div>
+                <div className="countdown-bar">
+                  <div 
+                    className="countdown-progress" 
+                    style={{width: `${(countdown / 5) * 100}%`}}
+                  ></div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Quick Return Button */}
+        <div className="return-section">
           <button className="return-now-btn" onClick={onReturn}>
-            Return to Service Monitor Now
+            Return to Service Monitor {isComplaintActive ? '' : 'Now'}
           </button>
         </div>
       </div>
