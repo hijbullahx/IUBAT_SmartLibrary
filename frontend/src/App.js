@@ -10,8 +10,6 @@ import IubatLogo from './assets/IUBAT2.png';
 function App() {
   const [studentId, setStudentId] = useState('');
   const [message, setMessage] = useState('');
-  const [studentName, setStudentName] = useState('');
-  const [studentDepartment, setStudentDepartment] = useState('');
   const [showElibrary, setShowElibrary] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [lastAction, setLastAction] = useState('');
@@ -39,26 +37,6 @@ function App() {
       setShouldShowGoodbye(false);
     }
   }, [shouldShowGoodbye]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage('Processing...');
-    try {
-      const response = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, { student_id: studentId });
-      setMessage(response.data.message);
-      setStudentName(response.data.student_name || '');
-      setLastAction(response.data.action || '');
-      setStudentId('');
-    } catch (error) {
-      if (error.response) {
-        setMessage(error.response.data.message);
-      } else {
-        setMessage('Network error. Is the Django server running?');
-      }
-      setStudentName('');
-      setLastAction('');
-    }
-  };
 
   const handleStudentScan = async (e) => {
     e.preventDefault();
@@ -216,8 +194,6 @@ function App() {
     // Return to service monitor after goodbye (since logout happened from service monitor)
     setStudentId('');
     setMessage('');
-    setStudentName('');
-    setStudentDepartment('');
     setScannedStudent(null);
     setShowGoodbye(false);
     setShowElibrary(false);

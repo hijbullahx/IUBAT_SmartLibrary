@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
 
@@ -8,15 +8,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
   const [loading, setLoading] = useState(true);
   const [currentUserPc, setCurrentUserPc] = useState(null);
 
-  useEffect(() => {
-    loadPCs();
-    // Check if student already has a PC assigned
-    if (scannedStudent) {
-      checkCurrentUserPc();
-    }
-  }, [scannedStudent]);
-
-  const loadPCs = async () => {
+  const loadPCs = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
@@ -34,9 +26,9 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [scannedStudent]);
 
-  const checkCurrentUserPc = async () => {
+  const checkCurrentUserPc = useCallback(async () => {
     try {
       // Check if student is already using a PC
       const response = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
@@ -49,7 +41,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     } catch (error) {
       console.error('Error checking current user PC:', error);
     }
-  };
+  }, [scannedStudent]);
 
   const handlePcSelect = async (pc) => {
     // If user already has a PC, prevent new selection
@@ -66,7 +58,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
 
     try {
       // Auto check-in to selected PC
-      const response = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKIN, {
+      await axios.post(API_ENDPOINTS.ELIBRARY_CHECKIN, {
         student_id: scannedStudent.student_id,
         pc_number: pc.pc_number
       });
@@ -99,7 +91,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     }
 
     try {
-      const response = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
+      await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
         student_id: scannedStudent.student_id,
         pc_number: currentUserPc.pc_number
       });
@@ -133,6 +125,14 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     }
     return 'Available';
   };
+
+  useEffect(() => {
+    loadPCs();
+    // Check if student already has a PC assigned
+    if (scannedStudent) {
+      checkCurrentUserPc();
+    }
+  }, [scannedStudent, loadPCs, checkCurrentUserPc]);
 
   if (loading) {
     return (
