@@ -15,6 +15,7 @@ function App() {
   const [showAdmin, setShowAdmin] = useState(false);
   const [lastAction, setLastAction] = useState('');
   const [scannedStudent, setScannedStudent] = useState(null);
+  const [showGoodbye, setShowGoodbye] = useState(false);
 
   // Initialize student ID based on scanned student
   useEffect(() => {
@@ -50,6 +51,36 @@ function App() {
       return;
     }
 
+    // Check if this is the same student scanning again (exit scenario)
+    if (scannedStudent && scannedStudent.student_id === studentId.trim()) {
+      // Process exit from main library
+      try {
+        const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+          student_id: studentId.trim()
+        });
+        
+        setMessage(entryResponse.data.message);
+        setLastAction(entryResponse.data.action);
+        setShowGoodbye(true);
+        setShowElibrary(false);
+        
+        // Auto return to welcome screen after 5 seconds
+        setTimeout(() => {
+          setStudentId('');
+          setMessage('');
+          setStudentName('');
+          setStudentDepartment('');
+          setScannedStudent(null);
+          setShowGoodbye(false);
+          setLastAction('');
+        }, 5000);
+        
+      } catch (entryError) {
+        setMessage(entryError.response?.data?.message || 'Error processing library exit');
+      }
+      return;
+    }
+
     try {
       // First, verify the student exists
       const studentResponse = await axios.get(`${API_ENDPOINTS.STUDENTS}${studentId}/`);
@@ -64,7 +95,7 @@ function App() {
         setStudentName(student.name);
         setStudentDepartment(student.department || 'CSE');
 
-        // Automatically process main library entry
+        // Automatically process main library entry for new student
         try {
           const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
             student_id: student.student_id
@@ -75,6 +106,7 @@ function App() {
           
           // Show e-library interface after successful main library entry
           setShowElibrary(true);
+          setShowGoodbye(false);
           setStudentId(''); // Clear the input for e-library use
           
         } catch (entryError) {
@@ -102,9 +134,11 @@ function App() {
       setStudentDepartment('');
       setScannedStudent(null);
       setShowElibrary(false);
+      setShowGoodbye(false);
       setLastAction('');
     } else if (view === 'admin') {
       setShowElibrary(false);
+      setShowGoodbye(false);
       setShowAdmin(true);
     }
   };
@@ -142,7 +176,46 @@ function App() {
       </header>
 
       <main className="main-content">
-        {showElibrary ? (
+        {showGoodbye ? (
+          <div className="goodbye-screen">
+            <div className="goodbye-container">
+              <div className="goodbye-icon">
+                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#27ae60"/>
+                  <path d="M8 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h1 className="goodbye-title">Thank You!</h1>
+              <h2 className="goodbye-subtitle">{scannedStudent?.name}</h2>
+              <div className="goodbye-message">
+                <p className="exit-status">
+                  {lastAction === 'logout' ? '✓ Successfully checked out from Main Library' : '✓ Successfully checked in to Main Library'}
+                </p>
+                <div className="library-rules">
+                  <h3>Library Guidelines Reminder:</h3>
+                  <ul>
+                    <li>📚 Please return borrowed books on time</li>
+                    <li>🔇 Maintain silence in study areas</li>
+                    <li>📱 Keep mobile phones on silent mode</li>
+                    <li>🍽️ No food or drinks in the library</li>
+                    <li>💻 Properly log out from computers</li>
+                    <li>🧹 Keep your area clean and organized</li>
+                  </ul>
+                </div>
+                <p className="farewell-message">
+                  {lastAction === 'logout' 
+                    ? "Have a great day! Come back soon for more learning." 
+                    : "Welcome to IUBAT Smart Library! Enjoy your study session."
+                  }
+                </p>
+              </div>
+              <div className="auto-return-notice">
+                <p>Returning to main screen automatically...</p>
+                <div className="countdown-bar"></div>
+              </div>
+            </div>
+          </div>
+        ) : showElibrary ? (
           <div className="elibrary-section">
             <div className="elibrary-header">
               <h2>IUBAT Smart Library - E-Library Section</h2>
@@ -212,7 +285,7 @@ function App() {
                 </div>
               </form>
 
-              {message && !showElibrary && (
+              {message && !showElibrary && !showGoodbye && (
                 <div className={getMessageClass()}>
                   <p>{message}</p>
                 </div>

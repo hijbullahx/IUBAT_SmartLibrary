@@ -1553,6 +1553,162 @@ body {
   color: #27ae60;
 }
 
+/* Goodbye Screen Styles */
+.goodbye-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  border-radius: 10px;
+  margin: 20px;
+}
+
+.goodbye-container {
+  text-align: center;
+  background: white;
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+.goodbye-icon {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.goodbye-title {
+  font-size: 3.2em;
+  color: #27ae60;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.goodbye-subtitle {
+  font-size: 2em;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.exit-status {
+  background: #d5f4e6;
+  color: #27ae60;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-size: 1.2em;
+  font-weight: 600;
+  margin-bottom: 30px;
+  border: 2px solid #2ecc71;
+}
+
+.library-rules {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 15px;
+  margin: 30px 0;
+  text-align: left;
+  border: 2px solid #e9ecef;
+}
+
+.library-rules h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 1.4em;
+  text-align: center;
+}
+
+.library-rules ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.library-rules li {
+  padding: 8px 0;
+  font-size: 1.1em;
+  color: #34495e;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.library-rules li:last-child {
+  border-bottom: none;
+}
+
+.farewell-message {
+  font-size: 1.3em;
+  color: #2c3e50;
+  line-height: 1.6;
+  font-weight: 500;
+  margin: 25px 0;
+  font-style: italic;
+}
+
+.auto-return-notice {
+  background: #3498db;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 10px;
+  margin-top: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auto-return-notice p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.countdown-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
+  animation: countdown 5s linear forwards;
+}
+
+@keyframes countdown {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Responsive Design for Goodbye Screen */
+@media (max-width: 768px) {
+  .goodbye-container {
+    margin: 20px;
+    padding: 40px 30px;
+  }
+  
+  .goodbye-title {
+    font-size: 2.5em;
+  }
+  
+  .goodbye-subtitle {
+    font-size: 1.6em;
+  }
+  
+  .library-rules {
+    padding: 20px;
+  }
+  
+  .library-rules li {
+    font-size: 1em;
+  }
+  
+  .farewell-message {
+    font-size: 1.1em;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .student-info-bar {
