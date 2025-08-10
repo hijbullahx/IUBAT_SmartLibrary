@@ -21,6 +21,14 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       setLoading(true);
       const response = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
       setPcs(response.data.pcs || []);
+      
+      // Also check for current user PC when loading PCs
+      if (scannedStudent) {
+        const userPc = response.data.pcs?.find(pc => 
+          pc.status === 'in-use' && pc.current_user === scannedStudent.student_id
+        );
+        setCurrentUserPc(userPc || null);
+      }
     } catch (error) {
       setMessage('Error loading PC status');
     } finally {
@@ -32,9 +40,11 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     try {
       // Check if student is already using a PC
       const response = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
-      const userPc = response.data.pcs?.find(pc => 
-        pc.status === 'in-use' && pc.current_user === scannedStudent.student_id
-      );
+      
+      const userPc = response.data.pcs?.find(pc => {
+        return pc.status === 'in-use' && pc.current_user === scannedStudent.student_id;
+      });
+      
       setCurrentUserPc(userPc || null);
     } catch (error) {
       console.error('Error checking current user PC:', error);
@@ -61,17 +71,21 @@ function ELibrary({ scannedStudent, onReturnToService }) {
         pc_number: pc.pc_number
       });
       
-      setMessage(`Successfully checked in to PC ${pc.pc_number}!`);
+      setMessage(`Successfully checked in to PC ${pc.pc_number}! You can now use this computer.`);
       
-      // Update current user PC immediately
-      setCurrentUserPc({
+      // Update current user PC immediately with the new assignment
+      const newUserPc = {
         pc_number: pc.pc_number,
         status: 'in-use',
-        current_user: scannedStudent.student_id
-      });
+        current_user: scannedStudent.student_id,
+        is_dumb: pc.is_dumb
+      };
+      setCurrentUserPc(newUserPc);
       
-      // Refresh PC list
-      loadPCs();
+      // Refresh PC list to get updated status
+      setTimeout(() => {
+        loadPCs();
+      }, 500);
       
     } catch (error) {
       setMessage(error.response?.data?.message || 'Error checking in to PC');
@@ -92,7 +106,11 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       
       setMessage(`Successfully checked out from PC ${currentUserPc.pc_number}. You can now select a different PC.`);
       setCurrentUserPc(null);
-      loadPCs(); // Refresh PC status
+      
+      // Refresh PC list to show updated status
+      setTimeout(() => {
+        loadPCs();
+      }, 500);
       
     } catch (error) {
       setMessage(error.response?.data?.message || 'Error checking out from PC');

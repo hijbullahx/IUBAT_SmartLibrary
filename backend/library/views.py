@@ -56,18 +56,37 @@ def library_entry_exit(request):
 def pc_status(request):
     if request.method == 'GET':
         all_pcs = PC.objects.all().order_by('pc_number')
-        pcs_in_use = ELibraryEntry.objects.filter(exit_time__isnull=True).values_list('pc__pc_number', flat=True)
+        pcs_in_use = ELibraryEntry.objects.filter(exit_time__isnull=True).select_related('student', 'pc')
 
         pc_list = []
         for pc in all_pcs:
-            status = "in use" if pc.pc_number in pcs_in_use else "available"
+            # Find if this PC is currently in use
+            current_entry = pcs_in_use.filter(pc=pc).first()
+            
+            if current_entry:
+                status = "in-use"
+                current_user = current_entry.student.student_id
+                current_user_name = current_entry.student.name
+            else:
+                status = "available"
+                current_user = None
+                current_user_name = None
+            
             if pc.is_dumb:
                 status = "dumb"
 
-            pc_list.append({
+            pc_data = {
                 'pc_number': pc.pc_number,
                 'status': status,
-            })
+                'is_dumb': pc.is_dumb,
+            }
+            
+            # Only add user info if PC is in use
+            if current_user:
+                pc_data['current_user'] = current_user
+                pc_data['current_user_name'] = current_user_name
+                
+            pc_list.append(pc_data)
         
         return JsonResponse({'status': 'success', 'pcs': pc_list})
 
