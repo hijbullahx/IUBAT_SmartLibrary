@@ -23,18 +23,24 @@ const InitialPage = () => {
   return (
     <div className="initial-page">
       <button className="admin-button" onClick={handleAdminClick}>
+        <div className="admin-icon-placeholder"></div>
         Admin
       </button>
       <div className="initial-content">
         <div className="main-section">
           <div className="university-section">
-            <h1>IUBAT</h1>
-            <h2>Library Management System</h2>
+            <div className="image-placeholder"></div>
+            <h1>IUBAT Library</h1>
+            <h2>Entry System</h2>
           </div>
           <div className="scan-section">
-            <h2>Please !!!</h2>
-            <h3>Scan Your ID Card</h3>
+            <h2>Scan Your ID</h2>
             <div className="scan-box">
+              <div className="scan-icon">
+                <div className="scan-line"></div>
+                <div className="bottom-left"></div>
+                <div className="bottom-right"></div>
+              </div>
               <form onSubmit={handleScan}>
                 <div className="input-container">
                   <input
