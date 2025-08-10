@@ -20,6 +20,7 @@ function App() {
   const [shouldShowGoodbye, setShouldShowGoodbye] = useState(false);
   const [showServiceMenu, setShowServiceMenu] = useState(false);
   const [isServiceMonitor, setIsServiceMonitor] = useState(false);
+  const [entryMonitorLoggedInStudents, setEntryMonitorLoggedInStudents] = useState(new Set());
 
   // Initialize student ID based on scanned student
   useEffect(() => {
@@ -85,32 +86,64 @@ function App() {
           setShowServiceMenu(true);
           setStudentId('');
         } else {
-          // ENTRY MONITOR: Process main library entry
+          // ENTRY MONITOR: Check if student is already tracked as logged in
+          const studentKey = student.student_id;
+          
           setScannedStudent({
             student_id: student.student_id,
             name: student.name,
             department: student.department || 'CSE'
           });
           
-          // Process main library entry
-          try {
-            const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
-              student_id: student.student_id
-            });
-            
-            setMessage(`Welcome ${student.name}! ${entryResponse.data.message}`);
-            setLastAction(entryResponse.data.action);
+          // Check if this student is already logged in from this entry monitor
+          if (entryMonitorLoggedInStudents.has(studentKey)) {
+            // Student already logged in, show message without calling API
+            setMessage(`${student.name} is already logged in to the library. Please use the service monitor inside for logout or e-library access.`);
+            setLastAction('already_logged_in');
             setStudentId('');
             
-            // Auto-clear message after 3 seconds
+            // Auto-clear message after 5 seconds
             setTimeout(() => {
               setMessage('');
               setScannedStudent(null);
               setLastAction('');
-            }, 3000);
-            
-          } catch (entryError) {
-            setMessage(entryError.response?.data?.message || 'Error processing library entry');
+            }, 5000);
+          } else {
+            // Student not tracked, process entry
+            try {
+              const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+                student_id: student.student_id
+              });
+              
+              if (entryResponse.data.action === 'login') {
+                // Add student to logged-in set
+                setEntryMonitorLoggedInStudents(prev => new Set([...prev, studentKey]));
+                setMessage(`Welcome ${student.name}! ${entryResponse.data.message}`);
+                setLastAction('login');
+              } else {
+                // Student was already in the system, add to set but show already logged in message
+                setEntryMonitorLoggedInStudents(prev => new Set([...prev, studentKey]));
+                setMessage(`${student.name} is already logged in to the library. Please use the service monitor inside for logout or e-library access.`);
+                setLastAction('already_logged_in');
+                
+                // Reverse the logout by calling API again to restore their login state
+                await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+                  student_id: student.student_id
+                });
+              }
+              
+              setStudentId('');
+              
+              // Auto-clear message after 5 seconds
+              setTimeout(() => {
+                setMessage('');
+                setScannedStudent(null);
+                setLastAction('');
+              }, 5000);
+              
+            } catch (entryError) {
+              setMessage(entryError.response?.data?.message || 'Error processing library entry');
+            }
           }
         }
       } else {
@@ -128,7 +161,7 @@ function App() {
       setShowAdmin(false);
       setShowServiceMenu(false);
       setIsServiceMonitor(false);
-      // Reset states for entry monitor
+      // Reset states for entry monitor but keep logged-in tracking
       setScannedStudent(null);
       setStudentId('');
       setMessage('');
@@ -156,6 +189,7 @@ function App() {
   const getMessageClass = () => {
     if (lastAction === 'login') return 'message success';
     if (lastAction === 'logout') return 'message warning';
+    if (lastAction === 'already_logged_in') return 'message info';
     if (message.includes('error') || message.includes('not found')) return 'message error';
     return 'message info';
   };
@@ -181,6 +215,13 @@ function App() {
       try {
         const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
           student_id: scannedStudent.student_id
+        });
+        
+        // Remove student from entry monitor tracking since they're logging out
+        setEntryMonitorLoggedInStudents(prev => {
+          const updated = new Set(prev);
+          updated.delete(scannedStudent.student_id);
+          return updated;
         });
         
         setMessage(entryResponse.data.message);
