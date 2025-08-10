@@ -53,13 +53,26 @@ function App() {
 
     try {
       const response = await axios.get(`${API_ENDPOINTS.STUDENTS}${studentId}/`);
-      const student = response.data;
       
-      setScannedStudent(student);
-      setStudentName(student.name);
-      setStudentDepartment(student.department);
-      setShowLibrarySection(true);
-      setMessage(`Welcome ${student.name}! Choose your library service.`);
+      // Handle the response format from backend
+      if (response.data.status === 'success') {
+        const student = response.data.student;
+        setScannedStudent({
+          student_id: student.student_id,
+          name: student.name,
+          department: student.department || 'CSE'
+        });
+        setStudentName(student.name);
+        setStudentDepartment(student.department || 'CSE');
+        setShowLibrarySection(true);
+        setMessage(`Welcome ${student.name}! Choose your library service.`);
+      } else {
+        setMessage(response.data.message || 'Student verification failed');
+        setScannedStudent(null);
+        setStudentName('');
+        setStudentDepartment('');
+        setShowLibrarySection(false);
+      }
     } catch (error) {
       setMessage('Student not found. Please check the ID and try again.');
       setScannedStudent(null);
@@ -78,12 +91,13 @@ function App() {
       });
       
       setMessage(response.data.message);
+      setStudentName(response.data.student_name || scannedStudent.name);
       setLastAction(response.data.action);
       
-      // Reset for next student after 3 seconds
+      // Reset for next student after 4 seconds
       setTimeout(() => {
         resetForNextStudent();
-      }, 3000);
+      }, 4000);
     } catch (error) {
       setMessage(error.response?.data?.message || 'Error processing library entry');
     }
@@ -108,14 +122,6 @@ function App() {
   const handleNavigate = (view) => {
     if (view === 'main') {
       resetForNextStudent();
-    } else if (view === 'elibrary') {
-      // If student is already scanned, go to e-library directly
-      if (scannedStudent) {
-        goToElibrary();
-      } else {
-        // Reset to scan screen
-        resetForNextStudent();
-      }
     } else if (view === 'admin') {
       setShowElibrary(false);
       setShowLibrarySection(false);
@@ -143,13 +149,7 @@ function App() {
               className={`nav-btn ${!showElibrary && !showAdmin ? 'active' : ''}`}
               onClick={() => handleNavigate('main')}
             >
-              Main Library
-            </button>
-            <button 
-              className={`nav-btn ${showElibrary ? 'active' : ''}`}
-              onClick={() => handleNavigate('elibrary')}
-            >
-              E-Library
+              Smart Library
             </button>
             <button 
               className={`nav-btn ${showAdmin ? 'active' : ''}`}

@@ -368,7 +368,8 @@ def student_lookup(request, student_id):
                 'status': 'success',
                 'student': {
                     'student_id': student.student_id,
-                    'name': student.name
+                    'name': student.name,
+                    'department': student.department
                 }
             })
         except Student.DoesNotExist:
