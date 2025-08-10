@@ -19,15 +19,27 @@ def api_root(request):
 class ReactAppView(TemplateView):
     def get(self, request, *args, **kwargs):
         try:
-            # Serve the React index.html file
-            index_path = os.path.join(settings.STATIC_ROOT, 'index.html')
-            if os.path.exists(index_path):
-                with open(index_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                return HttpResponse(content, content_type='text/html')
-            else:
-                # Fallback to API root if React build not found
-                return api_root(request)
+            # Try multiple possible locations for index.html
+            possible_paths = [
+                os.path.join(settings.STATIC_ROOT, 'index.html'),  # After collectstatic
+                os.path.join(settings.BASE_DIR, 'static', 'index.html'),  # Direct location
+                os.path.join(settings.BASE_DIR, 'staticfiles', 'index.html'),  # Collectstatic output
+            ]
+            
+            for index_path in possible_paths:
+                if os.path.exists(index_path):
+                    with open(index_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    print(f"Serving React app from: {index_path}")
+                    return HttpResponse(content, content_type='text/html')
+            
+            # Debug: Print what paths were checked
+            print(f"React index.html not found. Checked paths:")
+            for path in possible_paths:
+                print(f"  - {path} (exists: {os.path.exists(path)})")
+            
+            # Fallback to API root if React build not found
+            return api_root(request)
         except Exception as e:
             print(f"Error serving React app: {e}")
             return api_root(request)
