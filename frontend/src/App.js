@@ -3,6 +3,7 @@ import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
 import ELibrary from './ELibrary.js';
 import AdminDashboard from './AdminDashboardSimple.js';
+import GoodbyePage from './GoodbyePage.js';
 import './App.css';
 import IubatLogo from './assets/IUBAT2.png';
 
@@ -16,6 +17,9 @@ function App() {
   const [lastAction, setLastAction] = useState('');
   const [scannedStudent, setScannedStudent] = useState(null);
   const [showGoodbye, setShowGoodbye] = useState(false);
+  const [shouldShowGoodbye, setShouldShowGoodbye] = useState(false);
+  const [showServiceMenu, setShowServiceMenu] = useState(false);
+  const [isServiceMonitor, setIsServiceMonitor] = useState(false);
 
   // Initialize student ID based on scanned student
   useEffect(() => {
@@ -23,6 +27,17 @@ function App() {
       setStudentId(scannedStudent.student_id);
     }
   }, [scannedStudent, showElibrary]);
+
+  // Handle goodbye page transition
+  useEffect(() => {
+    if (shouldShowGoodbye) {
+      console.log('🎯 useEffect: Triggering goodbye page');
+      setShowElibrary(false);
+      setShowAdmin(false);
+      setShowGoodbye(true);
+      setShouldShowGoodbye(false);
+    }
+  }, [shouldShowGoodbye]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,94 +66,89 @@ function App() {
       return;
     }
 
-    // Check if this is the same student scanning again (exit scenario)
-    if (scannedStudent && scannedStudent.student_id === studentId.trim()) {
-      // Process exit from main library
-      try {
-        const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
-          student_id: studentId.trim()
-        });
-        
-        setMessage(entryResponse.data.message);
-        setLastAction(entryResponse.data.action);
-        setShowGoodbye(true);
-        setShowElibrary(false);
-        
-        // Auto return to welcome screen after 5 seconds
-        setTimeout(() => {
-          setStudentId('');
-          setMessage('');
-          setStudentName('');
-          setStudentDepartment('');
-          setScannedStudent(null);
-          setShowGoodbye(false);
-          setLastAction('');
-        }, 5000);
-        
-      } catch (entryError) {
-        setMessage(entryError.response?.data?.message || 'Error processing library exit');
-      }
-      return;
-    }
-
+    const inputStudentId = studentId.trim();
+    
     try {
       // First, verify the student exists
-      const studentResponse = await axios.get(`${API_ENDPOINTS.STUDENTS}${studentId}/`);
+      const studentResponse = await axios.get(`${API_ENDPOINTS.STUDENTS}${inputStudentId}/`);
       
       if (studentResponse.data.status === 'success') {
         const student = studentResponse.data.student;
-        setScannedStudent({
-          student_id: student.student_id,
-          name: student.name,
-          department: student.department || 'CSE'
-        });
-        setStudentName(student.name);
-        setStudentDepartment(student.department || 'CSE');
-
-        // Automatically process main library entry for new student
-        try {
-          const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
-            student_id: student.student_id
+        
+        if (isServiceMonitor) {
+          // SERVICE MONITOR: Show options for logout or e-library
+          setScannedStudent({
+            student_id: student.student_id,
+            name: student.name,
+            department: student.department || 'CSE'
+          });
+          setShowServiceMenu(true);
+          setStudentId('');
+        } else {
+          // ENTRY MONITOR: Process main library entry
+          setScannedStudent({
+            student_id: student.student_id,
+            name: student.name,
+            department: student.department || 'CSE'
           });
           
-          setMessage(entryResponse.data.message);
-          setLastAction(entryResponse.data.action);
-          
-          // Show e-library interface after successful main library entry
-          setShowElibrary(true);
-          setShowGoodbye(false);
-          setStudentId(''); // Clear the input for e-library use
-          
-        } catch (entryError) {
-          setMessage(entryError.response?.data?.message || 'Error processing main library entry');
+          // Process main library entry
+          try {
+            const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+              student_id: student.student_id
+            });
+            
+            setMessage(`Welcome ${student.name}! ${entryResponse.data.message}`);
+            setLastAction(entryResponse.data.action);
+            setStudentId('');
+            
+            // Auto-clear message after 3 seconds
+            setTimeout(() => {
+              setMessage('');
+              setScannedStudent(null);
+              setLastAction('');
+            }, 3000);
+            
+          } catch (entryError) {
+            setMessage(entryError.response?.data?.message || 'Error processing library entry');
+          }
         }
       } else {
         setMessage(studentResponse.data.message || 'Student verification failed');
-        setScannedStudent(null);
-        setStudentName('');
-        setStudentDepartment('');
       }
     } catch (error) {
       setMessage('Student not found. Please check the ID and try again.');
-      setScannedStudent(null);
-      setStudentName('');
-      setStudentDepartment('');
     }
   };
 
   const handleNavigate = (view) => {
     if (view === 'main') {
-      setStudentId('');
-      setMessage('');
-      setStudentName('');
-      setStudentDepartment('');
-      setScannedStudent(null);
       setShowElibrary(false);
       setShowGoodbye(false);
+      setShowAdmin(false);
+      setShowServiceMenu(false);
+      setIsServiceMonitor(false);
+      // Reset states for entry monitor
+      setScannedStudent(null);
+      setStudentId('');
+      setMessage('');
+      setLastAction('');
+    } else if (view === 'service') {
+      setShowElibrary(false);
+      setShowGoodbye(false);
+      setShowAdmin(false);
+      setShowServiceMenu(false);
+      setIsServiceMonitor(true);
+      // Reset states for service monitor
+      setScannedStudent(null);
+      setStudentId('');
+      setMessage('');
       setLastAction('');
     } else if (view === 'admin') {
       setShowElibrary(false);
       setShowGoodbye(false);
+      setShowServiceMenu(false);
+      setIsServiceMonitor(false);
       setShowAdmin(true);
     }
   };
@@ -148,6 +158,49 @@ function App() {
     if (lastAction === 'logout') return 'message warning';
     if (message.includes('error') || message.includes('not found')) return 'message error';
     return 'message info';
+  };
+
+  const handleReturnFromGoodbye = () => {
+    // Reset all states to return to welcome screen
+    setStudentId('');
+    setMessage('');
+    setStudentName('');
+    setStudentDepartment('');
+    setScannedStudent(null);
+    setShowGoodbye(false);
+    setShowElibrary(false);
+    setShowAdmin(false);
+    setLastAction('');
+    setShouldShowGoodbye(false);
+    setShowServiceMenu(false);
+  };
+
+  const handleServiceChoice = async (choice) => {
+    if (choice === 'logout') {
+      // Process full library logout
+      try {
+        const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+          student_id: scannedStudent.student_id
+        });
+        
+        setMessage(entryResponse.data.message);
+        setLastAction(entryResponse.data.action);
+        setShowServiceMenu(false);
+        setShowGoodbye(true);
+        
+      } catch (error) {
+        setMessage(error.response?.data?.message || 'Error processing logout');
+      }
+    } else if (choice === 'elibrary') {
+      // Go to e-library interface
+      setShowServiceMenu(false);
+      setShowElibrary(true);
+    }
+  };
+
+  const handleBackToService = () => {
+    setShowElibrary(false);
+    setShowServiceMenu(true);
   };
 
   return (
@@ -160,10 +213,16 @@ function App() {
           </div>
                     <nav className="nav-menu">
             <button 
-              className={`nav-btn ${!showElibrary && !showAdmin ? 'active' : ''}`}
+              className={`nav-btn ${!showElibrary && !showAdmin && !showGoodbye && !showServiceMenu ? 'active' : ''}`}
               onClick={() => handleNavigate('main')}
             >
-              Smart Library
+              Entry Monitor
+            </button>
+            <button 
+              className={`nav-btn ${isServiceMonitor && !showAdmin ? 'active' : ''}`}
+              onClick={() => handleNavigate('service')}
+            >
+              Service Monitor
             </button>
             <button 
               className={`nav-btn ${showAdmin ? 'active' : ''}`}
@@ -175,47 +234,51 @@ function App() {
         </div>
       </header>
 
-      <main className="main-content">
-        {showGoodbye ? (
-          <div className="goodbye-screen">
-            <div className="goodbye-container">
-              <div className="goodbye-icon">
-                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="10" fill="#27ae60"/>
-                  <path d="M8 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+      <main className="main-content">        
+        {showGoodbye === true ? (
+          <GoodbyePage 
+            scannedStudent={scannedStudent}
+            lastAction={lastAction}
+            onReturn={handleReturnFromGoodbye}
+          />
+        ) : showServiceMenu === true ? (
+          <div className="service-menu">
+            <div className="service-container">
+              <div className="student-welcome">
+                <h2>Welcome, {scannedStudent?.name}!</h2>
+                <p>ID: {scannedStudent?.student_id} | Department: {scannedStudent?.department}</p>
               </div>
-              <h1 className="goodbye-title">Thank You!</h1>
-              <h2 className="goodbye-subtitle">{scannedStudent?.name}</h2>
-              <div className="goodbye-message">
-                <p className="exit-status">
-                  {lastAction === 'logout' ? '✓ Successfully checked out from Main Library' : '✓ Successfully checked in to Main Library'}
-                </p>
-                <div className="library-rules">
-                  <h3>Library Guidelines Reminder:</h3>
-                  <ul>
-                    <li>📚 Please return borrowed books on time</li>
-                    <li>🔇 Maintain silence in study areas</li>
-                    <li>📱 Keep mobile phones on silent mode</li>
-                    <li>🍽️ No food or drinks in the library</li>
-                    <li>💻 Properly log out from computers</li>
-                    <li>🧹 Keep your area clean and organized</li>
-                  </ul>
+              
+              <div className="service-options">
+                <h3>What would you like to do?</h3>
+                
+                <div className="service-buttons">
+                  <button 
+                    className="service-btn logout-btn"
+                    onClick={() => handleServiceChoice('logout')}
+                  >
+                    <div className="btn-icon">🚪</div>
+                    <div className="btn-text">
+                      <h4>Exit Library</h4>
+                      <p>Complete logout from library</p>
+                    </div>
+                  </button>
+                  
+                  <button 
+                    className="service-btn elibrary-btn"
+                    onClick={() => handleServiceChoice('elibrary')}
+                  >
+                    <div className="btn-icon">💻</div>
+                    <div className="btn-text">
+                      <h4>Use E-Library</h4>
+                      <p>Access computers and digital resources</p>
+                    </div>
+                  </button>
                 </div>
-                <p className="farewell-message">
-                  {lastAction === 'logout' 
-                    ? "Have a great day! Come back soon for more learning." 
-                    : "Welcome to IUBAT Smart Library! Enjoy your study session."
-                  }
-                </p>
-              </div>
-              <div className="auto-return-notice">
-                <p>Returning to main screen automatically...</p>
-                <div className="countdown-bar"></div>
               </div>
             </div>
           </div>
-        ) : showElibrary ? (
+        ) : showElibrary === true ? (
           <div className="elibrary-section">
             <div className="elibrary-header">
               <h2>IUBAT Smart Library - E-Library Section</h2>
@@ -230,17 +293,29 @@ function App() {
                     </div>
                   )}
                 </div>
-                <div className="scan-for-next">
-                  <form onSubmit={handleStudentScan} className="next-scan-form">
-                    <input
-                      type="text"
-                      value={studentId}
-                      onChange={(e) => setStudentId(e.target.value)}
-                      placeholder="Scan next student ID..."
-                      className="next-student-input"
-                      autoComplete="off"
-                    />
-                  </form>
+                <div className="elibrary-actions">
+                  {isServiceMonitor && (
+                    <button 
+                      className="back-to-service-btn"
+                      onClick={handleBackToService}
+                    >
+                      ← Back to Services
+                    </button>
+                  )}
+                  {!isServiceMonitor && (
+                    <div className="scan-for-next">
+                      <form onSubmit={handleStudentScan} className="next-scan-form">
+                        <input
+                          type="text"
+                          value={studentId}
+                          onChange={(e) => setStudentId(e.target.value)}
+                          placeholder="Scan next student ID..."
+                          className="next-student-input"
+                          autoComplete="off"
+                        />
+                      </form>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -263,9 +338,20 @@ function App() {
                   <rect x="21" y="4" width="1" height="16" fill="#2c3e50"/>
                 </svg>
               </div>
-              <h1 className="scan-title">Welcome to</h1>
-              <h2 className="scan-subtitle">IUBAT Smart Library</h2>
-              <p className="scan-description">Please scan your ID card to enter the library</p>
+              
+              {isServiceMonitor ? (
+                <>
+                  <h1 className="scan-title">Library Services</h1>
+                  <h2 className="scan-subtitle">E-Library & Exit Station</h2>
+                  <p className="scan-description">Please scan your ID card to access services</p>
+                </>
+              ) : (
+                <>
+                  <h1 className="scan-title">Welcome to</h1>
+                  <h2 className="scan-subtitle">IUBAT Smart Library</h2>
+                  <p className="scan-description">Please scan your ID card to enter the library</p>
+                </>
+              )}
               
               <form onSubmit={handleStudentScan} className="scan-form">
                 <div className="input-group">
@@ -280,12 +366,12 @@ function App() {
                     autoFocus
                   />
                   <button type="submit" className="scan-btn">
-                    Enter Library
+                    {isServiceMonitor ? 'Access Services' : 'Enter Library'}
                   </button>
                 </div>
               </form>
 
-              {message && !showElibrary && !showGoodbye && (
+              {message && !showElibrary && !showGoodbye && !showServiceMenu && (
                 <div className={getMessageClass()}>
                   <p>{message}</p>
                 </div>

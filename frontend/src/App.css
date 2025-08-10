@@ -2166,3 +2166,146 @@ body {
     padding: 20px;
   }
 }
+
+/* Service Menu Styles */
+.service-menu {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.service-container {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  animation: slideIn 0.5s ease-out;
+}
+
+.student-welcome h2 {
+  color: #2c3e50;
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.student-welcome p {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+.service-options h3 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+}
+
+.service-buttons {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.service-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+  border: 3px solid #e9ecef;
+  background: white;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 200px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.service-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.logout-btn {
+  border-color: #e74c3c;
+}
+
+.logout-btn:hover {
+  border-color: #c0392b;
+  background: #fdf2f2;
+}
+
+.elibrary-btn {
+  border-color: #3498db;
+}
+
+.elibrary-btn:hover {
+  border-color: #2980b9;
+  background: #f2f8fd;
+}
+
+.btn-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.btn-text h4 {
+  font-size: 1.3rem;
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.btn-text p {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* E-Library Actions */
+.elibrary-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.back-to-service-btn {
+  padding: 10px 20px;
+  background: #95a5a6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.back-to-service-btn:hover {
+  background: #7f8c8d;
+  transform: translateY(-2px);
+}
+
+/* Service Menu Responsive Design */
+@media (max-width: 768px) {
+  .service-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .service-btn {
+    min-width: 250px;
+  }
+  
+  .service-container {
+    padding: 25px;
+    margin: 10px;
+  }
+}
