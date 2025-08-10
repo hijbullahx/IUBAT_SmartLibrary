@@ -77,7 +77,24 @@ function App() {
         const student = studentResponse.data.student;
         
         if (isServiceMonitor) {
-          // SERVICE MONITOR: Show options for logout or e-library
+          // SERVICE MONITOR: Only allow access if student entered via entry monitor
+          const studentKey = student.student_id;
+          
+          if (!entryMonitorLoggedInStudents.has(studentKey)) {
+            // Student hasn't entered via entry monitor
+            setMessage(`${student.name}, please scan your ID at the entry monitor first to enter the library.`);
+            setLastAction('entry_required');
+            setStudentId('');
+            
+            // Auto-clear message after 5 seconds
+            setTimeout(() => {
+              setMessage('');
+              setLastAction('');
+            }, 5000);
+            return;
+          }
+          
+          // Student is authorized, show service menu
           setScannedStudent({
             student_id: student.student_id,
             name: student.name,
@@ -190,12 +207,13 @@ function App() {
     if (lastAction === 'login') return 'message success';
     if (lastAction === 'logout') return 'message warning';
     if (lastAction === 'already_logged_in') return 'message info';
+    if (lastAction === 'entry_required') return 'message error';
     if (message.includes('error') || message.includes('not found')) return 'message error';
     return 'message info';
   };
 
   const handleReturnFromGoodbye = () => {
-    // Reset all states to return to welcome screen
+    // Return to service monitor after goodbye (since logout happened from service monitor)
     setStudentId('');
     setMessage('');
     setStudentName('');
@@ -207,6 +225,9 @@ function App() {
     setLastAction('');
     setShouldShowGoodbye(false);
     setShowServiceMenu(false);
+    
+    // Set to service monitor mode so user can scan again for services
+    setIsServiceMonitor(true);
   };
 
   const handleServiceChoice = async (choice) => {
@@ -385,6 +406,7 @@ function App() {
                   <h1 className="scan-title">Library Services</h1>
                   <h2 className="scan-subtitle">E-Library & Exit Station</h2>
                   <p className="scan-description">Please scan your ID card to access services</p>
+                  <p className="scan-note">Note: You must enter through the main entrance first</p>
                 </>
               ) : (
                 <>
@@ -415,6 +437,11 @@ function App() {
               {message && !showElibrary && !showGoodbye && !showServiceMenu && (
                 <div className={getMessageClass()}>
                   <p>{message}</p>
+                  {lastAction === 'entry_required' && (
+                    <p style={{marginTop: '10px', fontSize: '0.9rem', fontWeight: '500'}}>
+                      👈 Please use the Entry Monitor to scan in first
+                    </p>
+                  )}
                 </div>
               )}
             </div>
