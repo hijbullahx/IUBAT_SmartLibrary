@@ -146,7 +146,9 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     <div className="elibrary-container">
       <div className="elibrary-header">
         <h2>🖥️ E-Library - Computer Lab</h2>
-        <p>Welcome {scannedStudent?.name}! Select an available PC to get started.</p>
+        {!currentUserPc && (
+          <p>Welcome {scannedStudent?.name}! Select an available PC to get started.</p>
+        )}
       </div>
 
       {currentUserPc ? (
@@ -175,21 +177,6 @@ function ELibrary({ scannedStudent, onReturnToService }) {
               <h3>Select a Computer</h3>
               <p>Click on any available PC to automatically check in and start your session.</p>
             </div>
-          </div>
-        </div>
-      )}
-
-      {currentUserPc && (
-        <div className="active-session-section">
-          <h3>Your Active Session</h3>
-          <div className="session-info">
-            <div className="session-details">
-              <span className="pc-label">PC {currentUserPc.pc_number}</span>
-              <span className="session-status">Active Session</span>
-            </div>
-            <button onClick={handleCheckOut} className="checkout-session-btn">
-              Check Out
-            </button>
           </div>
         </div>
       )}
