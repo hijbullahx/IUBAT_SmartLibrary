@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>🎉 Static File Serving Works!</h1>
+    <p>If you can see this page, Django is serving HTML files correctly.</p>
+    <p>This means the issue is likely with the React app itself, not Django.</p>
+    <script>
+        console.log('✅ JavaScript execution works!');
+        
+        // Test if we can load the main React JS file
+        fetch('/static/js/main.d8f3d642.js')
+            .then(response => {
+                console.log('✅ React JS file accessible:', response.status);
+            })
+            .catch(error => {
+                console.error('❌ React JS file not accessible:', error);
+            });
+            
+        // Test if we can load the main React CSS file
+        fetch('/static/css/main.1142fc63.css')
+            .then(response => {
+                console.log('✅ React CSS file accessible:', response.status);
+            })
+            .catch(error => {
+                console.error('❌ React CSS file not accessible:', error);
+            });
+    </script>
+</body>
+</html>
