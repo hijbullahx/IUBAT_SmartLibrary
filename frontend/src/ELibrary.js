@@ -31,8 +31,10 @@ function ELibrary({ scannedStudent, onReturnToService }) {
   const checkCurrentUserPc = async () => {
     try {
       // Check if student is already using a PC
-      const response = await axios.get(`${API_ENDPOINTS.ELIBRARY_PC_STATUS}?student_id=${scannedStudent.student_id}`);
-      const userPc = response.data.pcs?.find(pc => pc.current_user === scannedStudent.student_id);
+      const response = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
+      const userPc = response.data.pcs?.find(pc => 
+        pc.status === 'in-use' && pc.current_user === scannedStudent.student_id
+      );
       setCurrentUserPc(userPc || null);
     } catch (error) {
       console.error('Error checking current user PC:', error);
@@ -61,10 +63,15 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       
       setMessage(`Successfully checked in to PC ${pc.pc_number}!`);
       
-      // Auto return to service monitor after 2 seconds
-      setTimeout(() => {
-        onReturnToService();
-      }, 2000);
+      // Update current user PC immediately
+      setCurrentUserPc({
+        pc_number: pc.pc_number,
+        status: 'in-use',
+        current_user: scannedStudent.student_id
+      });
+      
+      // Refresh PC list
+      loadPCs();
       
     } catch (error) {
       setMessage(error.response?.data?.message || 'Error checking in to PC');
@@ -83,7 +90,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
         pc_number: currentUserPc.pc_number
       });
       
-      setMessage('Successfully checked out from PC. You can continue using other library services.');
+      setMessage(`Successfully checked out from PC ${currentUserPc.pc_number}. You can now select a different PC.`);
       setCurrentUserPc(null);
       loadPCs(); // Refresh PC status
       
@@ -130,7 +137,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
             <div className="alert-icon">💻</div>
             <div className="alert-text">
               <h3>You are currently using PC {currentUserPc.pc_number}</h3>
-              <p>You have an active session on PC {currentUserPc.pc_number}. You can continue using it or check out to select a different PC.</p>
+              <p>You have an active session on PC {currentUserPc.pc_number}. You can check out to select a different PC or continue using your current session.</p>
             </div>
             <div className="alert-actions">
               <button onClick={handleCheckOut} className="checkout-alert-btn">
@@ -143,8 +150,29 @@ function ELibrary({ scannedStudent, onReturnToService }) {
           </div>
         </div>
       ) : (
-        <div className="no-pc-message">
-          <p>You don't have any active PC session. Select an available PC below to get started.</p>
+        <div className="pc-selection-info">
+          <div className="info-content">
+            <div className="info-icon">🖱️</div>
+            <div className="info-text">
+              <h3>Select a Computer</h3>
+              <p>Click on any available PC to automatically check in and start your session.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {currentUserPc && (
+        <div className="active-session-section">
+          <h3>Your Active Session</h3>
+          <div className="session-info">
+            <div className="session-details">
+              <span className="pc-label">PC {currentUserPc.pc_number}</span>
+              <span className="session-status">Active Session</span>
+            </div>
+            <button onClick={handleCheckOut} className="checkout-session-btn">
+              Check Out
+            </button>
+          </div>
         </div>
       )}
 
