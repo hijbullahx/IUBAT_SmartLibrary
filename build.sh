@@ -8,10 +8,13 @@ cd frontend
 npm install
 npm run build
 
-# Copy React build to Django static files
+# Copy React build to Django static files - flatten the structure
 cd ..
 mkdir -p backend/static
-cp -r frontend/build/* backend/static/
+# Copy top-level files (index.html, manifest.json, etc.)
+cp frontend/build/*.* backend/static/ 2>/dev/null || true
+# Copy the static subdirectory contents directly to static/
+cp -r frontend/build/static/* backend/static/ 2>/dev/null || true
 
 # Navigate to backend directory for Django operations
 cd backend
