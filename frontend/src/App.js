@@ -230,6 +230,13 @@ function App() {
     setIsServiceMonitor(true);
   };
 
+  const handleReturnToService = () => {
+    // Return from E-Library to service monitor
+    setShowElibrary(false);
+    setShowServiceMenu(true);
+    setIsServiceMonitor(true);
+  };
+
   const handleServiceChoice = async (choice) => {
     if (choice === 'logout') {
       // Process full library logout
@@ -381,7 +388,10 @@ function App() {
                 </div>
               </div>
             </div>
-            <ELibrary scannedStudent={scannedStudent} />
+            <ELibrary 
+              scannedStudent={scannedStudent} 
+              onReturnToService={handleReturnToService}
+            />
           </div>
         ) : showAdmin ? (
           <AdminDashboard />
