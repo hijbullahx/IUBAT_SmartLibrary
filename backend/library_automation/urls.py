@@ -84,8 +84,8 @@ urlpatterns = [
     path('debug-info/', debug_info, name='debug_info'),  # Debug endpoint
     path('test-react/', ReactAppView.as_view(), name='test_react'),  # Test endpoint
     
-    # React App - catch all other routes except API and admin
-    re_path(r'^(?!api/|admin/|debug-info/).*$', ReactAppView.as_view(), name='react_app'),
+    # React App - catch all other routes except API, admin, static files, and debug endpoints
+    re_path(r'^(?!api/|admin/|static/|debug-info/).*$', ReactAppView.as_view(), name='react_app'),
 ]
 
 # Serve static files
