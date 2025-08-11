@@ -378,9 +378,20 @@ def weekly_report(request):
 
     from datetime import timedelta
     
-    # Get current week (last 7 days)
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=7)
+    # Check if specific week is requested
+    week_param = request.GET.get('week')
+    
+    if week_param:
+        try:
+            # Parse the week start date
+            start_date = datetime.strptime(week_param, '%Y-%m-%d')
+            end_date = start_date + timedelta(days=6)
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid week format. Use YYYY-MM-DD.'}, status=400)
+    else:
+        # Default: Get current week (last 7 days)
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=7)
 
     main_library_entries = LibraryEntry.objects.filter(
         entry_time__range=[start_date, end_date]
@@ -428,10 +439,29 @@ def monthly_report(request):
         return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
 
     from datetime import timedelta
+    import calendar
     
-    # Get current month (last 30 days)
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=30)
+    # Check if specific month is requested
+    month_param = request.GET.get('month')
+    
+    if month_param:
+        try:
+            # Parse the month parameter (format: YYYY-MM)
+            year, month = map(int, month_param.split('-'))
+            
+            # Get first day of the month
+            start_date = datetime(year, month, 1)
+            
+            # Get last day of the month
+            last_day = calendar.monthrange(year, month)[1]
+            end_date = datetime(year, month, last_day, 23, 59, 59)
+            
+        except (ValueError, IndexError):
+            return JsonResponse({'status': 'error', 'message': 'Invalid month format. Use YYYY-MM.'}, status=400)
+    else:
+        # Default: Get current month (last 30 days)
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30)
 
     main_library_entries = LibraryEntry.objects.filter(
         entry_time__range=[start_date, end_date]
@@ -480,9 +510,26 @@ def yearly_report(request):
 
     from datetime import timedelta
     
-    # Get current year (last 365 days)
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=365)
+    # Check if specific year is requested
+    year_param = request.GET.get('year')
+    
+    if year_param:
+        try:
+            # Parse the year parameter
+            year = int(year_param)
+            
+            # Get first day of the year
+            start_date = datetime(year, 1, 1)
+            
+            # Get last day of the year
+            end_date = datetime(year, 12, 31, 23, 59, 59)
+            
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid year format.'}, status=400)
+    else:
+        # Default: Get current year (last 365 days)
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365)
 
     main_library_entries = LibraryEntry.objects.filter(
         entry_time__range=[start_date, end_date]

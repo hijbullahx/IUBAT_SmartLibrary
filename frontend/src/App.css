@@ -1302,6 +1302,23 @@ body {
   background: white; /* Ensure white background */
 }
 
+.report-controls select.date-select {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: #495057;
+  background: white;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.report-controls select.date-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
 .report-controls input:focus {
   outline: none;
   border-color: #667eea;

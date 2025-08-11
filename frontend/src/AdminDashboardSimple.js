@@ -26,6 +26,11 @@ function AdminDashboard() {
   const [endDate, setEndDate] = useState('2025-08-10');
   const [studentQuery, setStudentQuery] = useState('');
 
+  // New date selection states for weekly, monthly, yearly reports
+  const [selectedWeek, setSelectedWeek] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+
   useEffect(() => {
     if (isLoggedIn) {
       loadDashboardData();
@@ -170,11 +175,19 @@ function AdminDashboard() {
   const loadWeeklyReport = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_WEEKLY);
+      let url = API_ENDPOINTS.ADMIN_REPORTS_WEEKLY;
+      
+      // Add week parameter if selected
+      if (selectedWeek) {
+        url += `?week=${selectedWeek}`;
+      }
+
+      const response = await axios.get(url);
 
       if (response.data.status === 'success') {
         setWeeklyReport(response.data.report || []);
-        setMessage(`Found ${response.data.report?.length || 0} weekly entries`);
+        const weekText = selectedWeek ? `Week of ${selectedWeek}` : 'Last 7 Days';
+        setMessage(`Found ${response.data.report?.length || 0} entries for ${weekText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
       }
@@ -188,11 +201,19 @@ function AdminDashboard() {
   const loadMonthlyReport = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_MONTHLY);
+      let url = API_ENDPOINTS.ADMIN_REPORTS_MONTHLY;
+      
+      // Add month parameter if selected
+      if (selectedMonth) {
+        url += `?month=${selectedMonth}`;
+      }
+
+      const response = await axios.get(url);
 
       if (response.data.status === 'success') {
         setMonthlyReport(response.data.report || []);
-        setMessage(`Found ${response.data.report?.length || 0} monthly entries`);
+        const monthText = selectedMonth ? `${selectedMonth}` : 'Last 30 Days';
+        setMessage(`Found ${response.data.report?.length || 0} entries for ${monthText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
       }
@@ -206,11 +227,19 @@ function AdminDashboard() {
   const loadYearlyReport = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_YEARLY);
+      let url = API_ENDPOINTS.ADMIN_REPORTS_YEARLY;
+      
+      // Add year parameter if selected
+      if (selectedYear) {
+        url += `?year=${selectedYear}`;
+      }
+
+      const response = await axios.get(url);
 
       if (response.data.status === 'success') {
         setYearlyReport(response.data.report || []);
-        setMessage(`Found ${response.data.report?.length || 0} yearly entries`);
+        const yearText = selectedYear ? `Year ${selectedYear}` : 'Last 365 Days';
+        setMessage(`Found ${response.data.report?.length || 0} entries for ${yearText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
       }
@@ -343,6 +372,66 @@ function AdminDashboard() {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleString();
+  };
+
+  // Helper functions for date generation
+  const generateWeekOptions = () => {
+    const weeks = [];
+    const currentDate = new Date();
+    
+    // Generate last 52 weeks
+    for (let i = 0; i < 52; i++) {
+      const weekStart = new Date(currentDate);
+      weekStart.setDate(currentDate.getDate() - (i * 7));
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Start of week (Sunday)
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
+      
+      const weekStartStr = weekStart.toISOString().split('T')[0];
+      const weekEndStr = weekEnd.toISOString().split('T')[0];
+      
+      weeks.push({
+        value: weekStartStr,
+        label: `Week of ${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`
+      });
+    }
+    
+    return weeks;
+  };
+
+  const generateMonthOptions = () => {
+    const months = [];
+    const currentDate = new Date();
+    
+    // Generate last 24 months
+    for (let i = 0; i < 24; i++) {
+      const monthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const year = monthDate.getFullYear();
+      const month = monthDate.getMonth() + 1; // JavaScript months are 0-indexed
+      
+      months.push({
+        value: `${year}-${month.toString().padStart(2, '0')}`,
+        label: `${monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
+      });
+    }
+    
+    return months;
+  };
+
+  const generateYearOptions = () => {
+    const years = [];
+    const currentYear = new Date().getFullYear();
+    
+    // Generate years from 1999 to current year
+    for (let year = currentYear; year >= 1999; year--) {
+      years.push({
+        value: year.toString(),
+        label: year.toString()
+      });
+    }
+    
+    return years;
   };
 
   if (!isLoggedIn) {
@@ -722,13 +811,25 @@ function AdminDashboard() {
 
           {/* Weekly Report */}
           <div className="report-card">
-            <h4>📊 Weekly Report (Last 7 Days)</h4>
+            <h4>📊 Weekly Report</h4>
             <div className="report-controls">
+              <select 
+                value={selectedWeek} 
+                onChange={(e) => setSelectedWeek(e.target.value)}
+                className="date-select"
+              >
+                <option value="">Last 7 Days (Default)</option>
+                {generateWeekOptions().map(week => (
+                  <option key={week.value} value={week.value}>
+                    {week.label}
+                  </option>
+                ))}
+              </select>
               <button onClick={loadWeeklyReport} disabled={loading}>
-                Generate Weekly Report
+                {selectedWeek ? 'Generate Selected Week Report' : 'Generate Weekly Report'}
               </button>
               {weeklyReport.length > 0 && (
-                <button onClick={() => printReport(weeklyReport, 'Weekly Report (Last 7 Days)')} className="print-btn">
+                <button onClick={() => printReport(weeklyReport, selectedWeek ? `Weekly Report - Week of ${selectedWeek}` : 'Weekly Report (Last 7 Days)')} className="print-btn">
                   🖨️ Print
                 </button>
               )}
@@ -768,13 +869,25 @@ function AdminDashboard() {
 
           {/* Monthly Report */}
           <div className="report-card">
-            <h4>📅 Monthly Report (Last 30 Days)</h4>
+            <h4>📅 Monthly Report</h4>
             <div className="report-controls">
+              <select 
+                value={selectedMonth} 
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="date-select"
+              >
+                <option value="">Last 30 Days (Default)</option>
+                {generateMonthOptions().map(month => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
+                  </option>
+                ))}
+              </select>
               <button onClick={loadMonthlyReport} disabled={loading}>
-                Generate Monthly Report
+                {selectedMonth ? 'Generate Selected Month Report' : 'Generate Monthly Report'}
               </button>
               {monthlyReport.length > 0 && (
-                <button onClick={() => printReport(monthlyReport, 'Monthly Report (Last 30 Days)')} className="print-btn">
+                <button onClick={() => printReport(monthlyReport, selectedMonth ? `Monthly Report - ${selectedMonth}` : 'Monthly Report (Last 30 Days)')} className="print-btn">
                   🖨️ Print
                 </button>
               )}
@@ -814,13 +927,25 @@ function AdminDashboard() {
 
           {/* Yearly Report */}
           <div className="report-card">
-            <h4>🗓️ Yearly Report (Last 365 Days)</h4>
+            <h4>🗓️ Yearly Report</h4>
             <div className="report-controls">
+              <select 
+                value={selectedYear} 
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="date-select"
+              >
+                <option value="">Last 365 Days (Default)</option>
+                {generateYearOptions().map(year => (
+                  <option key={year.value} value={year.value}>
+                    {year.label}
+                  </option>
+                ))}
+              </select>
               <button onClick={loadYearlyReport} disabled={loading}>
-                Generate Yearly Report
+                {selectedYear ? 'Generate Selected Year Report' : 'Generate Yearly Report'}
               </button>
               {yearlyReport.length > 0 && (
-                <button onClick={() => printReport(yearlyReport, 'Yearly Report (Last 365 Days)')} className="print-btn">
+                <button onClick={() => printReport(yearlyReport, selectedYear ? `Yearly Report - ${selectedYear}` : 'Yearly Report (Last 365 Days)')} className="print-btn">
                   🖨️ Print
                 </button>
               )}
