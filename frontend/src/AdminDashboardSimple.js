@@ -10,9 +10,15 @@ function AdminDashboard() {
   const [stats, setStats] = useState({});
   const [timeBasedReport, setTimeBasedReport] = useState([]);
   const [studentBasedReport, setStudentBasedReport] = useState([]);
+  const [weeklyReport, setWeeklyReport] = useState([]);
+  const [monthlyReport, setMonthlyReport] = useState([]);
+  const [yearlyReport, setYearlyReport] = useState([]);
   const [pcs, setPcs] = useState([]);
   const [pcDetails, setPcDetails] = useState([]);
   const [liveStats, setLiveStats] = useState({});
+  const [analyticsData, setAnalyticsData] = useState([]);
+  const [showPcModal, setShowPcModal] = useState(false);
+  const [selectedPc, setSelectedPc] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Report filters
@@ -29,26 +35,24 @@ function AdminDashboard() {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      console.log('📊 Loading dashboard data...');
-      
-      // Load live statistics
       const liveStatsResponse = await axios.get(API_ENDPOINTS.ADMIN_STATS_LIVE);
-      
-      console.log('Live stats response:', liveStatsResponse);
       
       if (liveStatsResponse.data.status === 'success') {
         setLiveStats(liveStatsResponse.data.stats || {});
         setPcDetails(liveStatsResponse.data.pc_details || []);
       }
 
-      // Load PC status for backward compatibility
+      const analyticsResponse = await axios.get(API_ENDPOINTS.PC_ANALYTICS);
+      
+      if (analyticsResponse.data.status === 'success') {
+        setAnalyticsData(analyticsResponse.data.data || []);
+      }
+
       const pcResponse = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
       
       if (pcResponse.data.status === 'success') {
         setPcs(pcResponse.data.pcs || []);
       }
-
-      console.log('Dashboard data loaded successfully');
 
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -59,6 +63,33 @@ function AdminDashboard() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePcClick = (pc) => {
+    setSelectedPc(pc);
+    setShowPcModal(true);
+  };
+
+  const togglePcStatus = async (pcNumber, newStatus) => {
+    try {
+      const isDumb = newStatus === 'dumb';
+      const response = await axios.post(API_ENDPOINTS.ADMIN_TOGGLE_PC, {
+        pc_number: pcNumber,
+        is_dumb: isDumb
+      });
+
+      if (response.data.status === 'success') {
+        setMessage(`PC ${pcNumber} marked as ${newStatus}`);
+        // Reload data to get updated status
+        loadDashboardData();
+        setShowPcModal(false);
+      } else {
+        setMessage(`Error updating PC status: ${response.data.message}`);
+      }
+    } catch (error) {
+      console.error('Error toggling PC status:', error);
+      setMessage('Error updating PC status. Please try again.');
     }
   };
 
@@ -109,13 +140,9 @@ function AdminDashboard() {
 
     setLoading(true);
     try {
-      console.log('👤 Requesting student-based report...', { studentQuery });
-      
       const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_STUDENT, {
         params: { student_query: studentQuery }
       });
-
-      console.log('Student report response:', response);
 
       if (response.data.status === 'success') {
         setStudentBasedReport(response.data.report || []);
@@ -140,27 +167,156 @@ function AdminDashboard() {
     }
   };
 
+  const loadWeeklyReport = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_WEEKLY);
+
+      if (response.data.status === 'success') {
+        setWeeklyReport(response.data.report || []);
+        setMessage(`Found ${response.data.report?.length || 0} weekly entries`);
+      } else {
+        setMessage(`Error: ${response.data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      setMessage('Error loading weekly report. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMonthlyReport = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_MONTHLY);
+
+      if (response.data.status === 'success') {
+        setMonthlyReport(response.data.report || []);
+        setMessage(`Found ${response.data.report?.length || 0} monthly entries`);
+      } else {
+        setMessage(`Error: ${response.data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      setMessage('Error loading monthly report. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadYearlyReport = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_YEARLY);
+
+      if (response.data.status === 'success') {
+        setYearlyReport(response.data.report || []);
+        setMessage(`Found ${response.data.report?.length || 0} yearly entries`);
+      } else {
+        setMessage(`Error: ${response.data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      setMessage('Error loading yearly report. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const printReport = (reportData, reportTitle) => {
+    const printWindow = window.open('', '_blank');
+    const tableHTML = generatePrintableTable(reportData, reportTitle);
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${reportTitle} - IUBAT Smart Library</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .title { font-size: 24px; font-weight: bold; color: #2c3e50; }
+            .subtitle { font-size: 16px; color: #7f8c8d; margin-top: 5px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            .print-date { text-align: right; margin-top: 20px; font-size: 12px; color: #7f8c8d; }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">IUBAT Smart Library</div>
+            <div class="subtitle">${reportTitle}</div>
+          </div>
+          ${tableHTML}
+          <div class="print-date">Generated on: ${new Date().toLocaleString()}</div>
+          <script>
+            window.onload = function() {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              };
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  const generatePrintableTable = (data, title) => {
+    if (!data || data.length === 0) {
+      return '<p>No data available for this report.</p>';
+    }
+
+    const headers = Object.keys(data[0]);
+    
+    return `
+      <table>
+        <thead>
+          <tr>
+            ${headers.map(header => `<th>${formatHeader(header)}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(row => `
+            <tr>
+              ${headers.map(header => `<td>${formatCellValue(row[header], header)}</td>`).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  };
+
+  const formatHeader = (header) => {
+    return header.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
+  const formatCellValue = (value, header) => {
+    if (header.includes('time') && value) {
+      return formatDateTime(value);
+    }
+    return value || 'N/A';
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log('🔑 Attempting admin login...');
-      
       const response = await axios.post(API_ENDPOINTS.ADMIN_LOGIN, {
         username,
         password
       });
       
-      console.log('Login response:', response);
-      
       if (response.data.status === 'success') {
         setIsLoggedIn(true);
         setMessage('Login successful');
-        console.log('✅ Admin login successful, loading dashboard data...');
       } else {
         setMessage('Invalid credentials');
       }
     } catch (error) {
-      console.error('Login error:', error);
       if (error.response && error.response.data && error.response.data.message) {
         setMessage(error.response.data.message);
       } else {
@@ -292,6 +448,31 @@ function AdminDashboard() {
           </div>
         </div>
 
+        {/* Analytics Bar for Last 7 Days */}
+        <div className="analytics-section">
+          <h3>📈 PC Usage Analytics (Last 7 Days)</h3>
+          <div className="analytics-bar">
+            {analyticsData.length > 0 ? (
+              analyticsData.map((day, index) => (
+                <div key={index} className="analytics-day">
+                  <div className="day-bar">
+                    <div 
+                      className="usage-bar"
+                      style={{
+                        height: `${Math.max(10, (day.usage_count / Math.max(...analyticsData.map(d => d.usage_count))) * 80)}%`
+                      }}
+                    ></div>
+                  </div>
+                  <div className="day-label">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                  <div className="day-count">{day.usage_count}</div>
+                </div>
+              ))
+            ) : (
+              <div className="no-analytics">No usage data available</div>
+            )}
+          </div>
+        </div>
+
         {/* Enhanced PC Status Section with Library Layout */}
         <div className="pc-status-section">
           <h3>💻 E-Library PC Layout (8 Columns × 6 PCs)</h3>
@@ -328,7 +509,8 @@ function AdminDashboard() {
                           {leftColumnPcs.map(pc => (
                             <div 
                               key={pc.pc_number} 
-                              className={`pc-library ${pc.status}`}
+                              className={`pc-library ${pc.status} clickable`}
+                              onClick={() => handlePcClick(pc)}
                             >
                               {pc.pc_number}
                               <div className="pc-tooltip">
@@ -375,7 +557,8 @@ function AdminDashboard() {
                           {rightColumnPcs.map(pc => (
                             <div 
                               key={pc.pc_number} 
-                              className={`pc-library ${pc.status}`}
+                              className={`pc-library ${pc.status} clickable`}
+                              onClick={() => handlePcClick(pc)}
                             >
                               {pc.pc_number}
                               <div className="pc-tooltip">
@@ -446,6 +629,11 @@ function AdminDashboard() {
               <button onClick={loadTimeBasedReport} disabled={loading}>
                 Generate Report
               </button>
+              {timeBasedReport.length > 0 && (
+                <button onClick={() => printReport(timeBasedReport, 'Time-based Report')} className="print-btn">
+                  🖨️ Print
+                </button>
+              )}
             </div>
             
             {timeBasedReport.length > 0 && (
@@ -493,6 +681,11 @@ function AdminDashboard() {
               <button onClick={loadStudentBasedReport} disabled={loading}>
                 Search Student
               </button>
+              {studentBasedReport.length > 0 && (
+                <button onClick={() => printReport(studentBasedReport, 'Student-based Report')} className="print-btn">
+                  🖨️ Print
+                </button>
+              )}
             </div>
             
             {studentBasedReport.length > 0 && (
@@ -526,8 +719,217 @@ function AdminDashboard() {
               </div>
             )}
           </div>
+
+          {/* Weekly Report */}
+          <div className="report-card">
+            <h4>📊 Weekly Report (Last 7 Days)</h4>
+            <div className="report-controls">
+              <button onClick={loadWeeklyReport} disabled={loading}>
+                Generate Weekly Report
+              </button>
+              {weeklyReport.length > 0 && (
+                <button onClick={() => printReport(weeklyReport, 'Weekly Report (Last 7 Days)')} className="print-btn">
+                  🖨️ Print
+                </button>
+              )}
+            </div>
+            
+            {weeklyReport.length > 0 && (
+              <div className="report-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Student Name</th>
+                      <th>Student ID</th>
+                      <th>Department</th>
+                      <th>Location</th>
+                      <th>PC</th>
+                      <th>Entry Time</th>
+                      <th>Exit Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {weeklyReport.map((entry, index) => (
+                      <tr key={index}>
+                        <td>{entry.student_name}</td>
+                        <td>{entry.student_id}</td>
+                        <td>{entry.department}</td>
+                        <td>{entry.location}</td>
+                        <td>{entry.pc_number}</td>
+                        <td>{formatDateTime(entry.entry_time)}</td>
+                        <td>{formatDateTime(entry.exit_time)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Monthly Report */}
+          <div className="report-card">
+            <h4>📅 Monthly Report (Last 30 Days)</h4>
+            <div className="report-controls">
+              <button onClick={loadMonthlyReport} disabled={loading}>
+                Generate Monthly Report
+              </button>
+              {monthlyReport.length > 0 && (
+                <button onClick={() => printReport(monthlyReport, 'Monthly Report (Last 30 Days)')} className="print-btn">
+                  🖨️ Print
+                </button>
+              )}
+            </div>
+            
+            {monthlyReport.length > 0 && (
+              <div className="report-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Student Name</th>
+                      <th>Student ID</th>
+                      <th>Department</th>
+                      <th>Location</th>
+                      <th>PC</th>
+                      <th>Entry Time</th>
+                      <th>Exit Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyReport.map((entry, index) => (
+                      <tr key={index}>
+                        <td>{entry.student_name}</td>
+                        <td>{entry.student_id}</td>
+                        <td>{entry.department}</td>
+                        <td>{entry.location}</td>
+                        <td>{entry.pc_number}</td>
+                        <td>{formatDateTime(entry.entry_time)}</td>
+                        <td>{formatDateTime(entry.exit_time)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Yearly Report */}
+          <div className="report-card">
+            <h4>🗓️ Yearly Report (Last 365 Days)</h4>
+            <div className="report-controls">
+              <button onClick={loadYearlyReport} disabled={loading}>
+                Generate Yearly Report
+              </button>
+              {yearlyReport.length > 0 && (
+                <button onClick={() => printReport(yearlyReport, 'Yearly Report (Last 365 Days)')} className="print-btn">
+                  🖨️ Print
+                </button>
+              )}
+            </div>
+            
+            {yearlyReport.length > 0 && (
+              <div className="report-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Student Name</th>
+                      <th>Student ID</th>
+                      <th>Department</th>
+                      <th>Location</th>
+                      <th>PC</th>
+                      <th>Entry Time</th>
+                      <th>Exit Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {yearlyReport.map((entry, index) => (
+                      <tr key={index}>
+                        <td>{entry.student_name}</td>
+                        <td>{entry.student_id}</td>
+                        <td>{entry.department}</td>
+                        <td>{entry.location}</td>
+                        <td>{entry.pc_number}</td>
+                        <td>{formatDateTime(entry.entry_time)}</td>
+                        <td>{formatDateTime(entry.exit_time)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* PC Management Modal */}
+      {showPcModal && selectedPc && (
+        <div className="modal-overlay" onClick={() => setShowPcModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🖥️ PC {selectedPc.pc_number} Management</h3>
+              <button className="modal-close" onClick={() => setShowPcModal(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="pc-status-info">
+                <div className="status-indicator">
+                  <span className={`status-dot ${selectedPc.status}`}></span>
+                  <span className="status-text">
+                    Status: <strong>{selectedPc.status === 'available' ? 'Available' : 
+                                    selectedPc.status === 'in_use' ? 'In Use' : 'Out of Service'}</strong>
+                  </span>
+                </div>
+                
+                {selectedPc.user_info && (
+                  <div className="user-details">
+                    <h4>👤 Current User</h4>
+                    <p><strong>Name:</strong> {selectedPc.user_info.student_name}</p>
+                    <p><strong>ID:</strong> {selectedPc.user_info.student_id}</p>
+                    <p><strong>Department:</strong> {selectedPc.user_info.department}</p>
+                    <p><strong>Since:</strong> {new Date(selectedPc.user_info.entry_time).toLocaleString()}</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="pc-actions">
+                <h4>🔧 Actions</h4>
+                <div className="action-buttons">
+                  {selectedPc.status === 'available' && (
+                    <button 
+                      className="action-btn dumb"
+                      onClick={() => togglePcStatus(selectedPc.pc_number, 'dumb')}
+                    >
+                      ❌ Mark as Out of Service
+                    </button>
+                  )}
+                  {selectedPc.status === 'dumb' && (
+                    <button 
+                      className="action-btn available"
+                      onClick={() => togglePcStatus(selectedPc.pc_number, 'available')}
+                    >
+                      ✅ Mark as Available
+                    </button>
+                  )}
+                  {selectedPc.status === 'in_use' && (
+                    <>
+                      <button 
+                        className="action-btn available"
+                        onClick={() => togglePcStatus(selectedPc.pc_number, 'available')}
+                      >
+                        🔓 Force Checkout
+                      </button>
+                      <button 
+                        className="action-btn dumb"
+                        onClick={() => togglePcStatus(selectedPc.pc_number, 'dumb')}
+                      >
+                        ❌ Mark as Out of Service
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
