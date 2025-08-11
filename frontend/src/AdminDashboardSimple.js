@@ -292,71 +292,212 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* Enhanced PC Status Section with Hover Info */}
+        {/* Enhanced PC Status Section with Library Layout */}
         <div className="pc-status-section">
-          <h3>💻 E-Library PC Details</h3>
-          <div className="pc-grid">
-            {pcDetails.map((pc) => (
-              <div 
-                key={pc.pc_number} 
-                className={`pc-card-detailed ${pc.status}`}
-              >
-                <div className="pc-header">
-                  <div className="pc-number">PC {pc.pc_number}</div>
-                  <div className={`pc-status-badge ${pc.status}`}>
-                    {pc.status === 'available' && '✅ Available'}
-                    {pc.status === 'in_use' && '🔵 In Use'}
-                    {pc.status === 'dumb' && '❌ Out of Service'}
-                  </div>
-                </div>
-
-                {/* Custom Tooltip */}
-                <div className="pc-tooltip">
-                  <div className="tooltip-content">
-                    <div className="tooltip-title">PC {pc.pc_number}</div>
-                    {pc.user_info ? (
-                      <>
-                        <div className="tooltip-info">
-                          <span className="tooltip-label">Student: </span>
-                          <span className="tooltip-value">{pc.user_info.student_name}</span>
+          <h3>💻 E-Library PC Layout (4 Rows × 12 PCs)</h3>
+          
+          {/* Library Visual Layout */}
+          <div className="library-layout">
+            <div className="window-wall">
+              <div className="window"></div>
+              <div className="window"></div>
+              <div className="window"></div>
+            </div>
+            <div className="library-visual">
+              {[1, 2, 3, 4].map(rowNum => {
+                const startPc = (rowNum - 1) * 12 + 1;
+                const rowPcs = pcDetails.filter(pc => 
+                  pc.pc_number >= startPc && pc.pc_number <= startPc + 11
+                );
+                
+                return (
+                  <div key={rowNum} className="library-row">
+                    <div className="row-label">Row {rowNum}</div>
+                    <div className="row-content">
+                      {/* First side: PCs 1-6, 13-18, 25-30, 37-42 */}
+                      <div className="table-group">
+                        <div className="pc-table">
+                          {rowPcs.slice(0, 3).map(pc => (
+                            <div 
+                              key={pc.pc_number} 
+                              className={`pc-library ${pc.status}`}
+                            >
+                              {pc.pc_number}
+                              <div className="pc-tooltip">
+                                <div className="tooltip-content">
+                                  <div className="tooltip-title">PC {pc.pc_number}</div>
+                                  {pc.user_info ? (
+                                    <>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Student: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_name}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">ID: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_id}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Department: </span>
+                                        <span className="tooltip-value">{pc.user_info.department}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Since: </span>
+                                        <span className="tooltip-value">{new Date(pc.user_info.entry_time).toLocaleString()}</span>
+                                      </div>
+                                    </>
+                                  ) : pc.status === 'dumb' ? (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Out of service - needs maintenance</span>
+                                    </div>
+                                  ) : (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Available for use</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <div className="tooltip-info">
-                          <span className="tooltip-label">ID: </span>
-                          <span className="tooltip-value">{pc.user_info.student_id}</span>
+                        <div className="pc-table">
+                          {rowPcs.slice(3, 6).map(pc => (
+                            <div 
+                              key={pc.pc_number} 
+                              className={`pc-library ${pc.status}`}
+                            >
+                              {pc.pc_number}
+                              <div className="pc-tooltip">
+                                <div className="tooltip-content">
+                                  <div className="tooltip-title">PC {pc.pc_number}</div>
+                                  {pc.user_info ? (
+                                    <>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Student: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_name}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">ID: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_id}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Department: </span>
+                                        <span className="tooltip-value">{pc.user_info.department}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Since: </span>
+                                        <span className="tooltip-value">{new Date(pc.user_info.entry_time).toLocaleString()}</span>
+                                      </div>
+                                    </>
+                                  ) : pc.status === 'dumb' ? (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Out of service - needs maintenance</span>
+                                    </div>
+                                  ) : (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Available for use</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <div className="tooltip-info">
-                          <span className="tooltip-label">Department: </span>
-                          <span className="tooltip-value">{pc.user_info.department}</span>
-                        </div>
-                        <div className="tooltip-info">
-                          <span className="tooltip-label">Since: </span>
-                          <span className="tooltip-value">{new Date(pc.user_info.entry_time).toLocaleString()}</span>
-                        </div>
-                      </>
-                    ) : pc.status === 'dumb' ? (
-                      <div className="tooltip-info">
-                        <span className="tooltip-value">This PC is out of service and needs maintenance</span>
                       </div>
-                    ) : (
-                      <div className="tooltip-info">
-                        <span className="tooltip-value">This PC is available for use</span>
+                      
+                      {/* Second side: PCs 7-12, 19-24, 31-36, 43-48 */}
+                      <div className="table-group">
+                        <div className="pc-table">
+                          {rowPcs.slice(6, 9).map(pc => (
+                            <div 
+                              key={pc.pc_number} 
+                              className={`pc-library ${pc.status}`}
+                            >
+                              {pc.pc_number}
+                              <div className="pc-tooltip">
+                                <div className="tooltip-content">
+                                  <div className="tooltip-title">PC {pc.pc_number}</div>
+                                  {pc.user_info ? (
+                                    <>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Student: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_name}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">ID: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_id}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Department: </span>
+                                        <span className="tooltip-value">{pc.user_info.department}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Since: </span>
+                                        <span className="tooltip-value">{new Date(pc.user_info.entry_time).toLocaleString()}</span>
+                                      </div>
+                                    </>
+                                  ) : pc.status === 'dumb' ? (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Out of service - needs maintenance</span>
+                                    </div>
+                                  ) : (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Available for use</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="pc-table">
+                          {rowPcs.slice(9, 12).map(pc => (
+                            <div 
+                              key={pc.pc_number} 
+                              className={`pc-library ${pc.status}`}
+                            >
+                              {pc.pc_number}
+                              <div className="pc-tooltip">
+                                <div className="tooltip-content">
+                                  <div className="tooltip-title">PC {pc.pc_number}</div>
+                                  {pc.user_info ? (
+                                    <>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Student: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_name}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">ID: </span>
+                                        <span className="tooltip-value">{pc.user_info.student_id}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Department: </span>
+                                        <span className="tooltip-value">{pc.user_info.department}</span>
+                                      </div>
+                                      <div className="tooltip-info">
+                                        <span className="tooltip-label">Since: </span>
+                                        <span className="tooltip-value">{new Date(pc.user_info.entry_time).toLocaleString()}</span>
+                                      </div>
+                                    </>
+                                  ) : pc.status === 'dumb' ? (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Out of service - needs maintenance</span>
+                                    </div>
+                                  ) : (
+                                    <div className="tooltip-info">
+                                      <span className="tooltip-value">Available for use</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-
-                {pc.status === 'available' && (
-                  <div className="pc-available-info">
-                    <div className="available-text">Ready</div>
-                  </div>
-                )}
-                {pc.status === 'dumb' && (
-                  <div className="pc-dumb-info">
-                    <div className="dumb-text">Maintenance</div>
-                  </div>
-                )}
-              </div>
-            ))}
+                );
+              })}
+            </div>
           </div>
         </div>
 

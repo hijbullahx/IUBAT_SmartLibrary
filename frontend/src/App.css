@@ -1199,8 +1199,12 @@ body {
 
 .pc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .pc-card {
@@ -3108,6 +3112,146 @@ body {
 
 .tooltip-value {
   color: white;
+}
+
+/* Library Layout for 48 PCs in 4 rows */
+.library-layout {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  position: relative;
+}
+
+.library-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-left: 60px; /* Space for window wall */
+}
+
+/* Window wall on the left */
+.window-wall {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, #e3f2fd, #bbdefb);
+  border-right: 3px solid #2196f3;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 1rem 0;
+  border-radius: 12px 0 0 12px;
+}
+
+.window {
+  width: 30px;
+  height: 60px;
+  background: #e1f5fe;
+  border: 2px solid #0277bd;
+  border-radius: 4px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.window::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #0277bd;
+}
+
+.window::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: #0277bd;
+}
+
+/* Library row styling */
+.library-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.row-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.row-content {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Table groups (2 tables each with gap between groups) */
+.table-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-group + .table-group {
+  margin-left: 1rem; /* Gap between table groups */
+}
+
+/* PC table representation */
+.pc-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+/* Individual PC styling for library layout */
+.pc-library {
+  width: 35px;
+  height: 25px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.pc-library.available {
+  background: #27ae60;
+  box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
+}
+
+.pc-library.in_use {
+  background: #3498db;
+  box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+}
+
+.pc-library.dumb {
+  background: #e74c3c;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+}
+
+.pc-library:hover {
+  transform: scale(1.1);
+  z-index: 10;
 }
 
 /* Dashboard Actions */
