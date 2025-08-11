@@ -11,4 +11,7 @@ python manage.py collectstatic --no-input
 # Run database migrations
 python manage.py migrate
 
+# Setup initial data (students, PCs, admin user)
+python manage.py setup_database
+
 echo "Build completed successfully!"
