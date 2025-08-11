@@ -93,6 +93,48 @@ def pc_status(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
 
+@csrf_exempt
+def check_current_pc(request, student_id):
+    """Check if a student is currently assigned to a PC"""
+    if request.method == 'GET':
+        try:
+            # Find the student
+            try:
+                student = Student.objects.get(student_id=student_id)
+            except Student.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
+
+            # Check if student has an active E-Library session
+            current_entry = ELibraryEntry.objects.filter(
+                student=student, 
+                exit_time__isnull=True
+            ).select_related('pc').first()
+
+            if current_entry:
+                pc_data = {
+                    'pc_id': current_entry.pc.pk,
+                    'pc_name': f"PC {current_entry.pc.pc_number}",
+                    'pc_number': current_entry.pc.pc_number,
+                    'entry_time': current_entry.entry_time.isoformat()
+                }
+                return JsonResponse({
+                    'status': 'success', 
+                    'current_pc': pc_data,
+                    'message': f'Student is currently using PC {current_entry.pc.pc_number}'
+                })
+            else:
+                return JsonResponse({
+                    'status': 'success', 
+                    'current_pc': None,
+                    'message': 'Student is not currently using any PC'
+                })
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
 # Other placeholder views remain unchanged for now
 @csrf_exempt
 def elibrary_checkin(request):

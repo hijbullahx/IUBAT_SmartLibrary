@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
   ELIBRARY_PC_STATUS: '/api/elibrary/pc_status/',
   ELIBRARY_CHECKIN: '/api/entry/elibrary/checkin/',
   ELIBRARY_CHECKOUT: '/api/entry/elibrary/checkout/',
+  CHECK_CURRENT_USER_PC: '/api/elibrary/check_current_pc/',
   
   // Student endpoints
   STUDENTS: '/api/students/',
