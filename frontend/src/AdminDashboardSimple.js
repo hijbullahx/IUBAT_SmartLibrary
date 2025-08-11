@@ -10,7 +10,7 @@ function AdminDashboard() {
   const [stats, setStats] = useState({});
   const [timeBasedReport, setTimeBasedReport] = useState([]);
   const [studentBasedReport, setStudentBasedReport] = useState([]);
-  const [weeklyReport, setWeeklyReport] = useState([]);
+  const [dailyReport, setDailyReport] = useState([]);
   const [monthlyReport, setMonthlyReport] = useState([]);
   const [yearlyReport, setYearlyReport] = useState([]);
   const [pcs, setPcs] = useState([]);
@@ -26,8 +26,8 @@ function AdminDashboard() {
   const [endDate, setEndDate] = useState('2025-08-10');
   const [studentQuery, setStudentQuery] = useState('');
 
-  // New date selection states for weekly, monthly, yearly reports
-  const [selectedWeek, setSelectedWeek] = useState('');
+  // New date selection states for daily, monthly, yearly reports
+  const [selectedDay, setSelectedDay] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
 
@@ -172,27 +172,27 @@ function AdminDashboard() {
     }
   };
 
-  const loadWeeklyReport = async () => {
+  const loadDailyReport = async () => {
     setLoading(true);
     try {
-      let url = API_ENDPOINTS.ADMIN_REPORTS_WEEKLY;
+      let url = API_ENDPOINTS.ADMIN_REPORTS_DAILY;
       
-      // Add week parameter if selected
-      if (selectedWeek) {
-        url += `?week=${selectedWeek}`;
+      // Add day parameter if selected
+      if (selectedDay) {
+        url += `?day=${selectedDay}`;
       }
 
       const response = await axios.get(url);
 
       if (response.data.status === 'success') {
-        setWeeklyReport(response.data.report || []);
-        const weekText = selectedWeek ? `Week of ${selectedWeek}` : 'Last 7 Days';
-        setMessage(`Found ${response.data.report?.length || 0} entries for ${weekText}`);
+        setDailyReport(response.data.report || []);
+        const dayText = selectedDay ? `Day ${selectedDay}` : 'Last 7 Days';
+        setMessage(`Found ${response.data.report?.length || 0} entries for ${dayText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
       }
     } catch (error) {
-      setMessage('Error loading weekly report. Please try again.');
+      setMessage('Error loading daily report. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -375,29 +375,30 @@ function AdminDashboard() {
   };
 
   // Helper functions for date generation
-  const generateWeekOptions = () => {
-    const weeks = [];
+  const generateDayOptions = () => {
+    const days = [];
     const currentDate = new Date();
     
-    // Generate last 52 weeks
-    for (let i = 0; i < 52; i++) {
-      const weekStart = new Date(currentDate);
-      weekStart.setDate(currentDate.getDate() - (i * 7));
-      weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Start of week (Sunday)
+    // Generate last 7 days
+    for (let i = 0; i < 7; i++) {
+      const dayDate = new Date(currentDate);
+      dayDate.setDate(currentDate.getDate() - i);
       
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6); // End of week (Saturday)
+      const dayStr = dayDate.toISOString().split('T')[0];
+      const dayLabel = dayDate.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
       
-      const weekStartStr = weekStart.toISOString().split('T')[0];
-      const weekEndStr = weekEnd.toISOString().split('T')[0];
-      
-      weeks.push({
-        value: weekStartStr,
-        label: `Week of ${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`
+      days.push({
+        value: dayStr,
+        label: dayLabel
       });
     }
     
-    return weeks;
+    return days;
   };
 
   const generateMonthOptions = () => {
@@ -809,33 +810,33 @@ function AdminDashboard() {
             )}
           </div>
 
-          {/* Weekly Report */}
+          {/* Daily Report */}
           <div className="report-card">
-            <h4>📊 Weekly Report</h4>
+            <h4>📊 Daily Report</h4>
             <div className="report-controls">
               <select 
-                value={selectedWeek} 
-                onChange={(e) => setSelectedWeek(e.target.value)}
+                value={selectedDay} 
+                onChange={(e) => setSelectedDay(e.target.value)}
                 className="date-select"
               >
                 <option value="">Last 7 Days (Default)</option>
-                {generateWeekOptions().map(week => (
-                  <option key={week.value} value={week.value}>
-                    {week.label}
+                {generateDayOptions().map(day => (
+                  <option key={day.value} value={day.value}>
+                    {day.label}
                   </option>
                 ))}
               </select>
-              <button onClick={loadWeeklyReport} disabled={loading}>
-                {selectedWeek ? 'Generate Selected Week Report' : 'Generate Weekly Report'}
+              <button onClick={loadDailyReport} disabled={loading}>
+                {selectedDay ? 'Generate Selected Day Report' : 'Generate Daily Report'}
               </button>
-              {weeklyReport.length > 0 && (
-                <button onClick={() => printReport(weeklyReport, selectedWeek ? `Weekly Report - Week of ${selectedWeek}` : 'Weekly Report (Last 7 Days)')} className="print-btn">
+              {dailyReport.length > 0 && (
+                <button onClick={() => printReport(dailyReport, selectedDay ? `Daily Report - ${selectedDay}` : 'Daily Report (Last 7 Days)')} className="print-btn">
                   🖨️ Print
                 </button>
               )}
             </div>
             
-            {weeklyReport.length > 0 && (
+            {dailyReport.length > 0 && (
               <div className="report-table">
                 <table>
                   <thead>
@@ -850,7 +851,7 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {weeklyReport.map((entry, index) => (
+                    {dailyReport.map((entry, index) => (
                       <tr key={index}>
                         <td>{entry.student_name}</td>
                         <td>{entry.student_id}</td>

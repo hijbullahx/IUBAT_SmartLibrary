@@ -371,25 +371,28 @@ def department_statistics(request):
     return JsonResponse({'status': 'success', 'statistics': usage_stats}, safe=False)
 
 @csrf_exempt
-def weekly_report(request):
-    """Generate a weekly report of library usage"""
+def daily_report(request):
+    """Generate a daily report of library usage"""
     if not request.user.is_authenticated or not request.user.is_superuser:
         return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
 
     from datetime import timedelta
     
-    # Check if specific week is requested
-    week_param = request.GET.get('week')
+    # Check if specific day is requested
+    day_param = request.GET.get('day')
     
-    if week_param:
+    if day_param:
         try:
-            # Parse the week start date
-            start_date = datetime.strptime(week_param, '%Y-%m-%d')
-            end_date = start_date + timedelta(days=6)
+            # Parse the day date
+            start_date = datetime.strptime(day_param, '%Y-%m-%d')
+            # Set to start of day
+            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            # Set end to end of same day
+            end_date = start_date.replace(hour=23, minute=59, second=59, microsecond=999999)
         except ValueError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid week format. Use YYYY-MM-DD.'}, status=400)
+            return JsonResponse({'status': 'error', 'message': 'Invalid day format. Use YYYY-MM-DD.'}, status=400)
     else:
-        # Default: Get current week (last 7 days)
+        # Default: Get last 7 days
         end_date = datetime.now()
         start_date = end_date - timedelta(days=7)
 

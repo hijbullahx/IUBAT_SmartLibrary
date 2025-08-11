@@ -2,7 +2,7 @@ export const API_ENDPOINTS = {
   ADMIN_LOGIN: '/api/admin/login/',
   ADMIN_REPORTS_TIME: '/api/admin/reports/time-based/',
   ADMIN_REPORTS_STUDENT: '/api/admin/reports/student-based/',
-  ADMIN_REPORTS_WEEKLY: '/api/admin/reports/weekly/',
+  ADMIN_REPORTS_DAILY: '/api/admin/reports/daily/',
   ADMIN_REPORTS_MONTHLY: '/api/admin/reports/monthly/',
   ADMIN_REPORTS_YEARLY: '/api/admin/reports/yearly/',
   ADMIN_REPORTS_DEPT_STATS: '/api/admin/reports/department-stats/',
