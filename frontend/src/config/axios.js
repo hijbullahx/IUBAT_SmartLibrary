@@ -33,6 +33,12 @@ axiosInstance.interceptors.request.use(
     // Ensure withCredentials is always true
     config.withCredentials = true;
     
+    // Add auth token if available
+    const authToken = localStorage.getItem('admin_auth_token');
+    if (authToken && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    
     return config;
   },
   (error) => {

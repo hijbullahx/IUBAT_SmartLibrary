@@ -9,6 +9,43 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from django.db.models import Q
+from django.contrib.auth.models import User
+
+def check_admin_auth(request):
+    """Check if user is authenticated via session cookies or auth token"""
+    # First try session authentication
+    if request.user.is_authenticated and request.user.is_superuser:
+        return True, request.user
+    
+    # Try token authentication from header
+    auth_header = request.headers.get('Authorization', '')
+    if auth_header.startswith('Bearer '):
+        token = auth_header.split(' ')[1]
+        # Check if token exists in any active session
+        from django.contrib.sessions.models import Session
+        for session in Session.objects.all():
+            session_data = session.get_decoded()
+            if session_data.get('auth_token') == token:
+                try:
+                    user_id = session_data.get('user_id')
+                    user = User.objects.get(pk=user_id)
+                    if user.is_superuser:
+                        return True, user
+                except User.DoesNotExist:
+                    continue
+    
+    # Try token from session (fallback)
+    auth_token = request.session.get('auth_token')
+    if auth_token:
+        user_id = request.session.get('user_id')
+        try:
+            user = User.objects.get(pk=user_id)
+            if user.is_superuser:
+                return True, user
+        except User.DoesNotExist:
+            pass
+    
+    return False, None
 
 @csrf_exempt
 def library_entry_exit(request):
@@ -234,25 +271,34 @@ def admin_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None and user.is_superuser:
                 login(request, user)
+                
+                # Generate a simple token (in production, use Django REST Framework tokens or JWT)
+                import hashlib
+                import time
+                token_string = f"{user.username}:{user.pk}:{time.time()}"
+                auth_token = hashlib.sha256(token_string.encode()).hexdigest()
+                
+                # Store token in session for verification
+                request.session['auth_token'] = auth_token
+                request.session['user_id'] = user.pk
+                request.session.save()
+                
                 print(f"DEBUG LOGIN: Session key after login: {request.session.session_key}")
                 print(f"DEBUG LOGIN: User: {request.user}")
-                print(f"DEBUG LOGIN: Session data: {dict(request.session)}")
+                print(f"DEBUG LOGIN: Generated token: {auth_token}")
                 
-                # Create response and set session cookie explicitly
+                # Return token in response instead of relying only on cookies
                 response = JsonResponse({
-                    'status': 'success', 
+                    'success': True,  # Changed from 'status': 'success' to match frontend expectation
                     'message': 'Logged in as Admin.',
+                    'auth_token': auth_token,  # Frontend can store this in localStorage
                     'user': {
                         'username': user.username,
                         'is_superuser': user.is_superuser
-                    },
-                    'debug': {
-                        'session_key': request.session.session_key,
-                        'session_data': dict(request.session)
                     }
                 })
                 
-                # Ensure session cookie is set properly
+                # Still set session cookie for fallback
                 from django.conf import settings
                 response.set_cookie(
                     settings.SESSION_COOKIE_NAME,
@@ -267,10 +313,10 @@ def admin_login(request):
                 print(f"DEBUG LOGIN: Set session cookie {settings.SESSION_COOKIE_NAME}={request.session.session_key}")
                 return response
             else:
-                return JsonResponse({'status': 'error', 'message': 'Invalid credentials or not a superuser.'}, status=401)
+                return JsonResponse({'success': False, 'message': 'Invalid credentials or not a superuser.'}, status=401)
                 
         except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data.'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
             
@@ -675,12 +721,10 @@ def live_admin_stats(request):
             print(f"DEBUG: Cookies received: {dict(request.COOKIES)}")
             print(f"DEBUG: Headers: {dict(request.headers)}")
             
-            # Check authentication
-            if not request.user.is_authenticated:
+            # Check authentication using both methods
+            is_authenticated, admin_user = check_admin_auth(request)
+            if not is_authenticated:
                 return JsonResponse({'status': 'error', 'message': 'Authentication required', 'debug': {'session_key': request.session.session_key, 'user': str(request.user)}}, status=401)
-            
-            if not request.user.is_superuser:
-                return JsonResponse({'status': 'error', 'message': 'Superuser access required'}, status=403)
             
             # Count students currently in library (no exit time)
             students_in_library = LibraryEntry.objects.filter(exit_time__isnull=True).count()
