@@ -364,20 +364,21 @@ function AdminDashboard() {
     e.preventDefault();
     try {
       console.log('🔄 Attempting admin login...');
-      const response = await axios.post(API_ENDPOINTS.ADMIN_LOGIN, {
+      const loginResponse = await axios.post(API_ENDPOINTS.ADMIN_LOGIN, {
         username,
         password
       });
       
-      console.log('✅ Login response:', response.data);
+      console.log('✅ Login response:', loginResponse.data);
+      console.log('✅ Success value:', loginResponse.data.success, 'Type:', typeof loginResponse.data.success);
       
-      if (response.data.success) {
+      if (loginResponse.data.success === true) {
         // Store auth token for future requests
-        if (response.data.auth_token) {
-          localStorage.setItem('admin_auth_token', response.data.auth_token);
+        if (loginResponse.data.auth_token) {
+          localStorage.setItem('admin_auth_token', loginResponse.data.auth_token);
           // Set default authorization header for future requests
-          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.auth_token}`;
-          console.log('✅ Auth token stored:', response.data.auth_token.substring(0, 20) + '...');
+          axios.defaults.headers.common['Authorization'] = `Bearer ${loginResponse.data.auth_token}`;
+          console.log('✅ Auth token stored:', loginResponse.data.auth_token.substring(0, 20) + '...');
         }
         
         setIsLoggedIn(true);
@@ -385,7 +386,8 @@ function AdminDashboard() {
         console.log('✅ Admin logged in successfully');
       } else {
         setMessage('Invalid credentials');
-        console.error('❌ Login failed:', response.data);
+        console.error('❌ Login failed:', loginResponse.data);
+        console.error('❌ Success value was:', loginResponse.data.success, 'Type:', typeof loginResponse.data.success);
       }
     } catch (error) {
       console.error('❌ Login error:', error);
