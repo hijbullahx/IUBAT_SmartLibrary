@@ -186,17 +186,24 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'cookie',
+    'set-cookie',
+]
+
+# Expose cookies in CORS responses
+CORS_EXPOSE_HEADERS = [
+    'set-cookie',
 ]
 
 # Session settings for cross-origin cookies
-SESSION_COOKIE_SAMESITE = None    # More permissive for cross-origin
+SESSION_COOKIE_SAMESITE = 'None'  # Required for cross-site cookies
 SESSION_COOKIE_SECURE = not DEBUG  # True in production (HTTPS), False in development
 SESSION_COOKIE_HTTPONLY = False   # Allow JavaScript access to session cookies
-SESSION_COOKIE_DOMAIN = None      # Allow for localhost variations
+SESSION_COOKIE_DOMAIN = '.onrender.com' if not DEBUG else None  # Share cookies across Render subdomains
 SESSION_SAVE_EVERY_REQUEST = True # Ensure session is saved on every request
 
 # CSRF settings for cross-origin requests
-CSRF_COOKIE_SAMESITE = None       # More permissive for cross-origin
+CSRF_COOKIE_SAMESITE = 'None'     # Required for cross-site cookies
 CSRF_COOKIE_SECURE = not DEBUG    # True in production (HTTPS), False in development
 CSRF_COOKIE_HTTPONLY = False      # Allow JavaScript access to CSRF cookies
 CSRF_TRUSTED_ORIGINS = [
