@@ -223,7 +223,9 @@ def elibrary_checkout(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
 def export_data(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
+    # Check authentication using both session cookies and auth tokens
+    is_authenticated, admin_user = check_admin_auth(request)
+    if not is_authenticated:
         return HttpResponse("Unauthorized", status=401)
 
     response = HttpResponse(content_type='text/csv')
@@ -334,7 +336,9 @@ def admin_logout(request):
     return JsonResponse({'status': 'error', 'message': 'You are not logged in.'}, status=400)
 @csrf_exempt
 def time_based_report(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
+    # Check authentication using both session cookies and auth tokens
+    is_authenticated, admin_user = check_admin_auth(request)
+    if not is_authenticated:
         return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
 
     start_date_str = request.GET.get('start_date')
@@ -376,7 +380,9 @@ def time_based_report(request):
     return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
 @csrf_exempt
 def student_based_report(request):
-    if not request.user.is_authenticated or not request.user.is_superuser:
+    # Check authentication using both session cookies and auth tokens
+    is_authenticated, admin_user = check_admin_auth(request)
+    if not is_authenticated:
         return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
 
     student_query = request.GET.get('student_query')
@@ -426,7 +432,9 @@ def student_based_report(request):
 @csrf_exempt
 def department_statistics(request):
     """Get department-wise library usage statistics"""
-    if not request.user.is_authenticated or not request.user.is_superuser:
+    # Check authentication using both session cookies and auth tokens
+    is_authenticated, admin_user = check_admin_auth(request)
+    if not is_authenticated:
         return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
 
     from django.db.models import Count
@@ -466,8 +474,10 @@ def department_statistics(request):
 @csrf_exempt
 def daily_report(request):
     """Generate a daily report of library usage"""
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+    # Check admin authentication (both session and token)
+    user, auth_error = check_admin_auth(request)
+    if auth_error:
+        return auth_error
 
     from datetime import timedelta
     
@@ -531,8 +541,10 @@ def daily_report(request):
 @csrf_exempt
 def monthly_report(request):
     """Generate a monthly report of library usage"""
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+    # Check admin authentication (both session and token)
+    user, auth_error = check_admin_auth(request)
+    if auth_error:
+        return auth_error
 
     from datetime import timedelta
     import calendar
@@ -601,8 +613,10 @@ def monthly_report(request):
 @csrf_exempt
 def yearly_report(request):
     """Generate a yearly report of library usage"""
-    if not request.user.is_authenticated or not request.user.is_superuser:
-        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+    # Check admin authentication (both session and token)
+    user, auth_error = check_admin_auth(request)
+    if auth_error:
+        return auth_error
 
     from datetime import timedelta
     
