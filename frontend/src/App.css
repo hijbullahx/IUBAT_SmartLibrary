@@ -3134,7 +3134,7 @@ body {
   gap: 2rem; /* Gaps between column pairs */
   max-width: 900px;
   margin: 0 auto;
-  padding-top: 90px; /* Space for thicker horizontal wall */
+  padding-top: 60px; /* Space for shorter but thicker wall */
   justify-content: center;
   align-items: flex-start;
 }
@@ -3145,25 +3145,25 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 80px;
+  height: 50px;
   background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
-  border-bottom: 5px solid #2196f3;
+  border-bottom: 8px solid #2196f3;
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding: 0 1rem;
   border-radius: 12px 12px 0 0;
-  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  box-shadow: 0 3px 12px rgba(33, 150, 243, 0.4);
 }
 
 .window {
-  width: 80px;
-  height: 50px;
+  width: 60px;
+  height: 35px;
   background: #e1f5fe;
   border: 3px solid #0277bd;
   border-radius: 6px;
   position: relative;
-  box-shadow: inset 0 0 10px rgba(2, 119, 189, 0.2);
+  box-shadow: inset 0 0 8px rgba(2, 119, 189, 0.2);
 }
 
 .window::before {
