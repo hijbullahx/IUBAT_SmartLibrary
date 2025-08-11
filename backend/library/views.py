@@ -266,9 +266,13 @@ def admin_login(request):
             password = data.get('password')
             
             if not username or not password:
-                return JsonResponse({'status': 'error', 'message': 'Username and password required.'}, status=400)
+                return JsonResponse({'success': False, 'message': 'Username and password required.'}, status=400)
             
+            print(f"DEBUG: Attempting login with username: '{username}'")
             user = authenticate(request, username=username, password=password)
+            print(f"DEBUG: Authentication result: {user}")
+            print(f"DEBUG: User is_superuser: {getattr(user, 'is_superuser', 'N/A')}")
+            
             if user is not None and user.is_superuser:
                 login(request, user)
                 

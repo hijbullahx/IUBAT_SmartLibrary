@@ -9,16 +9,24 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Starting database setup...'))
         
         # Create superuser if it doesn't exist
-        if not User.objects.filter(is_superuser=True).exists():
-            self.stdout.write('Creating superuser...')
+        if not User.objects.filter(username='admin').exists():
+            self.stdout.write('Creating admin superuser...')
             User.objects.create_superuser(
                 username='admin',
                 email='admin@iubat.edu',
                 password='admin123'
             )
-            self.stdout.write(self.style.SUCCESS('Superuser created: admin / admin123'))
+            self.stdout.write(self.style.SUCCESS('Admin superuser created: admin / admin123'))
         else:
-            self.stdout.write('Superuser already exists')
+            # Ensure the existing admin user is a superuser
+            admin_user = User.objects.get(username='admin')
+            if not admin_user.is_superuser:
+                admin_user.is_superuser = True
+                admin_user.is_staff = True
+                admin_user.save()
+                self.stdout.write(self.style.WARNING('Updated admin user to be superuser'))
+            else:
+                self.stdout.write('Admin superuser already exists')
 
         # Add students if they don't exist
         if Student.objects.count() == 0:
