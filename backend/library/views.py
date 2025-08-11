@@ -488,6 +488,8 @@ def daily_report(request):
         try:
             # Parse the day date
             start_date = datetime.strptime(day_param, '%Y-%m-%d')
+            # Make timezone aware
+            start_date = timezone.make_aware(start_date)
             # Set to start of day
             start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
             # Set end to end of same day
@@ -496,7 +498,7 @@ def daily_report(request):
             return JsonResponse({'status': 'error', 'message': 'Invalid day format. Use YYYY-MM-DD.'}, status=400)
     else:
         # Default: Get last 7 days
-        end_date = datetime.now()
+        end_date = timezone.now()
         start_date = end_date - timedelta(days=7)
 
     main_library_entries = LibraryEntry.objects.filter(
@@ -559,16 +561,20 @@ def monthly_report(request):
             
             # Get first day of the month
             start_date = datetime(year, month, 1)
+            # Make timezone aware
+            start_date = timezone.make_aware(start_date)
             
             # Get last day of the month
             last_day = calendar.monthrange(year, month)[1]
             end_date = datetime(year, month, last_day, 23, 59, 59)
+            # Make timezone aware
+            end_date = timezone.make_aware(end_date)
             
         except (ValueError, IndexError):
             return JsonResponse({'status': 'error', 'message': 'Invalid month format. Use YYYY-MM.'}, status=400)
     else:
         # Default: Get current month (last 30 days)
-        end_date = datetime.now()
+        end_date = timezone.now()
         start_date = end_date - timedelta(days=30)
 
     main_library_entries = LibraryEntry.objects.filter(
@@ -630,15 +636,19 @@ def yearly_report(request):
             
             # Get first day of the year
             start_date = datetime(year, 1, 1)
+            # Make timezone aware
+            start_date = timezone.make_aware(start_date)
             
             # Get last day of the year
             end_date = datetime(year, 12, 31, 23, 59, 59)
+            # Make timezone aware
+            end_date = timezone.make_aware(end_date)
             
         except ValueError:
             return JsonResponse({'status': 'error', 'message': 'Invalid year format.'}, status=400)
     else:
         # Default: Get current year (last 365 days)
-        end_date = datetime.now()
+        end_date = timezone.now()
         start_date = end_date - timedelta(days=365)
 
     main_library_entries = LibraryEntry.objects.filter(
