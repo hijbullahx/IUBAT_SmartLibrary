@@ -88,16 +88,16 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     return 'available';
   };
 
-  const getPcStatusText = (pc) => {
-    if (pc.is_dumb) return 'Out of Order';
-    if (pc.status === 'in-use') {
-      if (pc.current_user === scannedStudent?.student_id) {
-        return 'Your PC';
-      }
-      return 'In Use';
-    }
-    return 'Available';
-  };
+  // const getPcStatusText = (pc) => {
+  //   if (pc.is_dumb) return 'Out of Order';
+  //   if (pc.status === 'in-use') {
+  //     if (pc.current_user === scannedStudent?.student_id) {
+  //       return 'Your PC';
+  //     }
+  //     return 'In Use';
+  //   }
+  //   return 'Available';
+  // };
 
   useEffect(() => {
     loadPCs();

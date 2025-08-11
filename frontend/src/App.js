@@ -237,7 +237,7 @@ function App() {
         }
         
         // Then logout from library
-        const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
+        await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
           student_id: scannedStudent.student_id
         });
         
@@ -264,7 +264,7 @@ function App() {
       // Logout from PC only (not from library)
       try {
         if (currentUserPc) {
-          const checkoutResponse = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
+          await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
             student_id: scannedStudent.student_id
           });
           

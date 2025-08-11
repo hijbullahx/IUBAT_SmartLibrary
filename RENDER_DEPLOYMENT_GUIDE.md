@@ -15,7 +15,7 @@
    - **Name**: `iubat-smartlibrary-backend`
    - **Environment**: `Python 3`
    - **Region**: Choose closest to you
-   - **Branch**: `main` (or your current branch)
+   - **Branch**: `react-deployment-fix` (your current branch)
    - **Root Directory**: `backend`
    - **Build Command**: `./build.sh`
    - **Start Command**: `gunicorn library_automation.wsgi:application --bind 0.0.0.0:$PORT`
@@ -42,19 +42,22 @@ chmod +x backend/build.sh
 ## Step 2: Deploy Frontend (React)
 
 ### 2.1 Create Frontend Service on Render
-1. Click "New +" and select "Static Site"
+1. Click "New +" and select **"Static Site"** (NOT Web Service)
 2. Connect the same GitHub repository
 3. Configure:
    - **Name**: `iubat-smartlibrary-frontend`
-   - **Branch**: `main` (or your current branch)
+   - **Branch**: `react-deployment-fix` (or your current branch)
    - **Root Directory**: `frontend`
    - **Build Command**: `npm ci && npm run build`
    - **Publish Directory**: `build`
+   - **Start Command**: Leave EMPTY (static sites don't need this)
 
 ### 2.2 Set Frontend Environment Variables
 ```
 REACT_APP_API_URL=https://iubat-smartlibrary-backend.onrender.com
 ```
+
+**Important:** Make sure you select "Static Site" not "Web Service" for the frontend!
 
 ## Step 3: Update Configuration
 
