@@ -22,6 +22,8 @@ function App() {
   const [isServiceMonitor, setIsServiceMonitor] = useState(false);
   const [entryMonitorLoggedInStudents, setEntryMonitorLoggedInStudents] = useState(new Set());
   const [currentUserPc, setCurrentUserPc] = useState(null); // Track user's current PC
+  const [complaint, setComplaint] = useState('');
+  const [complaintType, setComplaintType] = useState('pc');
 
   // Initialize student ID based on scanned student
   useEffect(() => {
@@ -249,7 +251,7 @@ function App() {
         // First, logout from PC if user has one
         if (currentUserPc) {
           try {
-            await axios.post(`${API_ENDPOINTS.CHECKOUT_PC}${currentUserPc.pc_id}/`, {
+            await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
               student_id: scannedStudent.student_id
             });
           } catch (pcError) {
@@ -270,11 +272,14 @@ function App() {
           return updated;
         });
         
+        // Clear states and return to service monitor scan interface immediately
         setCurrentUserPc(null);
-        setMessage(entryResponse.data.message);
-        setLastAction(entryResponse.data.action);
+        setScannedStudent(null);
         setShowServiceMenu(false);
-        setShowGoodbye(true);
+        setIsServiceMonitor(true);
+        setStudentId('');
+        setMessage('');
+        setLastAction('');
         
       } catch (error) {
         setMessage(error.response?.data?.message || 'Error processing logout');
@@ -305,6 +310,30 @@ function App() {
       setShowServiceMenu(false);
       setShowElibrary(true);
     }
+  };
+
+  const handleComplaintSubmit = async (e) => {
+    e.preventDefault();
+    if (!complaint.trim()) return;
+
+    // Log complaint (can be extended to API call in future)
+    console.log('Complaint submitted:', {
+      studentId: scannedStudent?.student_id,
+      studentName: scannedStudent?.name,
+      type: complaintType,
+      message: complaint,
+      timestamp: new Date().toISOString()
+    });
+
+    // Clear complaint form
+    setComplaint('');
+    setComplaintType('pc');
+    
+    // Show success message
+    setMessage('Thank you! Your report has been submitted.');
+    setTimeout(() => {
+      setMessage('');
+    }, 3000);
   };
 
   // Function to check current user's PC status
@@ -440,6 +469,102 @@ function App() {
                     </>
                   )}
                 </div>
+              </div>
+              
+              {/* Library Guidelines */}
+              <div className="guidelines-section">
+                <h3>📚 Library Guidelines Reminder</h3>
+                <div className="guidelines-grid">
+                  <div className="guideline-item">
+                    <span className="guideline-icon">📚</span>
+                    <span>Return books on time</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">🔇</span>
+                    <span>Maintain silence</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">📱</span>
+                    <span>Silent mode phones</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">🍽️</span>
+                    <span>No food or drinks</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">💻</span>
+                    <span>Log out properly</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">🧹</span>
+                    <span>Keep area clean</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Complaint Section */}
+              <div className="complaint-section">
+                <h3>🛠️ Report an Issue</h3>
+                <p className="complaint-subtitle">Found a problem? Let us know!</p>
+                
+                <form onSubmit={handleComplaintSubmit} className="complaint-form">
+                  <div className="complaint-type">
+                    <label>Issue Type:</label>
+                    <div className="type-buttons">
+                      <button 
+                        type="button"
+                        className={`type-btn ${complaintType === 'pc' ? 'active' : ''}`}
+                        onClick={() => setComplaintType('pc')}
+                      >
+                        💻 PC Issue
+                      </button>
+                      <button 
+                        type="button"
+                        className={`type-btn ${complaintType === 'facility' ? 'active' : ''}`}
+                        onClick={() => setComplaintType('facility')}
+                      >
+                        🏢 Facility Issue
+                      </button>
+                      <button 
+                        type="button"
+                        className={`type-btn ${complaintType === 'other' ? 'active' : ''}`}
+                        onClick={() => setComplaintType('other')}
+                      >
+                        🔧 Other Issue
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="complaint-input">
+                    <textarea
+                      value={complaint}
+                      onChange={(e) => setComplaint(e.target.value)}
+                      placeholder="Describe the issue you're experiencing..."
+                      rows="3"
+                      className="complaint-textarea"
+                    />
+                  </div>
+                  
+                  <div className="complaint-actions">
+                    <button 
+                      type="submit"
+                      className="submit-complaint-btn"
+                      disabled={!complaint.trim()}
+                    >
+                      Submit Report
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setComplaint('');
+                        setComplaintType('pc');
+                      }}
+                      className="cancel-complaint-btn"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
