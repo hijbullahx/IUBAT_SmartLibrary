@@ -2963,49 +2963,51 @@ body {
 /* Enhanced PC Cards with Detailed Info */
 .pc-card-detailed {
   background: white;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
-  min-height: 120px;
+  min-height: 80px;
+  max-height: 80px;
   position: relative;
+  overflow: hidden;
 }
 
 .pc-card-detailed:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .pc-card-detailed.available {
-  border-left: 5px solid #27ae60;
+  border-left: 4px solid #27ae60;
 }
 
 .pc-card-detailed.in_use {
-  border-left: 5px solid #3498db;
+  border-left: 4px solid #3498db;
 }
 
 .pc-card-detailed.dumb {
-  border-left: 5px solid #e74c3c;
+  border-left: 4px solid #e74c3c;
 }
 
 .pc-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .pc-number {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #2c3e50;
 }
 
 .pc-status-badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 15px;
-  font-size: 0.75rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
   font-weight: 500;
 }
 
@@ -3025,52 +3027,87 @@ body {
 }
 
 .pc-user-info {
-  padding: 0.5rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  font-size: 0.85rem;
-}
-
-.user-name {
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 0.25rem;
-}
-
-.user-id {
-  color: #7f8c8d;
-  margin-bottom: 0.25rem;
-}
-
-.user-dept {
-  color: #34495e;
-  margin-bottom: 0.25rem;
-}
-
-.user-time {
-  color: #27ae60;
-  font-size: 0.8rem;
+  display: none; /* Hide user info in cards, show only in tooltip */
 }
 
 .pc-available-info, .pc-dumb-info {
-  padding: 0.5rem;
   text-align: center;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
 }
 
 .pc-available-info {
-  background: #d5f4e6;
   color: #27ae60;
 }
 
 .pc-dumb-info {
-  background: #fadbd8;
   color: #e74c3c;
 }
 
 .available-text, .dumb-text {
   font-weight: 500;
+}
+
+/* PC Card Tooltip */
+.pc-tooltip {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2c3e50;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  min-width: 200px;
+  white-space: normal;
+  text-align: left;
+}
+
+.pc-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #2c3e50;
+}
+
+.pc-card-detailed:hover .pc-tooltip {
+  opacity: 1;
+  visibility: visible;
+  top: -120px;
+}
+
+.tooltip-content {
+  line-height: 1.4;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #3498db;
+}
+
+.tooltip-info {
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-label {
+  font-weight: 500;
+  color: #bdc3c7;
+}
+
+.tooltip-value {
+  color: white;
 }
 
 /* Dashboard Actions */

@@ -300,9 +300,6 @@ function AdminDashboard() {
               <div 
                 key={pc.pc_number} 
                 className={`pc-card-detailed ${pc.status}`}
-                title={pc.user_info ? 
-                  `${pc.user_info.student_name} (${pc.user_info.student_id})\nDepartment: ${pc.user_info.department}\nSince: ${new Date(pc.user_info.entry_time).toLocaleString()}` 
-                  : pc.status === 'dumb' ? 'This PC is out of service' : 'This PC is available for use'}
               >
                 <div className="pc-header">
                   <div className="pc-number">PC {pc.pc_number}</div>
@@ -312,22 +309,50 @@ function AdminDashboard() {
                     {pc.status === 'dumb' && '❌ Out of Service'}
                   </div>
                 </div>
-                {pc.user_info && (
-                  <div className="pc-user-info">
-                    <div className="user-name">{pc.user_info.student_name}</div>
-                    <div className="user-id">{pc.user_info.student_id}</div>
-                    <div className="user-dept">{pc.user_info.department}</div>
-                    <div className="user-time">Since: {new Date(pc.user_info.entry_time).toLocaleTimeString()}</div>
+
+                {/* Custom Tooltip */}
+                <div className="pc-tooltip">
+                  <div className="tooltip-content">
+                    <div className="tooltip-title">PC {pc.pc_number}</div>
+                    {pc.user_info ? (
+                      <>
+                        <div className="tooltip-info">
+                          <span className="tooltip-label">Student: </span>
+                          <span className="tooltip-value">{pc.user_info.student_name}</span>
+                        </div>
+                        <div className="tooltip-info">
+                          <span className="tooltip-label">ID: </span>
+                          <span className="tooltip-value">{pc.user_info.student_id}</span>
+                        </div>
+                        <div className="tooltip-info">
+                          <span className="tooltip-label">Department: </span>
+                          <span className="tooltip-value">{pc.user_info.department}</span>
+                        </div>
+                        <div className="tooltip-info">
+                          <span className="tooltip-label">Since: </span>
+                          <span className="tooltip-value">{new Date(pc.user_info.entry_time).toLocaleString()}</span>
+                        </div>
+                      </>
+                    ) : pc.status === 'dumb' ? (
+                      <div className="tooltip-info">
+                        <span className="tooltip-value">This PC is out of service and needs maintenance</span>
+                      </div>
+                    ) : (
+                      <div className="tooltip-info">
+                        <span className="tooltip-value">This PC is available for use</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+
                 {pc.status === 'available' && (
                   <div className="pc-available-info">
-                    <div className="available-text">Ready for use</div>
+                    <div className="available-text">Ready</div>
                   </div>
                 )}
                 {pc.status === 'dumb' && (
                   <div className="pc-dumb-info">
-                    <div className="dumb-text">Needs maintenance</div>
+                    <div className="dumb-text">Maintenance</div>
                   </div>
                 )}
               </div>
