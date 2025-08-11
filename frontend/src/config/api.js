@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   ADMIN_REPORTS_TIME: '/api/admin/reports/time-based/',
   ADMIN_REPORTS_STUDENT: '/api/admin/reports/student-based/',
   ADMIN_REPORTS_DEPT_STATS: '/api/admin/reports/department-stats/',
+  ADMIN_STATS_LIVE: '/api/admin/stats/live/',
   
   // Library endpoints
   LIBRARY_ENTRY: '/api/entry/library/',

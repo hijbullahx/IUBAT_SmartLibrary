@@ -439,3 +439,81 @@ def student_lookup(request, student_id):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+@csrf_exempt
+@login_required
+def live_admin_stats(request):
+    """Get real-time library statistics for admin dashboard"""
+    if request.method == 'GET':
+        try:
+            # Count students currently in library (no exit time)
+            students_in_library = LibraryEntry.objects.filter(exit_time__isnull=True).count()
+            
+            # Count students using e-library (active e-library sessions)
+            students_in_elibrary = ELibraryEntry.objects.filter(exit_time__isnull=True).count()
+            
+            # Students only in main library (in library but not in e-library)
+            students_only_main = students_in_library - students_in_elibrary
+            
+            # Get PC statistics
+            all_pcs = PC.objects.all()
+            total_pcs = all_pcs.count()
+            
+            # Get currently active e-library sessions
+            active_elibrary_sessions = ELibraryEntry.objects.filter(
+                exit_time__isnull=True
+            ).select_related('student', 'pc')
+            
+            pc_stats = {
+                'total': total_pcs,
+                'available': 0,
+                'in_use': 0,
+                'dumb': 0
+            }
+            
+            pc_details = []
+            for pc in all_pcs:
+                # Find if this PC is currently in use
+                current_session = active_elibrary_sessions.filter(pc=pc).first()
+                
+                if pc.is_dumb:
+                    status = 'dumb'
+                    pc_stats['dumb'] += 1
+                    user_info = None
+                elif current_session:
+                    status = 'in_use'
+                    pc_stats['in_use'] += 1
+                    user_info = {
+                        'student_id': current_session.student.student_id,
+                        'student_name': current_session.student.name,
+                        'department': current_session.student.department,
+                        'entry_time': current_session.entry_time.isoformat()
+                    }
+                else:
+                    status = 'available'
+                    pc_stats['available'] += 1
+                    user_info = None
+                
+                pc_details.append({
+                    'pc_number': pc.pc_number,
+                    'status': status,
+                    'is_dumb': pc.is_dumb,
+                    'user_info': user_info
+                })
+            
+            return JsonResponse({
+                'status': 'success',
+                'stats': {
+                    'students_in_library': students_in_library,
+                    'students_in_elibrary': students_in_elibrary,
+                    'students_only_main': students_only_main,
+                    'pc_stats': pc_stats
+                },
+                'pc_details': pc_details
+            })
+            
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)

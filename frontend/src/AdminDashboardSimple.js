@@ -11,6 +11,8 @@ function AdminDashboard() {
   const [timeBasedReport, setTimeBasedReport] = useState([]);
   const [studentBasedReport, setStudentBasedReport] = useState([]);
   const [pcs, setPcs] = useState([]);
+  const [pcDetails, setPcDetails] = useState([]);
+  const [liveStats, setLiveStats] = useState({});
   const [loading, setLoading] = useState(false);
 
   // Report filters
@@ -29,27 +31,22 @@ function AdminDashboard() {
     try {
       console.log('📊 Loading dashboard data...');
       
-      // Load PC status
-      const pcResponse = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
+      // Load live statistics
+      const liveStatsResponse = await axios.get(API_ENDPOINTS.ADMIN_STATS_LIVE);
       
-      console.log('PC status response:', pcResponse);
+      console.log('Live stats response:', liveStatsResponse);
+      
+      if (liveStatsResponse.data.status === 'success') {
+        setLiveStats(liveStatsResponse.data.stats || {});
+        setPcDetails(liveStatsResponse.data.pc_details || []);
+      }
+
+      // Load PC status for backward compatibility
+      const pcResponse = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
       
       if (pcResponse.data.status === 'success') {
         setPcs(pcResponse.data.pcs || []);
       }
-
-      // Calculate basic stats
-      const totalPCs = pcResponse.data.pcs?.length || 0;
-      const availablePCs = pcResponse.data.pcs?.filter(pc => pc.status === 'available').length || 0;
-      const inUsePCs = pcResponse.data.pcs?.filter(pc => pc.status === 'in use').length || 0;
-      const dumbPCs = pcResponse.data.pcs?.filter(pc => pc.status === 'dumb').length || 0;
-
-      setStats({
-        totalPCs,
-        availablePCs,
-        inUsePCs,
-        dumbPCs
-      });
 
       console.log('Dashboard data loaded successfully');
 
@@ -229,45 +226,110 @@ function AdminDashboard() {
       <div className="admin-dashboard">
         <div className="dashboard-header">
           <h2>Admin Dashboard</h2>
-          <button onClick={handleLogout} className="logout-btn">
-            Logout
-          </button>
+          <div className="dashboard-actions">
+            <button onClick={loadDashboardData} className="refresh-btn" disabled={loading}>
+              {loading ? '🔄 Refreshing...' : '🔄 Refresh Stats'}
+            </button>
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
+          </div>
         </div>
 
         {loading && <div className="loading">Loading...</div>}
         {message && <div className="message">{message}</div>}
 
-        {/* Statistics Section */}
+        {/* Live Statistics Section */}
         <div className="stats-section">
-          <h3>System Statistics</h3>
+          <h3>📊 Live Library Statistics</h3>
           <div className="stats-grid">
-            <div className="stat-card">
-              <h4>Total PCs</h4>
-              <span className="stat-number">{stats.totalPCs || 0}</span>
+            <div className="stat-card library">
+              <div className="stat-icon">🏛️</div>
+              <h4>Students in Library</h4>
+              <span className="stat-number">{liveStats.students_in_library || 0}</span>
+              <span className="stat-label">Total students inside</span>
             </div>
+            <div className="stat-card elibrary">
+              <div className="stat-icon">💻</div>
+              <h4>Using E-Library</h4>
+              <span className="stat-number">{liveStats.students_in_elibrary || 0}</span>
+              <span className="stat-label">Students on PCs</span>
+            </div>
+            <div className="stat-card main-only">
+              <div className="stat-icon">📚</div>
+              <h4>Main Library Only</h4>
+              <span className="stat-number">{liveStats.students_only_main || 0}</span>
+              <span className="stat-label">Reading/studying</span>
+            </div>
+          </div>
+
+          <h3>🖥️ PC Status Overview</h3>
+          <div className="stats-grid">
             <div className="stat-card available">
+              <div className="stat-icon">✅</div>
               <h4>Available PCs</h4>
-              <span className="stat-number">{stats.availablePCs || 0}</span>
+              <span className="stat-number">{liveStats.pc_stats?.available || 0}</span>
+              <span className="stat-label">Ready to use</span>
             </div>
             <div className="stat-card in-use">
+              <div className="stat-icon">🔵</div>
               <h4>In Use PCs</h4>
-              <span className="stat-number">{stats.inUsePCs || 0}</span>
+              <span className="stat-number">{liveStats.pc_stats?.in_use || 0}</span>
+              <span className="stat-label">Currently occupied</span>
             </div>
             <div className="stat-card dumb">
+              <div className="stat-icon">❌</div>
               <h4>Out of Service</h4>
-              <span className="stat-number">{stats.dumbPCs || 0}</span>
+              <span className="stat-number">{liveStats.pc_stats?.dumb || 0}</span>
+              <span className="stat-label">Need maintenance</span>
+            </div>
+            <div className="stat-card total">
+              <div className="stat-icon">🖥️</div>
+              <h4>Total PCs</h4>
+              <span className="stat-number">{liveStats.pc_stats?.total || 0}</span>
+              <span className="stat-label">All computers</span>
             </div>
           </div>
         </div>
 
-        {/* PC Status Section */}
+        {/* Enhanced PC Status Section with Hover Info */}
         <div className="pc-status-section">
-          <h3>E-Library PC Status</h3>
+          <h3>💻 E-Library PC Details</h3>
           <div className="pc-grid">
-            {pcs.map((pc) => (
-              <div key={pc.pc_number} className={`pc-card ${pc.status.replace(' ', '-')}`}>
-                <div className="pc-number">PC {pc.pc_number}</div>
-                <div className="pc-status">{pc.status.toUpperCase()}</div>
+            {pcDetails.map((pc) => (
+              <div 
+                key={pc.pc_number} 
+                className={`pc-card-detailed ${pc.status}`}
+                title={pc.user_info ? 
+                  `${pc.user_info.student_name} (${pc.user_info.student_id})\nDepartment: ${pc.user_info.department}\nSince: ${new Date(pc.user_info.entry_time).toLocaleString()}` 
+                  : pc.status === 'dumb' ? 'This PC is out of service' : 'This PC is available for use'}
+              >
+                <div className="pc-header">
+                  <div className="pc-number">PC {pc.pc_number}</div>
+                  <div className={`pc-status-badge ${pc.status}`}>
+                    {pc.status === 'available' && '✅ Available'}
+                    {pc.status === 'in_use' && '🔵 In Use'}
+                    {pc.status === 'dumb' && '❌ Out of Service'}
+                  </div>
+                </div>
+                {pc.user_info && (
+                  <div className="pc-user-info">
+                    <div className="user-name">{pc.user_info.student_name}</div>
+                    <div className="user-id">{pc.user_info.student_id}</div>
+                    <div className="user-dept">{pc.user_info.department}</div>
+                    <div className="user-time">Since: {new Date(pc.user_info.entry_time).toLocaleTimeString()}</div>
+                  </div>
+                )}
+                {pc.status === 'available' && (
+                  <div className="pc-available-info">
+                    <div className="available-text">Ready for use</div>
+                  </div>
+                )}
+                {pc.status === 'dumb' && (
+                  <div className="pc-dumb-info">
+                    <div className="dumb-text">Needs maintenance</div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

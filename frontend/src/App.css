@@ -2926,3 +2926,177 @@ body {
   background: #7f8c8d;
   transform: translateY(-2px);
 }
+
+/* Enhanced Admin Dashboard Styles */
+.stat-card.library {
+  background: linear-gradient(135deg, #3498db, #5dade2);
+  color: white;
+}
+
+.stat-card.elibrary {
+  background: linear-gradient(135deg, #9b59b6, #bb8fce);
+  color: white;
+}
+
+.stat-card.main-only {
+  background: linear-gradient(135deg, #e67e22, #f39c12);
+  color: white;
+}
+
+.stat-card.total {
+  background: linear-gradient(135deg, #34495e, #566573);
+  color: white;
+}
+
+.stat-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Enhanced PC Cards with Detailed Info */
+.pc-card-detailed {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 120px;
+  position: relative;
+}
+
+.pc-card-detailed:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.pc-card-detailed.available {
+  border-left: 5px solid #27ae60;
+}
+
+.pc-card-detailed.in_use {
+  border-left: 5px solid #3498db;
+}
+
+.pc-card-detailed.dumb {
+  border-left: 5px solid #e74c3c;
+}
+
+.pc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.pc-number {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.pc-status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.pc-status-badge.available {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.pc-status-badge.in_use {
+  background: #dbeafe;
+  color: #3498db;
+}
+
+.pc-status-badge.dumb {
+  background: #fadbd8;
+  color: #e74c3c;
+}
+
+.pc-user-info {
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.user-id {
+  color: #7f8c8d;
+  margin-bottom: 0.25rem;
+}
+
+.user-dept {
+  color: #34495e;
+  margin-bottom: 0.25rem;
+}
+
+.user-time {
+  color: #27ae60;
+  font-size: 0.8rem;
+}
+
+.pc-available-info, .pc-dumb-info {
+  padding: 0.5rem;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.pc-available-info {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.pc-dumb-info {
+  background: #fadbd8;
+  color: #e74c3c;
+}
+
+.available-text, .dumb-text {
+  font-weight: 500;
+}
+
+/* Dashboard Actions */
+.dashboard-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.refresh-btn {
+  padding: 0.5rem 1rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #2980b9;
+}
+
+.refresh-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
