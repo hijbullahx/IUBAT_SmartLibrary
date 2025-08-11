@@ -91,7 +91,7 @@ class Command(BaseCommand):
             self.stdout.write('Adding PCs...')
             for i in range(1, 49):  # Create PCs 1-48 (full e-library capacity)
                 pc, created = PC.objects.get_or_create(
-                    pc_number=f'PC-{i:02d}',
+                    pc_number=i,  # Use integer instead of string
                     defaults={'is_dumb': False}
                 )
                 if created:
