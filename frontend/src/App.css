@@ -3125,11 +3125,12 @@ body {
 
 .library-visual {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem; /* Gaps between column pairs */
   max-width: 900px;
   margin: 0 auto;
   padding-left: 60px; /* Space for window wall */
+  justify-content: center;
+  align-items: flex-start;
 }
 
 /* Window wall on the left */
@@ -3275,6 +3276,42 @@ body {
 .pc-library:hover {
   transform: scale(1.1);
   z-index: 10;
+}
+
+/* Column pair styling */
+.column-pair {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pair-label {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.columns-content {
+  display: flex;
+  gap: 0.5rem; /* Small gap between back-to-back columns */
+  align-items: flex-start;
+}
+
+.column-label {
+  font-size: 0.75rem;
+  color: #34495e;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.pc-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
 }
 
 /* Dashboard Actions */

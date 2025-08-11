@@ -294,7 +294,7 @@ function AdminDashboard() {
 
         {/* Enhanced PC Status Section with Library Layout */}
         <div className="pc-status-section">
-          <h3>💻 E-Library PC Layout (4 Rows × 12 PCs)</h3>
+          <h3>💻 E-Library PC Layout (8 Columns × 6 PCs)</h3>
           
           {/* Library Visual Layout */}
           <div className="library-layout">
@@ -304,28 +304,31 @@ function AdminDashboard() {
               <div className="window"></div>
             </div>
             <div className="library-visual">
-              {[1, 2, 3, 4].map(rowNum => {
-                const leftStartPc = (rowNum - 1) * 12 + 1;  // 1, 13, 25, 37
-                const rightStartPc = leftStartPc + 6;        // 7, 19, 31, 43
+              {/* 4 column pairs with gaps */}
+              {[1, 2, 3, 4].map(pairNum => {
+                const leftColumnStart = (pairNum - 1) * 12 + 1;   // 1, 13, 25, 37
+                const rightColumnStart = leftColumnStart + 6;     // 7, 19, 31, 43
                 
-                const leftSidePcs = pcDetails.filter(pc => 
-                  pc.pc_number >= leftStartPc && pc.pc_number <= leftStartPc + 5
-                ).sort((a, b) => b.pc_number - a.pc_number); // Reverse order (6->1, 18->13, etc)
+                const leftColumnPcs = pcDetails.filter(pc => 
+                  pc.pc_number >= leftColumnStart && pc.pc_number <= leftColumnStart + 5
+                ).sort((a, b) => a.pc_number - b.pc_number); // Normal order (1->6, 13->18, etc)
                 
-                const rightSidePcs = pcDetails.filter(pc => 
-                  pc.pc_number >= rightStartPc && pc.pc_number <= rightStartPc + 5
-                ).sort((a, b) => b.pc_number - a.pc_number); // Reverse order (12->7, 24->19, etc)
+                const rightColumnPcs = pcDetails.filter(pc => 
+                  pc.pc_number >= rightColumnStart && pc.pc_number <= rightColumnStart + 5
+                ).sort((a, b) => a.pc_number - b.pc_number); // Normal order (7->12, 19->24, etc)
                 
                 return (
-                  <div key={rowNum} className="library-row">
-                    <div className="row-label">Row {rowNum}</div>
-                    <div className="row-content">
+                  <div key={pairNum} className="column-pair">
+                    <div className="pair-label">Columns {pairNum * 2 - 1} & {pairNum * 2}</div>
+                    <div className="columns-content">
                       
-                      {/* Left side desks (facing window) */}
-                      <div className="desk-side">
-                        <div className="side-label">Window Side</div>
-                        <div className="pc-column">
-                          {leftSidePcs.map(pc => (
+                      {/* Left column (window side or towards window) */}
+                      <div className="pc-column">
+                        <div className="column-label">
+                          {pairNum === 1 ? 'Window Wall' : `Col ${pairNum * 2 - 1}`}
+                        </div>
+                        <div className="pc-stack">
+                          {leftColumnPcs.reverse().map(pc => ( // Reverse to show 6->1, 18->13, etc (top to bottom)
                             <div 
                               key={pc.pc_number} 
                               className={`pc-library ${pc.status}`}
@@ -369,11 +372,11 @@ function AdminDashboard() {
                         </div>
                       </div>
                       
-                      {/* Right side desks (back to back) */}
-                      <div className="desk-side">
-                        <div className="side-label">Center Side</div>
-                        <div className="pc-column">
-                          {rightSidePcs.map(pc => (
+                      {/* Right column (back-to-back) */}
+                      <div className="pc-column">
+                        <div className="column-label">Col {pairNum * 2}</div>
+                        <div className="pc-stack">
+                          {rightColumnPcs.reverse().map(pc => ( // Reverse to show 12->7, 24->19, etc (top to bottom)
                             <div 
                               key={pc.pc_number} 
                               className={`pc-library ${pc.status}`}
