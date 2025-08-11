@@ -71,7 +71,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
         pc_number: pc.pc_number
       });
       
-      setMessage(`Successfully checked in to PC ${pc.pc_number}! Returning to service menu...`);
+      setMessage(`Successfully checked in to PC ${pc.pc_number}!`);
       
       // Update current user PC immediately with the new assignment
       const newUserPc = {
@@ -82,10 +82,8 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       };
       setCurrentUserPc(newUserPc);
       
-      // Auto-return to service monitor after successful PC selection
-      setTimeout(() => {
-        onReturnToService();
-      }, 1500);
+      // Immediately return to service monitor after successful PC selection
+      onReturnToService();
       
     } catch (error) {
       setMessage(error.response?.data?.message || 'Error checking in to PC');
