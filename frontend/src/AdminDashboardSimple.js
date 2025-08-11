@@ -7,13 +7,13 @@ function AdminDashboard() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  // const [stats, setStats] = useState({}); // Removed unused variable
+  const [stats, setStats] = useState({});
   const [timeBasedReport, setTimeBasedReport] = useState([]);
   const [studentBasedReport, setStudentBasedReport] = useState([]);
   const [dailyReport, setDailyReport] = useState([]);
   const [monthlyReport, setMonthlyReport] = useState([]);
   const [yearlyReport, setYearlyReport] = useState([]);
-  // const [pcs, setPcs] = useState([]); // Removed unused variable
+  const [pcs, setPcs] = useState([]);
   const [pcDetails, setPcDetails] = useState([]);
   const [liveStats, setLiveStats] = useState({});
   const [analyticsData, setAnalyticsData] = useState([]);
