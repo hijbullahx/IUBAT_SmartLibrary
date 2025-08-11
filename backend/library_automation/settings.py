@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     '.render.com',
     '.onrender.com',
     'iubat-smartlibrary.onrender.com',
+    'iubat-smartlibrary-backend.onrender.com',  # Your actual backend domain
     # Add your specific Render domain here when you get it
 ]
 
@@ -166,9 +167,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3002",  # React development server (alt port)
     "http://127.0.0.1:3001",  # Alternative React dev server (alt port)
     "http://127.0.0.1:3002",  # Alternative React dev server (alt port)
-    # Add your frontend Render domain here when deployed
-    "https://iubat-smartlibrary-frontend.onrender.com",
-    "https://your-frontend-domain.onrender.com",  # Replace with actual domain
+    # Production Render domains
+    "https://iubat-smartlibrary-frontend.onrender.com",  # Your frontend URL
+    "https://iubat-smartlibrary-backend.onrender.com",   # Your backend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -203,9 +204,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
-    # Add your Render domains
-    "https://iubat-smartlibrary.onrender.com",
-    "https://iubat-smartlibrary-frontend.onrender.com",
-    "https://your-backend-domain.onrender.com",  # Replace with actual backend domain
-    "https://your-frontend-domain.onrender.com",  # Replace with actual frontend domain
+    # Production Render domains
+    "https://iubat-smartlibrary-backend.onrender.com",   # Your backend URL
+    "https://iubat-smartlibrary-frontend.onrender.com",  # Your frontend URL
 ]

@@ -4,7 +4,7 @@ import axios from 'axios';
 // Use production API URL in production, localhost in development
 const getBaseURL = () => {
   if (process.env.NODE_ENV === 'production') {
-    // Replace with your actual backend Render URL
+    // Your actual backend Render URL
     return process.env.REACT_APP_API_URL || 'https://iubat-smartlibrary-backend.onrender.com';
   }
   return 'http://localhost:8000';

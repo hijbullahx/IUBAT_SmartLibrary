@@ -55,36 +55,33 @@ chmod +x backend/build.sh
 ```
 REACT_APP_API_URL=https://iubat-smartlibrary-backend.onrender.com
 ```
-(Replace with your actual backend URL from step 1)
 
 ## Step 3: Update Configuration
 
 ### 3.1 Update Backend CORS Settings
-After getting your actual Render URLs, update these in `backend/library_automation/settings.py`:
+Your backend URLs are now configured in `backend/library_automation/settings.py`:
 
 ```python
 CORS_ALLOWED_ORIGINS = [
     # ... existing localhost entries ...
-    "https://your-actual-frontend-url.onrender.com",
+    "https://iubat-smartlibrary-frontend.onrender.com",  # Your frontend
+    "https://iubat-smartlibrary-backend.onrender.com",   # Your backend
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     # ... existing entries ...
-    "https://your-actual-backend-url.onrender.com",
-    "https://your-actual-frontend-url.onrender.com",
+    "https://iubat-smartlibrary-backend.onrender.com",   # Your backend
+    "https://iubat-smartlibrary-frontend.onrender.com",  # Your frontend
 ]
 
 ALLOWED_HOSTS = [
     # ... existing entries ...
-    'your-actual-backend-url.onrender.com',
+    'iubat-smartlibrary-backend.onrender.com',  # Your backend domain
 ]
 ```
 
 ### 3.2 Update Frontend API URL
-Update `frontend/src/config/axios.js`:
-```javascript
-return process.env.REACT_APP_API_URL || 'https://your-actual-backend-url.onrender.com';
-```
+Your frontend is configured to use: `https://iubat-smartlibrary-backend.onrender.com`
 
 ## Step 4: Database Setup
 
@@ -106,8 +103,8 @@ Then run your data setup scripts if needed.
 
 ## Step 5: Testing
 
-1. Access your backend at: `https://your-backend-url.onrender.com/api/status/`
-2. Access your frontend at: `https://your-frontend-url.onrender.com`
+1. Access your backend at: `https://iubat-smartlibrary-backend.onrender.com/api/status/`
+2. Access your frontend at: `https://iubat-smartlibrary-frontend.onrender.com`
 3. Test admin login with the superuser you created
 
 ## Important Notes
