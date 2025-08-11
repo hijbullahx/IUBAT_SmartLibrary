@@ -40,29 +40,48 @@ function AdminDashboard() {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
+      console.log('🔄 Loading dashboard data...');
+      
       const liveStatsResponse = await axios.get(API_ENDPOINTS.ADMIN_STATS_LIVE);
       
       if (liveStatsResponse.data.status === 'success') {
+        console.log('✅ Live stats loaded:', liveStatsResponse.data);
         setLiveStats(liveStatsResponse.data.stats || {});
         setPcDetails(liveStatsResponse.data.pc_details || []);
+      } else {
+        console.error('❌ Live stats error:', liveStatsResponse.data);
+        setMessage(`Live stats error: ${liveStatsResponse.data.message}`);
       }
 
       const analyticsResponse = await axios.get(API_ENDPOINTS.PC_ANALYTICS);
       
       if (analyticsResponse.data.status === 'success') {
+        console.log('✅ Analytics loaded:', analyticsResponse.data);
         setAnalyticsData(analyticsResponse.data.data || []);
+      } else {
+        console.error('❌ Analytics error:', analyticsResponse.data);
       }
 
       const pcResponse = await axios.get(API_ENDPOINTS.ELIBRARY_PC_STATUS);
       
       if (pcResponse.data.status === 'success') {
+        console.log('✅ PC status loaded:', pcResponse.data);
         setPcs(pcResponse.data.pcs || []);
+      } else {
+        console.error('❌ PC status error:', pcResponse.data);
       }
 
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      console.error('❌ Error loading dashboard data:', error);
       if (error.response) {
-        setMessage(`Error loading dashboard: ${error.response.data?.message || 'Server error'}`);
+        if (error.response.status === 401) {
+          setMessage('Authentication required. Please log in again.');
+          setIsLoggedIn(false);
+        } else if (error.response.status === 403) {
+          setMessage('Access denied. Superuser privileges required.');
+        } else {
+          setMessage(`Error loading dashboard: ${error.response.data?.message || 'Server error'}`);
+        }
       } else {
         setMessage('Error loading dashboard data. Please check server connection.');
       }
@@ -334,18 +353,24 @@ function AdminDashboard() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log('🔄 Attempting admin login...');
       const response = await axios.post(API_ENDPOINTS.ADMIN_LOGIN, {
         username,
         password
       });
       
+      console.log('✅ Login response:', response.data);
+      
       if (response.data.status === 'success') {
         setIsLoggedIn(true);
         setMessage('Login successful');
+        console.log('✅ Admin logged in successfully');
       } else {
         setMessage('Invalid credentials');
+        console.error('❌ Login failed:', response.data);
       }
     } catch (error) {
+      console.error('❌ Login error:', error);
       if (error.response && error.response.data && error.response.data.message) {
         setMessage(error.response.data.message);
       } else {

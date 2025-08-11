@@ -220,17 +220,36 @@ def export_data(request):
 
     return response
 @csrf_exempt
+@csrf_exempt
 def admin_login(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None and user.is_superuser:
-            login(request, user)
-            return JsonResponse({'status': 'success', 'message': 'Logged in as Admin.'})
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Invalid credentials or not a superuser.'}, status=401)
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
+            
+            if not username or not password:
+                return JsonResponse({'status': 'error', 'message': 'Username and password required.'}, status=400)
+            
+            user = authenticate(request, username=username, password=password)
+            if user is not None and user.is_superuser:
+                login(request, user)
+                return JsonResponse({
+                    'status': 'success', 
+                    'message': 'Logged in as Admin.',
+                    'user': {
+                        'username': user.username,
+                        'is_superuser': user.is_superuser
+                    }
+                })
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid credentials or not a superuser.'}, status=401)
+                
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
 @csrf_exempt
@@ -579,6 +598,9 @@ def api_status(request):
         'status': 'success',
         'message': 'IUBAT Smart Library API is running',
         'version': '1.0.0',
+        'user_authenticated': request.user.is_authenticated,
+        'user_is_superuser': request.user.is_superuser if request.user.is_authenticated else False,
+        'username': request.user.username if request.user.is_authenticated else None,
         'endpoints': {
             'library_entry': '/api/entry/library/',
             'elibrary_checkin': '/api/entry/elibrary/checkin/',
@@ -613,11 +635,17 @@ def student_lookup(request, student_id):
 
 
 @csrf_exempt
-@login_required
 def live_admin_stats(request):
     """Get real-time library statistics for admin dashboard"""
     if request.method == 'GET':
         try:
+            # Check authentication
+            if not request.user.is_authenticated:
+                return JsonResponse({'status': 'error', 'message': 'Authentication required'}, status=401)
+            
+            if not request.user.is_superuser:
+                return JsonResponse({'status': 'error', 'message': 'Superuser access required'}, status=403)
+            
             # Count students currently in library (no exit time)
             students_in_library = LibraryEntry.objects.filter(exit_time__isnull=True).count()
             
