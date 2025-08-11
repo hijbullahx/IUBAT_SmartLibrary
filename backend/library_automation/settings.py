@@ -32,7 +32,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1', 
     '.render.com',
     '.onrender.com',
-    'iubat-smartlibrary.onrender.com'
+    'iubat-smartlibrary.onrender.com',
+    # Add your specific Render domain here when you get it
 ]
 
 
@@ -88,13 +89,21 @@ WSGI_APPLICATION = "library_automation.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Priority: DATABASE_URL (Neon) > local SQLite
 DATABASE_URL = os.environ.get('DATABASE_URL', None)
 
 if DATABASE_URL:
+    # Production: Use Neon PostgreSQL
     DATABASES = {
-        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600, conn_health_checks=True)
+        'default': dj_database_url.config(
+            default=DATABASE_URL, 
+            conn_max_age=600, 
+            conn_health_checks=True,
+            ssl_require=True
+        )
     }
 else:
+    # Development: Use SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -157,6 +166,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3002",  # React development server (alt port)
     "http://127.0.0.1:3001",  # Alternative React dev server (alt port)
     "http://127.0.0.1:3002",  # Alternative React dev server (alt port)
+    # Add your frontend Render domain here when deployed
+    "https://iubat-smartlibrary-frontend.onrender.com",
+    "https://your-frontend-domain.onrender.com",  # Replace with actual domain
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -191,4 +203,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
+    # Add your Render domains
+    "https://iubat-smartlibrary.onrender.com",
+    "https://iubat-smartlibrary-frontend.onrender.com",
+    "https://your-backend-domain.onrender.com",  # Replace with actual backend domain
+    "https://your-frontend-domain.onrender.com",  # Replace with actual frontend domain
 ]

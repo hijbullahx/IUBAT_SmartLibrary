@@ -1,9 +1,17 @@
 import axios from 'axios';
 
 // Create a custom axios instance with proper configuration
-// Use current domain in production, proxy in development
+// Use production API URL in production, localhost in development
+const getBaseURL = () => {
+  if (process.env.NODE_ENV === 'production') {
+    // Replace with your actual backend Render URL
+    return process.env.REACT_APP_API_URL || 'https://iubat-smartlibrary-backend.onrender.com';
+  }
+  return 'http://localhost:8000';
+};
+
 const axiosInstance = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? '' : 'http://localhost:8000',
+  baseURL: getBaseURL(),
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
