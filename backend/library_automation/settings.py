@@ -176,13 +176,14 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # Session settings for cross-origin cookies
-SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cross-origin cookies
-SESSION_COOKIE_SECURE = False     # Set to True in production with HTTPS
+SESSION_COOKIE_SAMESITE = None    # More permissive for cross-origin
+SESSION_COOKIE_SECURE = False     # Set to True in production with HTTPS  
 SESSION_COOKIE_HTTPONLY = False   # Allow JavaScript access to session cookies
 SESSION_COOKIE_DOMAIN = None      # Allow for localhost variations
+SESSION_SAVE_EVERY_REQUEST = True # Ensure session is saved on every request
 
 # CSRF settings for cross-origin requests
-CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = None       # More permissive for cross-origin
 CSRF_COOKIE_SECURE = False        # Set to True in production with HTTPS
 CSRF_COOKIE_HTTPONLY = False      # Allow JavaScript access to CSRF cookies
 CSRF_TRUSTED_ORIGINS = [

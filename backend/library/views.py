@@ -219,7 +219,7 @@ def export_data(request):
         ])
 
     return response
-@csrf_exempt
+
 @csrf_exempt
 def admin_login(request):
     if request.method == 'POST':
@@ -234,14 +234,38 @@ def admin_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None and user.is_superuser:
                 login(request, user)
-                return JsonResponse({
+                print(f"DEBUG LOGIN: Session key after login: {request.session.session_key}")
+                print(f"DEBUG LOGIN: User: {request.user}")
+                print(f"DEBUG LOGIN: Session data: {dict(request.session)}")
+                
+                # Create response and set session cookie explicitly
+                response = JsonResponse({
                     'status': 'success', 
                     'message': 'Logged in as Admin.',
                     'user': {
                         'username': user.username,
                         'is_superuser': user.is_superuser
+                    },
+                    'debug': {
+                        'session_key': request.session.session_key,
+                        'session_data': dict(request.session)
                     }
                 })
+                
+                # Ensure session cookie is set properly
+                from django.conf import settings
+                response.set_cookie(
+                    settings.SESSION_COOKIE_NAME,
+                    request.session.session_key,
+                    max_age=settings.SESSION_COOKIE_AGE,
+                    domain=settings.SESSION_COOKIE_DOMAIN,
+                    secure=settings.SESSION_COOKIE_SECURE,
+                    httponly=settings.SESSION_COOKIE_HTTPONLY,
+                    samesite=settings.SESSION_COOKIE_SAMESITE
+                )
+                
+                print(f"DEBUG LOGIN: Set session cookie {settings.SESSION_COOKIE_NAME}={request.session.session_key}")
+                return response
             else:
                 return JsonResponse({'status': 'error', 'message': 'Invalid credentials or not a superuser.'}, status=401)
                 
@@ -601,6 +625,9 @@ def api_status(request):
         'user_authenticated': request.user.is_authenticated,
         'user_is_superuser': request.user.is_superuser if request.user.is_authenticated else False,
         'username': request.user.username if request.user.is_authenticated else None,
+        'session_key': request.session.session_key,
+        'session_data': dict(request.session),
+        'cookies_received': dict(request.COOKIES),
         'endpoints': {
             'library_entry': '/api/entry/library/',
             'elibrary_checkin': '/api/entry/elibrary/checkin/',
@@ -639,9 +666,18 @@ def live_admin_stats(request):
     """Get real-time library statistics for admin dashboard"""
     if request.method == 'GET':
         try:
+            # Debug session and authentication
+            print(f"DEBUG: Session key: {request.session.session_key}")
+            print(f"DEBUG: User authenticated: {request.user.is_authenticated}")
+            print(f"DEBUG: User: {request.user}")
+            print(f"DEBUG: User is superuser: {getattr(request.user, 'is_superuser', False)}")
+            print(f"DEBUG: Session data: {dict(request.session)}")
+            print(f"DEBUG: Cookies received: {dict(request.COOKIES)}")
+            print(f"DEBUG: Headers: {dict(request.headers)}")
+            
             # Check authentication
             if not request.user.is_authenticated:
-                return JsonResponse({'status': 'error', 'message': 'Authentication required'}, status=401)
+                return JsonResponse({'status': 'error', 'message': 'Authentication required', 'debug': {'session_key': request.session.session_key, 'user': str(request.user)}}, status=401)
             
             if not request.user.is_superuser:
                 return JsonResponse({'status': 'error', 'message': 'Superuser access required'}, status=403)
