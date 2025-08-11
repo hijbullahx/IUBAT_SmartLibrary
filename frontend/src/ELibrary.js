@@ -71,7 +71,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
         pc_number: pc.pc_number
       });
       
-      setMessage(`Successfully checked in to PC ${pc.pc_number}! You can now use this computer.`);
+      setMessage(`Successfully checked in to PC ${pc.pc_number}! Returning to service menu...`);
       
       // Update current user PC immediately with the new assignment
       const newUserPc = {
@@ -82,38 +82,13 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       };
       setCurrentUserPc(newUserPc);
       
-      // Refresh PC list to get updated status
+      // Auto-return to service monitor after successful PC selection
       setTimeout(() => {
-        loadPCs();
-      }, 500);
+        onReturnToService();
+      }, 1500);
       
     } catch (error) {
       setMessage(error.response?.data?.message || 'Error checking in to PC');
-    }
-  };
-
-  const handleCheckOut = async () => {
-    if (!currentUserPc) {
-      setMessage('No PC currently assigned to you');
-      return;
-    }
-
-    try {
-      const response = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
-        student_id: scannedStudent.student_id,
-        pc_number: currentUserPc.pc_number
-      });
-      
-      setMessage(`Successfully checked out from PC ${currentUserPc.pc_number}. You can now select a different PC.`);
-      setCurrentUserPc(null);
-      
-      // Refresh PC list to show updated status
-      setTimeout(() => {
-        loadPCs();
-      }, 500);
-      
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Error checking out from PC');
     }
   };
 
@@ -157,14 +132,11 @@ function ELibrary({ scannedStudent, onReturnToService }) {
             <div className="alert-icon">💻</div>
             <div className="alert-text">
               <h3>You are currently using PC {currentUserPc.pc_number}</h3>
-              <p>You have an active session on PC {currentUserPc.pc_number}. You can check out to select a different PC or continue using your current session.</p>
+              <p>You have an active session on PC {currentUserPc.pc_number}. Return to the Service Monitor to manage your session.</p>
             </div>
             <div className="alert-actions">
-              <button onClick={handleCheckOut} className="checkout-alert-btn">
-                Check Out from PC {currentUserPc.pc_number}
-              </button>
               <button onClick={onReturnToService} className="continue-btn">
-                Continue Current Session
+                Return to Service Monitor
               </button>
             </div>
           </div>
