@@ -26,7 +26,7 @@ In Render dashboard, go to your backend service → Environment tab:
 ```
 DATABASE_URL=postgresql://neondb_owner:npg_q21haZeluxOU@ep-purple-waterfall-added26e-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
-SECRET_KEY=your-super-secret-django-key-here-make-it-long-and-random
+SECRET_KEY=y02klAsspCFaZfgj_q-omBjcU4fKt&N^KBqaU=Nvlv@8PJ6Ke!
 
 DEBUG=False
 
