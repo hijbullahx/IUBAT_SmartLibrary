@@ -32,6 +32,16 @@ function AdminDashboard() {
   const [selectedYear, setSelectedYear] = useState('');
 
   useEffect(() => {
+    // Check for existing auth token on component mount
+    const existingToken = localStorage.getItem('admin_auth_token');
+    if (existingToken) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${existingToken}`;
+      setIsLoggedIn(true);
+      console.log('✅ Found existing auth token, auto-login');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isLoggedIn) {
       loadDashboardData();
     }
@@ -361,7 +371,15 @@ function AdminDashboard() {
       
       console.log('✅ Login response:', response.data);
       
-      if (response.data.status === 'success') {
+      if (response.data.success) {
+        // Store auth token for future requests
+        if (response.data.auth_token) {
+          localStorage.setItem('admin_auth_token', response.data.auth_token);
+          // Set default authorization header for future requests
+          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.auth_token}`;
+          console.log('✅ Auth token stored:', response.data.auth_token.substring(0, 20) + '...');
+        }
+        
         setIsLoggedIn(true);
         setMessage('Login successful');
         console.log('✅ Admin logged in successfully');
@@ -380,10 +398,14 @@ function AdminDashboard() {
   };
 
   const handleLogout = () => {
+    // Clear auth token
+    localStorage.removeItem('admin_auth_token');
+    delete axios.defaults.headers.common['Authorization'];
+    
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');
-    setMessage('');
+    setMessage('Logged out successfully');
     setStats({});
     setTimeBasedReport([]);
     setStudentBasedReport([]);
