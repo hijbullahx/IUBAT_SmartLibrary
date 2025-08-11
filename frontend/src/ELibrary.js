@@ -63,7 +63,7 @@ function ELibrary({ scannedStudent, onReturnToService }) {
         pc_number: pc.pc_number
       });
       
-      setMessage(`Successfully checked in to PC ${pc.pc_number}! You can now use this computer.`);
+      setMessage(`Successfully checked in to PC ${pc.pc_number}!`);
       
       // Update current user PC immediately with the new assignment
       const newUserPc = {
@@ -74,45 +74,18 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       };
       setCurrentUserPc(newUserPc);
       
-      // Refresh PC list to get updated status
-      setTimeout(() => {
-        loadPCs();
-      }, 500);
+      // Immediately return to service monitor after successful PC selection
+      onReturnToService();
       
     } catch (error) {
       setMessage(error.response?.data?.message || 'Error checking in to PC');
     }
   };
 
-  const handleCheckOut = async () => {
-    if (!currentUserPc) {
-      setMessage('No PC currently assigned to you');
-      return;
-    }
-
-    try {
-      await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
-        student_id: scannedStudent.student_id,
-        pc_number: currentUserPc.pc_number
-      });
-      
-      setMessage(`Successfully checked out from PC ${currentUserPc.pc_number}. You can now select a different PC.`);
-      setCurrentUserPc(null);
-      
-      // Refresh PC list to show updated status
-      setTimeout(() => {
-        loadPCs();
-      }, 500);
-      
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Error checking out from PC');
-    }
-  };
-
   const getPcStatusClass = (pc) => {
-    if (pc.is_dumb) return 'pc-card dumb';
-    if (pc.status === 'in-use') return 'pc-card in-use';
-    return 'pc-card available';
+    if (pc.is_dumb) return 'dumb';
+    if (pc.status === 'in-use') return 'in_use';
+    return 'available';
   };
 
   const getPcStatusText = (pc) => {
@@ -157,14 +130,11 @@ function ELibrary({ scannedStudent, onReturnToService }) {
             <div className="alert-icon">💻</div>
             <div className="alert-text">
               <h3>You are currently using PC {currentUserPc.pc_number}</h3>
-              <p>You have an active session on PC {currentUserPc.pc_number}. You can check out to select a different PC or continue using your current session.</p>
+              <p>You have an active session on PC {currentUserPc.pc_number}. Return to the Service Monitor to manage your session.</p>
             </div>
             <div className="alert-actions">
-              <button onClick={handleCheckOut} className="checkout-alert-btn">
-                Check Out from PC {currentUserPc.pc_number}
-              </button>
               <button onClick={onReturnToService} className="continue-btn">
-                Continue Current Session
+                Return to Service Monitor
               </button>
             </div>
           </div>
@@ -182,49 +152,98 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       )}
 
       <div className="pc-status-section">
-        <h3>Available Computers</h3>
-        <div className="pc-grid">
-          {pcs.map(pc => (
-            <div
-              key={pc.pc_number}
-              className={`${getPcStatusClass(pc)} ${pc.status === 'available' && !currentUserPc ? 'clickable' : ''}`}
-              onClick={() => currentUserPc ? null : handlePcSelect(pc)}
-              style={{
-                cursor: pc.status === 'available' && !pc.is_dumb && !currentUserPc ? 'pointer' : 'not-allowed',
-                opacity: currentUserPc && pc.pc_number !== currentUserPc.pc_number ? 0.6 : 1
-              }}
-            >
-              <div className="pc-header">
-                <h4>PC {pc.pc_number}</h4>
-                <span className={`status-badge ${pc.is_dumb ? 'dumb' : pc.status}`}>
-                  {getPcStatusText(pc)}
-                </span>
-              </div>
+        <h3>💻 E-Library PC Layout - Select Your Computer</h3>
+        
+        {/* Library Visual Layout */}
+        <div className="library-layout">
+          <div className="window-wall-horizontal">
+            <div className="window"></div>
+            <div className="window"></div>
+            <div className="window"></div>
+            <div className="window"></div>
+          </div>
+          <div className="library-visual">
+            {/* 4 column pairs with gaps */}
+            {[1, 2, 3, 4].map(pairNum => {
+              const leftColumnStart = (pairNum - 1) * 12 + 1;   // 1, 13, 25, 37
+              const rightColumnStart = leftColumnStart + 6;     // 7, 19, 31, 43
               
-              <div className="pc-visual">
-                <div className={`monitor ${pc.is_dumb ? 'offline' : pc.status}`}>
-                  <div className="screen">
-                    {pc.status === 'available' && !pc.is_dumb && !currentUserPc && (
-                      <span className="click-hint">Click to select</span>
-                    )}
-                    {pc.status === 'in-use' && pc.current_user === scannedStudent?.student_id && (
-                      <span className="user-indicator">YOUR PC</span>
-                    )}
-                    {currentUserPc && pc.status === 'available' && (
-                      <span className="disabled-hint">Check out first</span>
-                    )}
+              const leftColumnPcs = pcs.filter(pc => 
+                pc.pc_number >= leftColumnStart && pc.pc_number <= leftColumnStart + 5
+              ).sort((a, b) => b.pc_number - a.pc_number); // Reverse order (6->1, 18->13, etc) top to bottom
+              
+              const rightColumnPcs = pcs.filter(pc => 
+                pc.pc_number >= rightColumnStart && pc.pc_number <= rightColumnStart + 5
+              ).sort((a, b) => a.pc_number - b.pc_number); // Normal order (7->12, 19->24, etc) so 7 is at top near wall
+              
+              return (
+                <div key={pairNum} className="column-pair">
+                  <div className="columns-content">
+                    
+                    {/* Left column */}
+                    <div className="pc-column">
+                      <div className="pc-stack">
+                        {leftColumnPcs.map(pc => (
+                          <div 
+                            key={pc.pc_number} 
+                            className={`pc-library ${getPcStatusClass(pc)} ${pc.status === 'available' && !currentUserPc ? 'clickable' : ''}`}
+                            onClick={() => currentUserPc ? null : handlePcSelect(pc)}
+                            style={{
+                              cursor: pc.status === 'available' && !pc.is_dumb && !currentUserPc ? 'pointer' : 'not-allowed',
+                              opacity: currentUserPc && pc.pc_number !== currentUserPc.pc_number ? 0.6 : 1
+                            }}
+                          >
+                            {pc.pc_number}
+                            {pc.status === 'in-use' && pc.current_user === scannedStudent?.student_id && (
+                              <div style={{fontSize: '0.5rem', color: 'yellow'}}>YOUR</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Right column (no gap from left) */}
+                    <div className="pc-column">
+                      <div className="pc-stack">
+                        {rightColumnPcs.map(pc => (
+                          <div 
+                            key={pc.pc_number} 
+                            className={`pc-library ${getPcStatusClass(pc)} ${pc.status === 'available' && !currentUserPc ? 'clickable' : ''}`}
+                            onClick={() => currentUserPc ? null : handlePcSelect(pc)}
+                            style={{
+                              cursor: pc.status === 'available' && !pc.is_dumb && !currentUserPc ? 'pointer' : 'not-allowed',
+                              opacity: currentUserPc && pc.pc_number !== currentUserPc.pc_number ? 0.6 : 1
+                            }}
+                          >
+                            {pc.pc_number}
+                            {pc.status === 'in-use' && pc.current_user === scannedStudent?.student_id && (
+                              <div style={{fontSize: '0.5rem', color: 'yellow'}}>YOUR</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div className="cpu"></div>
-              </div>
-              
-              {pc.status === 'in-use' && pc.current_user && pc.current_user !== scannedStudent?.student_id && (
-                <div className="user-info">
-                  <small>Used by: {pc.current_user_name || pc.current_user}</small>
-                </div>
-              )}
-            </div>
-          ))}
+              );
+            })}
+          </div>
+        </div>
+        
+        {/* Legend */}
+        <div style={{display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem', fontSize: '0.8rem'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <div className="pc-library available" style={{width: '20px', height: '15px'}}></div>
+            Available
+          </div>
+          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <div className="pc-library in_use" style={{width: '20px', height: '15px'}}></div>
+            In Use
+          </div>
+          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <div className="pc-library dumb" style={{width: '20px', height: '15px'}}></div>
+            Out of Service
+          </div>
         </div>
       </div>
 

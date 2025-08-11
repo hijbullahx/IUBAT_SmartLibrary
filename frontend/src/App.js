@@ -19,6 +19,9 @@ function App() {
   const [showServiceMenu, setShowServiceMenu] = useState(false);
   const [isServiceMonitor, setIsServiceMonitor] = useState(false);
   const [entryMonitorLoggedInStudents, setEntryMonitorLoggedInStudents] = useState(new Set());
+  const [currentUserPc, setCurrentUserPc] = useState(null); // Track user's current PC
+  const [complaint, setComplaint] = useState('');
+  const [complaintType, setComplaintType] = useState('pc');
 
   // Initialize student ID based on scanned student
   useEffect(() => {
@@ -211,12 +214,29 @@ function App() {
     setShowElibrary(false);
     setShowServiceMenu(true);
     setIsServiceMonitor(true);
+    // Refresh PC status when returning to service monitor
+    if (scannedStudent) {
+      checkCurrentUserPc(scannedStudent.student_id);
+    }
   };
 
   const handleServiceChoice = async (choice) => {
     if (choice === 'logout') {
-      // Process full library logout
+      // Process full library logout (includes PC logout if applicable)
       try {
+        // First, logout from PC if user has one
+        if (currentUserPc) {
+          try {
+            await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
+              student_id: scannedStudent.student_id
+            });
+          } catch (pcError) {
+            console.error('Error logging out from PC:', pcError);
+            // Continue with library logout even if PC logout fails
+          }
+        }
+        
+        // Then logout from library
         const entryResponse = await axios.post(API_ENDPOINTS.LIBRARY_ENTRY, {
           student_id: scannedStudent.student_id
         });
@@ -228,13 +248,38 @@ function App() {
           return updated;
         });
         
-        setMessage(entryResponse.data.message);
-        setLastAction(entryResponse.data.action);
+        // Clear states and return to service monitor scan interface immediately
+        setCurrentUserPc(null);
+        setScannedStudent(null);
         setShowServiceMenu(false);
-        setShowGoodbye(true);
+        setIsServiceMonitor(true);
+        setStudentId('');
+        setMessage('');
+        setLastAction('');
         
       } catch (error) {
         setMessage(error.response?.data?.message || 'Error processing logout');
+      }
+    } else if (choice === 'logout_pc') {
+      // Logout from PC only (not from library)
+      try {
+        if (currentUserPc) {
+          const checkoutResponse = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
+            student_id: scannedStudent.student_id
+          });
+          
+          setCurrentUserPc(null);
+          setMessage(`Successfully logged out from PC ${currentUserPc.pc_name}`);
+          setLastAction('pc_logout');
+          
+          // Auto-clear message after 3 seconds
+          setTimeout(() => {
+            setMessage('');
+            setLastAction('');
+          }, 3000);
+        }
+      } catch (error) {
+        setMessage(error.response?.data?.message || 'Error logging out from PC');
       }
     } else if (choice === 'elibrary') {
       // Go to e-library interface
@@ -242,6 +287,51 @@ function App() {
       setShowElibrary(true);
     }
   };
+
+  const handleComplaintSubmit = async (e) => {
+    e.preventDefault();
+    if (!complaint.trim()) return;
+
+    // Log complaint (can be extended to API call in future)
+    console.log('Complaint submitted:', {
+      studentId: scannedStudent?.student_id,
+      studentName: scannedStudent?.name,
+      type: complaintType,
+      message: complaint,
+      timestamp: new Date().toISOString()
+    });
+
+    // Clear complaint form
+    setComplaint('');
+    setComplaintType('pc');
+    
+    // Show success message
+    setMessage('Thank you! Your report has been submitted.');
+    setTimeout(() => {
+      setMessage('');
+    }, 3000);
+  };
+
+  // Function to check current user's PC status
+  const checkCurrentUserPc = async (studentId) => {
+    try {
+      const response = await axios.get(`${API_ENDPOINTS.CHECK_CURRENT_USER_PC}${studentId}/`);
+      if (response.data.status === 'success' && response.data.current_pc) {
+        setCurrentUserPc(response.data.current_pc);
+      } else {
+        setCurrentUserPc(null);
+      }
+    } catch (error) {
+      setCurrentUserPc(null);
+    }
+  };
+
+  // Check PC status when service menu is shown
+  useEffect(() => {
+    if (showServiceMenu && scannedStudent) {
+      checkCurrentUserPc(scannedStudent.student_id);
+    }
+  }, [showServiceMenu, scannedStudent]);
 
   const handleBackToService = () => {
     setShowElibrary(false);
@@ -292,34 +382,165 @@ function App() {
               <div className="student-welcome">
                 <h2>Welcome, {scannedStudent?.name}!</h2>
                 <p>ID: {scannedStudent?.student_id} | Department: {scannedStudent?.department}</p>
+                {currentUserPc && (
+                  <div className="pc-status">
+                    <p className="pc-info">Currently using: <strong>{currentUserPc.pc_name}</strong></p>
+                  </div>
+                )}
               </div>
               
               <div className="service-options">
                 <h3>What would you like to do?</h3>
                 
                 <div className="service-buttons">
-                  <button 
-                    className="service-btn logout-btn"
-                    onClick={() => handleServiceChoice('logout')}
-                  >
-                    <div className="btn-icon">🚪</div>
-                    <div className="btn-text">
-                      <h4>Exit Library</h4>
-                      <p>Complete logout from library</p>
-                    </div>
-                  </button>
-                  
-                  <button 
-                    className="service-btn elibrary-btn"
-                    onClick={() => handleServiceChoice('elibrary')}
-                  >
-                    <div className="btn-icon">💻</div>
-                    <div className="btn-text">
-                      <h4>Use E-Library</h4>
-                      <p>Access computers and digital resources</p>
-                    </div>
-                  </button>
+                  {currentUserPc ? (
+                    // Show PC-specific options when user has a PC
+                    <>
+                      <button 
+                        className="service-btn logout-pc-btn"
+                        onClick={() => handleServiceChoice('logout_pc')}
+                      >
+                        <div className="btn-icon">💻</div>
+                        <div className="btn-text">
+                          <h4>Logout from PC</h4>
+                          <p>Exit {currentUserPc.pc_name} only</p>
+                        </div>
+                      </button>
+                      
+                      <button 
+                        className="service-btn logout-btn"
+                        onClick={() => handleServiceChoice('logout')}
+                      >
+                        <div className="btn-icon">🚪</div>
+                        <div className="btn-text">
+                          <h4>Exit Library</h4>
+                          <p>Logout from PC and library</p>
+                        </div>
+                      </button>
+                    </>
+                  ) : (
+                    // Show standard options when user doesn't have a PC
+                    <>
+                      <button 
+                        className="service-btn logout-btn"
+                        onClick={() => handleServiceChoice('logout')}
+                      >
+                        <div className="btn-icon">🚪</div>
+                        <div className="btn-text">
+                          <h4>Exit Library</h4>
+                          <p>Complete logout from library</p>
+                        </div>
+                      </button>
+                      
+                      <button 
+                        className="service-btn elibrary-btn"
+                        onClick={() => handleServiceChoice('elibrary')}
+                      >
+                        <div className="btn-icon">💻</div>
+                        <div className="btn-text">
+                          <h4>Use E-Library</h4>
+                          <p>Access computers and digital resources</p>
+                        </div>
+                      </button>
+                    </>
+                  )}
                 </div>
+              </div>
+              
+              {/* Library Guidelines */}
+              <div className="guidelines-section">
+                <h3>📚 Library Guidelines Reminder</h3>
+                <div className="guidelines-grid">
+                  <div className="guideline-item">
+                    <span className="guideline-icon">📚</span>
+                    <span>Return books on time</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">🔇</span>
+                    <span>Maintain silence</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">📱</span>
+                    <span>Silent mode phones</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">🍽️</span>
+                    <span>No food or drinks</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">💻</span>
+                    <span>Log out properly</span>
+                  </div>
+                  <div className="guideline-item">
+                    <span className="guideline-icon">🧹</span>
+                    <span>Keep area clean</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Complaint Section */}
+              <div className="complaint-section">
+                <h3>🛠️ Report an Issue</h3>
+                <p className="complaint-subtitle">Found a problem? Let us know!</p>
+                
+                <form onSubmit={handleComplaintSubmit} className="complaint-form">
+                  <div className="complaint-type">
+                    <label>Issue Type:</label>
+                    <div className="type-buttons">
+                      <button 
+                        type="button"
+                        className={`type-btn ${complaintType === 'pc' ? 'active' : ''}`}
+                        onClick={() => setComplaintType('pc')}
+                      >
+                        💻 PC Issue
+                      </button>
+                      <button 
+                        type="button"
+                        className={`type-btn ${complaintType === 'facility' ? 'active' : ''}`}
+                        onClick={() => setComplaintType('facility')}
+                      >
+                        🏢 Facility Issue
+                      </button>
+                      <button 
+                        type="button"
+                        className={`type-btn ${complaintType === 'other' ? 'active' : ''}`}
+                        onClick={() => setComplaintType('other')}
+                      >
+                        🔧 Other Issue
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="complaint-input">
+                    <textarea
+                      value={complaint}
+                      onChange={(e) => setComplaint(e.target.value)}
+                      placeholder="Describe the issue you're experiencing..."
+                      rows="3"
+                      className="complaint-textarea"
+                    />
+                  </div>
+                  
+                  <div className="complaint-actions">
+                    <button 
+                      type="submit"
+                      className="submit-complaint-btn"
+                      disabled={!complaint.trim()}
+                    >
+                      Submit Report
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setComplaint('');
+                        setComplaintType('pc');
+                      }}
+                      className="cancel-complaint-btn"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

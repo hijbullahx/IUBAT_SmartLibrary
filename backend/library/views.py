@@ -1,5 +1,3 @@
-# library/views.py
-
 from django.http import JsonResponse
 from .models import Student, LibraryEntry, ELibraryEntry, PC
 from django.views.decorators.csrf import csrf_exempt
@@ -16,29 +14,22 @@ from django.db.models import Q
 def library_entry_exit(request):
     if request.method == 'POST':
         try:
-            # We assume the barcode is sent in a JSON body.
-            # The React frontend will send {'student_id': 'your_barcode_value'}
             data = json.loads(request.body)
             student_id = data.get('student_id')
 
-            # 1. Find the student
             try:
                 student = Student.objects.get(student_id=student_id)
             except Student.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
 
-            # 2. Check if the student is currently inside the library
-            # Look for an entry with no exit time
             current_entry = LibraryEntry.objects.filter(student=student, exit_time__isnull=True).first()
 
             if current_entry:
-                # 3a. Student is inside, so we record their exit time
                 current_entry.exit_time = timezone.now()
                 current_entry.save()
                 message = f'{student.name} has logged out from the main library.'
                 return JsonResponse({'status': 'success', 'action': 'logout', 'message': message, 'student_name': student.name})
             else:
-                # 3b. Student is not inside, so we create a new entry
                 LibraryEntry.objects.create(student=student)
                 message = f'{student.name} has logged in to the main library.'
                 return JsonResponse({'status': 'success', 'action': 'login', 'message': message, 'student_name': student.name})
@@ -46,11 +37,9 @@ def library_entry_exit(request):
         except json.JSONDecodeError:
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
         except Exception as e:
-            # General error handling
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
-
 
 @csrf_exempt
 def pc_status(request):
@@ -60,7 +49,6 @@ def pc_status(request):
 
         pc_list = []
         for pc in all_pcs:
-            # Find if this PC is currently in use
             current_entry = pcs_in_use.filter(pc=pc).first()
             
             if current_entry:
@@ -81,7 +69,6 @@ def pc_status(request):
                 'is_dumb': pc.is_dumb,
             }
             
-            # Only add user info if PC is in use
             if current_user:
                 pc_data['current_user'] = current_user
                 pc_data['current_user_name'] = current_user_name
@@ -92,8 +79,44 @@ def pc_status(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
+@csrf_exempt
+def check_current_pc(request, student_id):
+    if request.method == 'GET':
+        try:
+            try:
+                student = Student.objects.get(student_id=student_id)
+            except Student.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
 
-# Other placeholder views remain unchanged for now
+            current_entry = ELibraryEntry.objects.filter(
+                student=student, 
+                exit_time__isnull=True
+            ).select_related('pc').first()
+
+            if current_entry:
+                pc_data = {
+                    'pc_id': current_entry.pc.pk,
+                    'pc_name': f"PC {current_entry.pc.pc_number}",
+                    'pc_number': current_entry.pc.pc_number,
+                    'entry_time': current_entry.entry_time.isoformat()
+                }
+                return JsonResponse({
+                    'status': 'success', 
+                    'current_pc': pc_data,
+                    'message': f'Student is currently using PC {current_entry.pc.pc_number}'
+                })
+            else:
+                return JsonResponse({
+                    'status': 'success', 
+                    'current_pc': None,
+                    'message': 'Student is not currently using any PC'
+                })
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
 @csrf_exempt
 def elibrary_checkin(request):
     if request.method == 'POST':
@@ -102,13 +125,11 @@ def elibrary_checkin(request):
             student_id = data.get('student_id')
             pc_number = data.get('pc_number')
 
-            # 1. Find the student
             try:
                 student = Student.objects.get(student_id=student_id)
             except Student.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
 
-            # 2. Find the PC
             try:
                 pc = PC.objects.get(pc_number=pc_number)
             except PC.DoesNotExist:
@@ -118,15 +139,12 @@ def elibrary_checkin(request):
             if pc.is_dumb:
                 return JsonResponse({'status': 'error', 'message': f'PC {pc_number} is marked as dumb and cannot be used.'}, status=400)
 
-            # 4. Check if the PC is already in use
             if ELibraryEntry.objects.filter(pc=pc, exit_time__isnull=True).exists():
                 return JsonResponse({'status': 'error', 'message': f'PC {pc_number} is already in use.'}, status=400)
             
-            # 5. Check if the student is already checked in to another PC
             if ELibraryEntry.objects.filter(student=student, exit_time__isnull=True).exists():
                 return JsonResponse({'status': 'error', 'message': f'{student.name} is already using another PC.'}, status=400)
 
-            # 6. If all checks pass, create a new ELibraryEntry
             ELibraryEntry.objects.create(student=student, pc=pc)
             message = f'{student.name} has successfully checked in to PC {pc.pc_number}.'
             return JsonResponse({'status': 'success', 'message': message, 'student_name': student.name, 'pc_number': pc.pc_number})
@@ -138,7 +156,6 @@ def elibrary_checkin(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
 
-
 @csrf_exempt
 def elibrary_checkout(request):
     if request.method == 'POST':
@@ -146,23 +163,19 @@ def elibrary_checkout(request):
             data = json.loads(request.body)
             student_id = data.get('student_id')
 
-            # 1. Find the student
             try:
                 student = Student.objects.get(student_id=student_id)
             except Student.DoesNotExist:
                 return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
             
-            # 2. Find the active e-library session for the student
             active_session = ELibraryEntry.objects.filter(student=student, exit_time__isnull=True).first()
 
             if active_session:
-                # 3. End the session by setting the exit time
                 active_session.exit_time = timezone.now()
                 active_session.save()
                 message = f'{student.name} has successfully checked out from PC {active_session.pc.pc_number}.'
                 return JsonResponse({'status': 'success', 'message': message, 'student_name': student.name, 'pc_number': active_session.pc.pc_number})
             else:
-                # 4. Student is not checked in to any PC
                 return JsonResponse({'status': 'error', 'message': f'{student.name} is not currently checked in to any PC.'}, status=400)
 
         except json.JSONDecodeError:
@@ -171,8 +184,8 @@ def elibrary_checkout(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
 def export_data(request):
-    # We need to make sure this is only accessible to admins
     if not request.user.is_authenticated or not request.user.is_superuser:
         return HttpResponse("Unauthorized", status=401)
 
@@ -180,17 +193,14 @@ def export_data(request):
     response['Content-Disposition'] = 'attachment; filename="library_entries.csv"'
 
     writer = csv.writer(response)
-
-    # Write the header row
     writer.writerow(['Student Name', 'Student ID', 'PC Number', 'Entry Time', 'Exit Time', 'Location'])
 
-    # Get all entries from the main library
     library_entries = LibraryEntry.objects.all().order_by('entry_time')
     for entry in library_entries:
         writer.writerow([
             entry.student.name,
             entry.student.student_id,
-            'N/A', # No PC for main library
+            'N/A',
             entry.entry_time.strftime('%Y-%m-%d %H:%M:%S'),
             entry.exit_time.strftime('%Y-%m-%d %H:%M:%S') if entry.exit_time else '',
             'Main Library'
@@ -360,6 +370,159 @@ def department_statistics(request):
     
     return JsonResponse({'status': 'success', 'statistics': usage_stats}, safe=False)
 
+@csrf_exempt
+def weekly_report(request):
+    """Generate a weekly report of library usage"""
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    from datetime import timedelta
+    
+    # Get current week (last 7 days)
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=7)
+
+    main_library_entries = LibraryEntry.objects.filter(
+        entry_time__range=[start_date, end_date]
+    ).order_by('entry_time')
+    
+    elibrary_entries = ELibraryEntry.objects.filter(
+        entry_time__range=[start_date, end_date]
+    ).order_by('entry_time')
+
+    report_data = []
+
+    # Add main library entries
+    for entry in main_library_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'department': entry.student.department,
+            'pc_number': 'N/A',
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'Main Library'
+        })
+
+    # Add e-library entries
+    for entry in elibrary_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'department': entry.student.department,
+            'pc_number': entry.pc.pc_number,
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'E-Library'
+        })
+
+    # Sort by entry time
+    report_data.sort(key=lambda x: x['entry_time'])
+
+    return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
+
+@csrf_exempt
+def monthly_report(request):
+    """Generate a monthly report of library usage"""
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    from datetime import timedelta
+    
+    # Get current month (last 30 days)
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=30)
+
+    main_library_entries = LibraryEntry.objects.filter(
+        entry_time__range=[start_date, end_date]
+    ).order_by('entry_time')
+    
+    elibrary_entries = ELibraryEntry.objects.filter(
+        entry_time__range=[start_date, end_date]
+    ).order_by('entry_time')
+
+    report_data = []
+
+    # Add main library entries
+    for entry in main_library_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'department': entry.student.department,
+            'pc_number': 'N/A',
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'Main Library'
+        })
+
+    # Add e-library entries
+    for entry in elibrary_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'department': entry.student.department,
+            'pc_number': entry.pc.pc_number,
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'E-Library'
+        })
+
+    # Sort by entry time
+    report_data.sort(key=lambda x: x['entry_time'])
+
+    return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
+
+@csrf_exempt
+def yearly_report(request):
+    """Generate a yearly report of library usage"""
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    from datetime import timedelta
+    
+    # Get current year (last 365 days)
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=365)
+
+    main_library_entries = LibraryEntry.objects.filter(
+        entry_time__range=[start_date, end_date]
+    ).order_by('entry_time')
+    
+    elibrary_entries = ELibraryEntry.objects.filter(
+        entry_time__range=[start_date, end_date]
+    ).order_by('entry_time')
+
+    report_data = []
+
+    # Add main library entries
+    for entry in main_library_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'department': entry.student.department,
+            'pc_number': 'N/A',
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'Main Library'
+        })
+
+    # Add e-library entries
+    for entry in elibrary_entries:
+        report_data.append({
+            'student_name': entry.student.name,
+            'student_id': entry.student.student_id,
+            'department': entry.student.department,
+            'pc_number': entry.pc.pc_number,
+            'entry_time': entry.entry_time.isoformat(),
+            'exit_time': entry.exit_time.isoformat() if entry.exit_time else None,
+            'location': 'E-Library'
+        })
+
+    # Sort by entry time
+    report_data.sort(key=lambda x: x['entry_time'])
+
+    return JsonResponse({'status': 'success', 'report': report_data}, safe=False)
+
 def api_status(request):
     """Simple API status endpoint"""
     return JsonResponse({
@@ -397,3 +560,159 @@ def student_lookup(request, student_id):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+@csrf_exempt
+@login_required
+def live_admin_stats(request):
+    """Get real-time library statistics for admin dashboard"""
+    if request.method == 'GET':
+        try:
+            # Count students currently in library (no exit time)
+            students_in_library = LibraryEntry.objects.filter(exit_time__isnull=True).count()
+            
+            # Count students using e-library (active e-library sessions)
+            students_in_elibrary = ELibraryEntry.objects.filter(exit_time__isnull=True).count()
+            
+            # Students only in main library (in library but not in e-library)
+            students_only_main = students_in_library - students_in_elibrary
+            
+            # Get PC statistics
+            all_pcs = PC.objects.all()
+            total_pcs = all_pcs.count()
+            
+            # Get currently active e-library sessions
+            active_elibrary_sessions = ELibraryEntry.objects.filter(
+                exit_time__isnull=True
+            ).select_related('student', 'pc')
+            
+            pc_stats = {
+                'total': total_pcs,
+                'available': 0,
+                'in_use': 0,
+                'dumb': 0
+            }
+            
+            pc_details = []
+            for pc in all_pcs:
+                # Find if this PC is currently in use
+                current_session = active_elibrary_sessions.filter(pc=pc).first()
+                
+                if pc.is_dumb:
+                    status = 'dumb'
+                    pc_stats['dumb'] += 1
+                    user_info = None
+                elif current_session:
+                    status = 'in_use'
+                    pc_stats['in_use'] += 1
+                    user_info = {
+                        'student_id': current_session.student.student_id,
+                        'student_name': current_session.student.name,
+                        'department': current_session.student.department,
+                        'entry_time': current_session.entry_time.isoformat()
+                    }
+                else:
+                    status = 'available'
+                    pc_stats['available'] += 1
+                    user_info = None
+                
+                pc_details.append({
+                    'pc_number': pc.pc_number,
+                    'status': status,
+                    'is_dumb': pc.is_dumb,
+                    'user_info': user_info
+                })
+            
+            return JsonResponse({
+                'status': 'success',
+                'stats': {
+                    'students_in_library': students_in_library,
+                    'students_in_elibrary': students_in_elibrary,
+                    'students_only_main': students_only_main,
+                    'pc_stats': pc_stats
+                },
+                'pc_details': pc_details
+            })
+            
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+@csrf_exempt
+def get_pc_analytics(request):
+    """Get PC usage analytics for the last 7 days"""
+    if request.method == 'GET':
+        try:
+            from datetime import datetime, timedelta
+            from django.db.models import Count
+            from django.utils import timezone
+            
+            # Get last 7 days
+            end_date = timezone.now()
+            start_date = end_date - timedelta(days=7)
+            
+            # Get daily PC usage
+            daily_usage = []
+            for i in range(7):
+                day = start_date + timedelta(days=i)
+                day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+                day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
+                
+                # Count unique PC sessions for this day
+                sessions_count = ELibraryEntry.objects.filter(
+                    entry_time__range=[day_start, day_end]
+                ).count()
+                
+                # Count unique students for this day
+                students_count = ELibraryEntry.objects.filter(
+                    entry_time__range=[day_start, day_end]
+                ).values('student').distinct().count()
+                
+                daily_usage.append({
+                    'date': day.strftime('%Y-%m-%d'),
+                    'day_name': day.strftime('%A'),
+                    'usage_count': sessions_count,  # This matches frontend expectation
+                    'pc_sessions': sessions_count,
+                    'unique_students': students_count
+                })
+            
+            return JsonResponse({
+                'status': 'success',
+                'data': daily_usage  # This matches frontend expectation
+            })
+            
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+@csrf_exempt
+def admin_toggle_pc_status(request):
+    """Admin endpoint to toggle PC status (dumb/available)"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            pc_number = data.get('pc_number')
+            new_status = data.get('is_dumb')  # True for dumb, False for available
+            
+            try:
+                pc = PC.objects.get(pc_number=pc_number)
+                pc.is_dumb = new_status
+                pc.save()
+                
+                status_text = "out of service" if new_status else "available"
+                return JsonResponse({
+                    'status': 'success',
+                    'message': f'PC {pc_number} marked as {status_text}',
+                    'pc_number': pc_number,
+                    'is_dumb': new_status
+                })
+                
+            except PC.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': f'PC {pc_number} not found'}, status=404)
+                
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
