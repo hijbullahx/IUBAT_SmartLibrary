@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './InitialPage.css';
+import logo from '../../assets/iubat_logo.png';
 
 const InitialPage = () => {
   const navigate = useNavigate();
@@ -29,9 +30,10 @@ const InitialPage = () => {
       <div className="initial-content">
         <div className="main-section">
           <div className="university-section">
-            <div className="image-placeholder"></div>
-            <h1>IUBAT Library</h1>
-            <h2>Entry System</h2>
+            <div className="image-placeholder">
+              <img src={logo} alt="IUBAT Logo" />
+            </div>
+            <h1>IUBAT Library <br /> Entry System</h1>
           </div>
           <div className="scan-section">
             <h2>Scan Your ID</h2>
