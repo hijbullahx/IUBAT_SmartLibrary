@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './InitialPage.css';
 import logo from '../../assets/iubat_logo.png';
+import barcode from '../../assets/barcode_scan_icon.png';
+import icon_admin from '../../assets/icon_admin.png';
+
 
 const InitialPage = () => {
   const navigate = useNavigate();
@@ -24,7 +27,9 @@ const InitialPage = () => {
   return (
     <div className="initial-page">
       <button className="admin-button" onClick={handleAdminClick}>
-        <div className="admin-icon-placeholder"></div>
+        <div>
+          <img className="admin-icon" src={icon_admin} alt="Admin Icon" />
+        </div>
         Admin
       </button>
       <div className="initial-content">
@@ -38,10 +43,8 @@ const InitialPage = () => {
           <div className="scan-section">
             <h2>Scan Your ID</h2>
             <div className="scan-box">
-              <div className="scan-icon">
-                <div className="scan-line"></div>
-                <div className="bottom-left"></div>
-                <div className="bottom-right"></div>
+              <div className="scan-img">
+                <img src={barcode} alt="Barcode Logo" />
               </div>
               <form onSubmit={handleScan}>
                 <div className="input-container">
