@@ -1,7 +1,8 @@
 .default-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #f0f4f8;
   padding: 2rem;
+  font-family: Arial, sans-serif;
 }
 
 .dashboard-container {
@@ -15,45 +16,54 @@
 .left-panel {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .user-profile {
   background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
-.profile-header {
-  margin-bottom: 2rem;
+.user-id-display {
   text-align: center;
+  margin-bottom: 1.5rem;
 }
 
-.profile-header h2 {
+.user-id-display h1 {
+  font-size: 2.5rem;
   color: #2c3e50;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
 }
 
-.user-info {
-  margin-bottom: 2rem;
+.user-id-display span {
+  color: #27ae60;
+  font-size: 1.2rem;
 }
 
-.info-item {
+.user-details {
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px dashed #eee;
 }
 
-.info-item label {
+.detail-item label {
   color: #666;
   font-weight: 500;
 }
 
+.detail-item span {
+  color: #2c3e50;
+}
+
 .scanner-section {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .scanner-section .scan-section {
@@ -61,131 +71,96 @@
   max-width: 400px;
   padding: 1.5rem;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.scanner-section .scan-box {
-  padding: 1rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-.scanner-section .scan-img {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 1rem;
-}
-
-.scanner-section .scan-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.scanner-section .scan-box form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  max-width: 250px;
-}
-
-.scanner-section .input-container {
-  width: 100%;
-}
-
-.scanner-section .id-input {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1rem;
-  border: 1px solid #acacac;
-  border-radius: 10px;
-  text-align: center;
-  background: white;
-  transition: border-color 0.2s ease;
-}
-
-.scanner-section .id-input:focus {
-  border-color: #b8f371;
-  outline: none;
-}
-
-.scanner-section .button-container {
-  width: 100%;
-}
-
-.scanner-section .scan-button {
-  width: 100%;
-  padding: 0.5rem;
-  background: #e3ffc0;
-  color: #212015;
-  font-weight: bold;
-  border: 1px solid #acacac;
-  border-radius: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.scanner-section .scan-button:hover {
-  background: #b8f371;
-}
-
 .right-panel {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
-.instructions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-}
-
-.instruction-box,
-.warning-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.instruction-box h3,
-.warning-box h3 {
+.section-title {
+  font-size: 1.5rem;
   color: #2c3e50;
+  text-align: center;
   margin-bottom: 1rem;
 }
 
-.instruction-box ul {
-  list-style: none;
-  padding: 0;
+.computer-grid {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 1rem;
+  background: white;
 }
 
-.instruction-box li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+.info-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.selection-box {
+  background: #e6ffe6;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.status-box {
+  background: #fff9e6;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: flex;
+  gap: 1rem;
+}
+
+.status-box div {
+  flex: 1;
+  text-align: center;
+}
+
+.instruction-box {
+  background: white;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.instruction-box h3 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.instruction-box p {
   color: #666;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .warning-box {
   background: #fff3e0;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
 .warning-box h3 {
   color: #f57c00;
+  margin-bottom: 0.5rem;
 }
 
 .warning-box p {
   color: #e65100;
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
 @media (max-width: 1200px) {
@@ -193,7 +168,7 @@
     grid-template-columns: 1fr;
   }
 
-  .instructions {
+  .info-section {
     grid-template-columns: 1fr;
   }
 

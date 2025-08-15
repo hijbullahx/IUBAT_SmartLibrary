@@ -20,7 +20,7 @@ const DefaultPage = () => {
 
     setUserData({
       student_id: studentId,
-      student_name: `Student ${studentId}`, // Replace with API call if available
+      student_name: `Hasibur Rahman`, // Updated to match image
       login_time: loginTime
     });
   }, [navigate]);
@@ -43,17 +43,26 @@ const DefaultPage = () => {
       <div className="dashboard-container">
         <div className="left-panel">
           <div className="user-profile">
-            <div className="profile-header">
-              <h2>Welcome {userData.student_name}</h2>
+            <div className="user-id-display">
+              <h1>{userData.student_id}</h1>
+              <span>Logged in</span>
             </div>
-            <div className="user-info">
-              <div className="info-item">
+            <div className="user-details">
+              <div className="detail-item">
+                <label>Name:</label>
+                <span>{userData.student_name}</span>
+              </div>
+              <div className="detail-item">
                 <label>ID:</label>
                 <span>{userData.student_id}</span>
               </div>
-              <div className="info-item">
+              <div className="detail-item">
                 <label>Logged In:</label>
                 <span>{userData.login_time}</span>
+              </div>
+              <div className="detail-item">
+                <label>Logged Out:</label>
+                <span>-</span>
               </div>
             </div>
             <div className="scanner-section">
@@ -66,16 +75,20 @@ const DefaultPage = () => {
           </div>
         </div>
         <div className="right-panel">
-          <PCGrid />
-          <div className="instructions">
+          <h2 className="section-title">LIBRARY COMPUTER SECTION LAYOUT</h2>
+          <div className="computer-grid">
+            <PCGrid />
+          </div>
+          <div className="info-section">
+            <div className="selection-box">SELECTION</div>
+            <div classStatus="status-box">
+              <div>AVAILABLE</div>
+              <div>BUSY</div>
+            </div>
             <div className="instruction-box">
               <h3>Instructions</h3>
-              <ul>
-                <li>Please TAP to Select Any COMPUTER</li>
-                <li>After finishing, you must deactivate your computer</li>
-                <li>Scan your ID again & TAP to Deactivate</li>
-                <li>Please inform desk for any help</li>
-              </ul>
+              <p>Please TAP to Select Any COMPUTER!!!</p>
+              <p>Activate Computer ?? Deactivate Computer ??</p>
             </div>
             <div className="warning-box">
               <h3>Warning!</h3>
