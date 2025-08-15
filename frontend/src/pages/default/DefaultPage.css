@@ -29,6 +29,8 @@
 .user-id-display {
   text-align: center;
   margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
 }
 
 .user-id-display h1 {
@@ -66,6 +68,14 @@
   margin-top: 1rem;
 }
 
+.scan-instruction {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
 .scanner-section .scan-section {
   width: 100%;
   max-width: 400px;
@@ -90,6 +100,8 @@
   color: #2c3e50;
   text-align: center;
   margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
 }
 
 .computer-grid {
@@ -144,6 +156,11 @@
   color: #666;
   margin: 0;
   line-height: 1.4;
+}
+
+.instruction-box .icon {
+  color: #27ae60;
+  margin: 0 0.5rem;
 }
 
 .warning-box {

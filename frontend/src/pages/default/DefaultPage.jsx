@@ -20,7 +20,7 @@ const DefaultPage = () => {
 
     setUserData({
       student_id: studentId,
-      student_name: `Hasibur Rahman`, // Updated to match image
+      student_name: `Hasibur Rahman`, // Matches image
       login_time: loginTime
     });
   }, [navigate]);
@@ -66,6 +66,7 @@ const DefaultPage = () => {
               </div>
             </div>
             <div className="scanner-section">
+              <div className="scan-instruction">Please !!! Scan Your ID Card</div>
               <Scanbox
                 studentId={exitId}
                 setStudentId={setExitId}
@@ -81,14 +82,14 @@ const DefaultPage = () => {
           </div>
           <div className="info-section">
             <div className="selection-box">SELECTION</div>
-            <div classStatus="status-box">
+            <div className="status-box">
               <div>AVAILABLE</div>
               <div>BUSY</div>
             </div>
             <div className="instruction-box">
               <h3>Instructions</h3>
               <p>Please TAP to Select Any COMPUTER!!!</p>
-              <p>Activate Computer ?? Deactivate Computer ??</p>
+              <p><span className="icon">?</span> Activate Computer ?? <span className="icon">?</span> Deactivate Computer ??</p>
             </div>
             <div className="warning-box">
               <h3>Warning!</h3>
