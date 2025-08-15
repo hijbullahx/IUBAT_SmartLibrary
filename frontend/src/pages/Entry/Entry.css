@@ -41,7 +41,8 @@
 
 .user-id-display span {
   color: #27ae60;
-  font-size: 1.2rem;
+  font-size: 1.8rem;
+  font-weight: bold;
 }
 
 .user-details {
