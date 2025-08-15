@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PCGrid from '../../components/PCGrid/PCGrid';
 import Scanbox from '../../components/Scanbox/Scanbox';
-import './DefaultPage.css';
+import './Entry.css';
 
-const DefaultPage = () => {
+const Entry = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [exitId, setExitId] = useState('');
@@ -102,4 +102,4 @@ const DefaultPage = () => {
   );
 };
 
-export default DefaultPage;
+export default Entry;
