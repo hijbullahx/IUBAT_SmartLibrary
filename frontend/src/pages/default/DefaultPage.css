@@ -56,6 +56,88 @@
   margin-top: 2rem;
 }
 
+.scanner-section .scan-section {
+  width: 100%;
+  max-width: 400px;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.scanner-section .scan-box {
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.scanner-section .scan-img {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+}
+
+.scanner-section .scan-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.scanner-section .scan-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 250px;
+}
+
+.scanner-section .input-container {
+  width: 100%;
+}
+
+.scanner-section .id-input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #acacac;
+  border-radius: 10px;
+  text-align: center;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.scanner-section .id-input:focus {
+  border-color: #b8f371;
+  outline: none;
+}
+
+.scanner-section .button-container {
+  width: 100%;
+}
+
+.scanner-section .scan-button {
+  width: 100%;
+  padding: 0.5rem;
+  background: #e3ffc0;
+  color: #212015;
+  font-weight: bold;
+  border: 1px solid #acacac;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.scanner-section .scan-button:hover {
+  background: #b8f371;
+}
+
 .right-panel {
   display: flex;
   flex-direction: column;
@@ -68,14 +150,16 @@
   gap: 2rem;
 }
 
-.instruction-box, .warning-box {
+.instruction-box,
+.warning-box {
   background: white;
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.instruction-box h3, .warning-box h3 {
+.instruction-box h3,
+.warning-box h3 {
   color: #2c3e50;
   margin-bottom: 1rem;
 }
@@ -104,13 +188,17 @@
   line-height: 1.6;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .dashboard-container {
     grid-template-columns: 1fr;
   }
-  
+
   .instructions {
     grid-template-columns: 1fr;
+  }
+
+  .scanner-section .scan-section {
+    max-width: 100%;
+    padding: 1rem;
   }
 }

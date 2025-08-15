@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PCGrid from '../../components/pcgrid/PCGrid';
-import ScannerBox from '../../components/scanner/ScannerBox';
+import PCGrid from '../../components/PCGrid/PCGrid';
+import Scanbox from '../../components/Scanbox/Scanbox';
 import './DefaultPage.css';
 
 const DefaultPage = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
+  const [exitId, setExitId] = useState('');
 
   useEffect(() => {
     const studentId = localStorage.getItem('studentId');
@@ -19,10 +20,21 @@ const DefaultPage = () => {
 
     setUserData({
       student_id: studentId,
-      student_name: `Student ${studentId}`, // You can replace this with actual name from API
+      student_name: `Student ${studentId}`, // Replace with API call if available
       login_time: loginTime
     });
   }, [navigate]);
+
+  const handleExitScan = (e) => {
+    e.preventDefault();
+    if (exitId && exitId === userData.student_id) {
+      localStorage.removeItem('studentId');
+      localStorage.removeItem('loginTime');
+      navigate('/');
+    } else {
+      alert('Invalid ID or mismatch with logged-in student ID.');
+    }
+  };
 
   if (!userData) return null;
 
@@ -45,7 +57,11 @@ const DefaultPage = () => {
               </div>
             </div>
             <div className="scanner-section">
-              <ScannerBox type="exit" />
+              <Scanbox
+                studentId={exitId}
+                setStudentId={setExitId}
+                handleScan={handleExitScan}
+              />
             </div>
           </div>
         </div>
