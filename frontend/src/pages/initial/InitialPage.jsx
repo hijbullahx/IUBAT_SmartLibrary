@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './InitialPage.css';
 import logo from '../../assets/iubat_logo.png';
-import barcode from '../../assets/barcode_scan_icon.png';
 import icon_admin from '../../assets/icon_admin.png';
-
-
+import Scanbox from '../../components/Scanbox/Scanbox';
 const InitialPage = () => {
   const navigate = useNavigate();
   const [studentId, setStudentId] = useState('');
@@ -17,7 +15,6 @@ const InitialPage = () => {
   const handleScan = (e) => {
     e.preventDefault();
     if (studentId) {
-      // Save login time and navigate to PC selection
       localStorage.setItem('loginTime', new Date().toLocaleTimeString());
       localStorage.setItem('studentId', studentId);
       navigate('/default');
@@ -27,9 +24,7 @@ const InitialPage = () => {
   return (
     <div className="initial-page">
       <button className="admin-button" onClick={handleAdminClick}>
-        <div>
-          <img className="admin-icon" src={icon_admin} alt="Admin Icon" />
-        </div>
+        <img className="admin-icon" src={icon_admin} alt="Admin Icon" />
         Admin
       </button>
       <div className="initial-content">
@@ -40,30 +35,11 @@ const InitialPage = () => {
             </div>
             <h1>IUBAT Library <br /> Entry System</h1>
           </div>
-          <div className="scan-section">
-            <h2>Scan Your ID</h2>
-            <div className="scan-box">
-              <div className="scan-img">
-                <img src={barcode} alt="Barcode Logo" />
-              </div>
-              <form onSubmit={handleScan}>
-                <div className="input-container">
-                  <input
-                    type="text"
-                    value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
-                    placeholder="Enter Student ID"
-                    className="id-input"
-                  />
-                </div>
-                <div className="button-container">
-                  <button type="submit" className="scan-button">
-                    Scan
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <Scanbox
+            studentId={studentId}
+            setStudentId={setStudentId}
+            handleScan={handleScan}
+          />
         </div>
       </div>
     </div>

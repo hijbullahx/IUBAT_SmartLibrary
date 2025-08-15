@@ -1,0 +1,96 @@
+.scan-section {
+  width: 400px;
+  height: 400px;
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.scan-box {
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.scan-img {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 2rem;
+}
+
+.scan-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.scan-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 300px;
+}
+
+.input-container {
+  width: 100%;
+}
+
+.id-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.2rem;
+  border: 1px solid #acacac;
+  border-radius: 15px;
+  text-align: center;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.id-input:focus {
+  border-color: #b8f371;
+  outline: none;
+}
+
+.button-container {
+  width: 100%;
+}
+
+.scan-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #e3ffc0;
+  color: #212015;
+  font-weight: bold;
+  border: 1px solid #acacac;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.scan-button:hover {
+  background: #b8f371;
+}
+
+@media (max-width: 768px) {
+  .scan-section {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    min-height: 300px;
+    padding: 2rem;
+  }
+
+  .scan-section h2 {
+    font-size: 1.3rem;
+  }
+}
