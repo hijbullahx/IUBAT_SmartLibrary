@@ -1,0 +1,151 @@
+.pc-grid-container {
+  width: 100%;
+  max-width: 800px; /* Adjusted to fit 6x6 grid better */
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.header h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.status-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.indicator {
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 80px;
+}
+
+.indicator.selection {
+  background-color: #90EE90;
+}
+
+.indicator.available {
+  background-color: white;
+  border: 1px solid #ddd;
+}
+
+.indicator.busy {
+  background-color: #FFE4B5;
+}
+
+/* PC Layout Grid */
+.pc-layout {
+  padding: 10px;
+}
+
+.col-numbers {
+  display: grid;
+  grid-template-columns: 40px repeat(6, 1fr);
+  gap: 5px;
+  margin-bottom: 5px;
+  padding-left: 40px;
+}
+
+.col-number {
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-rows: repeat(6, auto); /* Limited to 6 rows */
+  gap: 5px;
+}
+
+.grid-row {
+  display: grid;
+  grid-template-columns: 40px repeat(6, 1fr);
+  gap: 5px;
+  align-items: center;
+}
+
+.row-label {
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.pc-cell {
+  aspect-ratio: 1;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 2px;
+  transition: all 0.2s ease;
+  font-size: 0.7rem;
+}
+
+.pc-cell.selection {
+  background-color: #90EE90;
+}
+
+.pc-cell.available {
+  background-color: white;
+}
+
+.pc-cell.busy {
+  background-color: #FFE4B5;
+  cursor: not-allowed;
+}
+
+.computer-label {
+  font-size: 0.6rem;
+  color: #666;
+  margin-bottom: 1px;
+}
+
+.computer-id {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .pc-grid-container {
+    padding: 10px;
+    max-width: 100%;
+  }
+  
+  .status-indicators {
+    flex-wrap: wrap;
+  }
+  
+  .indicator {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    min-width: 70px;
+  }
+  
+  .computer-label {
+    font-size: 0.5rem;
+  }
+  
+  .computer-id {
+    font-size: 0.6rem;
+  }
+}

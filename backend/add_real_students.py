@@ -20,7 +20,7 @@ from library.models import Student, PC, LibraryEntry, ELibraryEntry
 def add_real_students():
     print("Adding real IUBAT student data...")
     
-    # Real student data.
+    # Real student data from your list
     students_data = [
         {'student_id': '21303018', 'name': 'Md. Rifat Hossen Saown'},
         {'student_id': '22103260', 'name': 'Nahiduzzaman'},
@@ -64,8 +64,6 @@ def add_real_students():
         {'student_id': '23103297', 'name': 'Md. Abdula Al Mamun'},
         {'student_id': '23103300', 'name': 'Md. Makhmudul Haque Shawon'},
         {'student_id': '23103406', 'name': 'FATEMA TAJ MIM'},
-        {'student_id': '22303089', 'name': 'Hasibur Rahman'},
-        {'student_id': '22303296', 'name': 'Md.Rony Mia'},
     ]
     
     # Clear existing dummy data
@@ -83,7 +81,12 @@ def add_real_students():
         else:
             print(f"Student already exists: {student.name} ({student.student_id})")
     
-    print(f"\nProcessed {len(students_data)} students.")
+    print(f"\nSuccessfully processed {len(students_data)} real IUBAT students!")
+    print("\nYou can now test with real student IDs:")
+    print("Examples: 21303018, 22303142, 23103065")
+
+if __name__ == '__main__':
+    add_real_students()
 
 if __name__ == '__main__':
     add_real_students()

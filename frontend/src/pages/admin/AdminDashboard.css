@@ -1,0 +1,128 @@
+.admin-dashboard {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-dashboard h1 {
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.report-sections {
+  display: grid;
+  gap: 2rem;
+}
+
+.report-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.report-section h2 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+form {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.date-inputs {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+input[type="date"],
+input[type="text"] {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  flex: 1;
+}
+
+input[type="text"] {
+  flex: 1;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+button:disabled {
+  background: #a5d6a7;
+  cursor: not-allowed;
+}
+
+.report-table {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+tr:hover {
+  background: #f8f9fa;
+}
+
+.error-message {
+  color: #d32f2f;
+  text-align: center;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #ffebee;
+  border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+  .date-inputs {
+    flex-direction: column;
+  }
+
+  form {
+    flex-direction: column;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 0.75rem;
+  }
+}

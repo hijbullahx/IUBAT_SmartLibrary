@@ -13,7 +13,8 @@ IUBAT_SmartLibrary/
 │   ├── requirements.txt    # Python dependencies
 │   ├── manage.py           # Django management utilities
 │   ├── db.sqlite3          # SQLite database
-│   └── add_real_students.py # Student data initialization
+│   ├── add_real_students.py # Student data initialization
+│   └── setup_data.py       # Database setup script
 ├── frontend/               # React.js source files
 │   ├── src/                # React components and assets
 │   ├── public/             # Static frontend assets
