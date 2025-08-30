@@ -1,9 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import InitialPage from './pages/InitialPage/InitialPage';
-import Entry from './pages/entry/Entry';
-import AdminLogin from './components/auth/AdminLogin';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import InitialPage from "./pages/InitialPage/InitialPage";
+import Entry from "./pages/Entry/Entry.jsx";
+import AdminLogin from "./components/auth/AdminLogin.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import "./App.css";
 
 function App() {
   return (
