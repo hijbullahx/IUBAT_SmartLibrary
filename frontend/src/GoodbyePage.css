@@ -1,0 +1,429 @@
+/* GoodbyePage.css */
+.goodbye-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.goodbye-container {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header Section */
+.goodbye-header {
+  margin-bottom: 30px;
+}
+
+.goodbye-icon {
+  margin-bottom: 20px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.goodbye-title {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin: 0 0 10px 0;
+  font-weight: 700;
+}
+
+.goodbye-student-name {
+  font-size: 1.8rem;
+  color: #27ae60;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.goodbye-student-info {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Status Section */
+.status-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.status-badge.login {
+  background: #d4edda;
+  color: #155724;
+  border: 2px solid #c3e6cb;
+}
+
+.status-badge.logout {
+  background: #fff3cd;
+  color: #856404;
+  border: 2px solid #ffeaa7;
+}
+
+.status-message {
+  color: #2c3e50;
+  font-size: 1.2rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Guidelines Section */
+.guidelines-section {
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.guidelines-section h3 {
+  color: #2c3e50;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.guidelines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.guideline-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+}
+
+.guideline-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.guideline-icon {
+  font-size: 1.5rem;
+  margin-right: 12px;
+}
+
+/* Complaint Section */
+.complaint-section {
+  margin-bottom: 30px;
+  padding: 25px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  text-align: left;
+}
+
+.complaint-section h3 {
+  color: #2c3e50;
+  font-size: 1.4rem;
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+
+.complaint-subtitle {
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.success-icon {
+  font-size: 1.2rem;
+}
+
+.complaint-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.complaint-type label {
+  display: block;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.type-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.type-btn {
+  padding: 10px 20px;
+  border: 2px solid #e9ecef;
+  background: white;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.type-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.type-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.complaint-input {
+  position: relative;
+}
+
+.complaint-input textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.complaint-input textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.char-count {
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  color: #7f8c8d;
+  font-size: 0.8rem;
+  background: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.submit-complaint-btn {
+  padding: 12px 30px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.submit-complaint-btn:hover:not(:disabled) {
+  background: #2ecc71;
+  transform: translateY(-2px);
+}
+
+.submit-complaint-btn:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.complaint-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.cancel-complaint-btn {
+  padding: 12px 30px;
+  background: #95a5a6;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-complaint-btn:hover {
+  background: #7f8c8d;
+  transform: translateY(-2px);
+}
+
+/* Timer Paused State */
+.timer-paused {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #fff3cd;
+  border: 2px solid #ffeaa7;
+  border-radius: 10px;
+  color: #856404;
+  font-weight: 500;
+}
+
+.pause-icon {
+  font-size: 1.2rem;
+}
+
+.pause-text {
+  font-size: 1rem;
+}
+
+/* Auto Return Section */
+.auto-return-section {
+  text-align: center;
+}
+
+.countdown-display {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.countdown-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #e74c3c;
+  margin: 0 8px;
+  display: inline-block;
+  min-width: 40px;
+}
+
+.countdown-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.countdown-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+  transition: width 1s linear;
+  border-radius: 4px;
+}
+
+.return-now-btn {
+  padding: 12px 30px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.return-now-btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .goodbye-container {
+    padding: 25px;
+    margin: 10px;
+  }
+  
+  .goodbye-title {
+    font-size: 2rem;
+  }
+  
+  .goodbye-student-name {
+    font-size: 1.5rem;
+  }
+  
+  .guidelines-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .type-buttons {
+    flex-direction: column;
+  }
+  
+  .type-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .goodbye-container {
+    padding: 20px;
+  }
+  
+  .countdown-display {
+    font-size: 1rem;
+  }
+  
+  .countdown-number {
+    font-size: 1.5rem;
+  }
+}

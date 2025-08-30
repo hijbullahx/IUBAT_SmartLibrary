@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Debug Test</title>
+    <link href="/static/css/main.1142fc63.css" rel="stylesheet">
+</head>
+<body>
+    <h1>🔍 React Debug Test</h1>
+    <div id="root">
+        <p>⏳ React should mount here...</p>
+    </div>
+    
+    <div id="debug-info">
+        <h2>Debug Information:</h2>
+        <div id="js-status">📊 Checking JavaScript files...</div>
+        <div id="console-errors">📋 Console errors will appear here</div>
+    </div>
+
+    <script>
+        // Capture console errors
+        const originalError = console.error;
+        const errors = [];
+        console.error = function(...args) {
+            errors.push(args.join(' '));
+            document.getElementById('console-errors').innerHTML = '❌ Errors: ' + errors.join('<br>');
+            originalError.apply(console, args);
+        };
+
+        // Test CSS loading
+        fetch('/static/css/main.1142fc63.css')
+            .then(response => {
+                console.log('✅ CSS file status:', response.status);
+                document.getElementById('js-status').innerHTML += '<br>✅ CSS: ' + response.status;
+            })
+            .catch(error => {
+                console.error('❌ CSS load error:', error);
+                document.getElementById('js-status').innerHTML += '<br>❌ CSS: ' + error;
+            });
+            
+        // Test JS loading
+        fetch('/static/js/main.d8f3d642.js')
+            .then(response => {
+                console.log('✅ JS file status:', response.status);
+                document.getElementById('js-status').innerHTML += '<br>✅ JS: ' + response.status;
+            })
+            .catch(error => {
+                console.error('❌ JS load error:', error);
+                document.getElementById('js-status').innerHTML += '<br>❌ JS: ' + error;
+            });
+
+        // Watch for React mounting
+        setTimeout(() => {
+            const root = document.getElementById('root');
+            if (root && root.children.length === 0) {
+                document.getElementById('js-status').innerHTML += '<br>❌ React did not mount after 3 seconds';
+            } else {
+                document.getElementById('js-status').innerHTML += '<br>✅ React appears to have mounted';
+            }
+        }, 3000);
+    </script>
+    
+    <!-- Load the actual React JS file -->
+    <script defer="defer" src="/static/js/main.d8f3d642.js"></script>
+</body>
+</html>

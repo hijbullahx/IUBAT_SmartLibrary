@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/static/css/main.1142fc63.css",
+    "main.js": "/static/js/main.d8f3d642.js",
+    "static/media/IUBAT2.png": "/static/media/IUBAT2.33ac17563d8616182b74.png",
+    "index.html": "/index.html",
+    "main.1142fc63.css.map": "/static/css/main.1142fc63.css.map",
+    "main.d8f3d642.js.map": "/static/js/main.d8f3d642.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1142fc63.css",
+    "static/js/main.d8f3d642.js"
+  ]
+}

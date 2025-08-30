@@ -32,7 +32,9 @@ ALLOWED_HOSTS = [
     '127.0.0.1', 
     '.render.com',
     '.onrender.com',
-    'iubat-smartlibrary.onrender.com'
+    'iubat-smartlibrary.onrender.com',
+    'iubat-smartlibrary-backend.onrender.com',  # Your actual backend domain
+    # Add your specific Render domain here when you get it
 ]
 
 
@@ -51,7 +53,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     'corsheaders.middleware.CorsMiddleware',
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -68,9 +69,7 @@ ROOT_URLCONF = "library_automation.urls"
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),  # For built React app
-        ],
+        'DIRS': [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -91,13 +90,21 @@ WSGI_APPLICATION = "library_automation.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Priority: DATABASE_URL (Neon) > local SQLite
 DATABASE_URL = os.environ.get('DATABASE_URL', None)
 
 if DATABASE_URL:
+    # Production: Use Neon PostgreSQL
     DATABASES = {
-        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600, conn_health_checks=True)
+        'default': dj_database_url.config(
+            default=DATABASE_URL, 
+            conn_max_age=600, 
+            conn_health_checks=True,
+            ssl_require=True
+        )
     }
 else:
+    # Development: Use SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -137,21 +144,16 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images) - Includes React build
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# No STATICFILES_DIRS - we'll copy files manually in build script
-STATICFILES_DIRS = []
-
-# Use WhiteNoise static files storage for production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-
-# WhiteNoise configuration
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_AUTOREFRESH = True
+# Additional directories to search for static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # React build files
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -159,19 +161,57 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS settings for React frontend
 CORS_ALLOWED_ORIGINS = [
-    "https://iubat-smartlibrary.onrender.com",
+    "http://localhost:3000",  # React development server
+    "http://127.0.0.1:3000",  # Alternative React dev server
+    "http://localhost:3001",  # React development server (alt port)
+    "http://localhost:3002",  # React development server (alt port)
+    "http://127.0.0.1:3001",  # Alternative React dev server (alt port)
+    "http://127.0.0.1:3002",  # Alternative React dev server (alt port)
+    # Production Render domains
+    "https://iubat-smartlibrary-frontend.onrender.com",  # Your frontend URL
+    "https://iubat-smartlibrary-backend.onrender.com",   # Your backend URL
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all in development only
 
-# Security settings for production
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_BROWSER_XSS_FILTER = True
-    X_FRAME_OPTIONS = 'SAMEORIGIN'  # Changed from DENY to allow React
+# Additional CORS settings for browser compatibility
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'cookie',
+    'set-cookie',
+]
+
+# Expose cookies in CORS responses
+CORS_EXPOSE_HEADERS = [
+    'set-cookie',
+]
+
+# Session settings for cross-origin cookies
+SESSION_COOKIE_SAMESITE = 'None'  # Required for cross-site cookies
+SESSION_COOKIE_SECURE = not DEBUG  # True in production (HTTPS), False in development
+SESSION_COOKIE_HTTPONLY = False   # Allow JavaScript access to session cookies
+SESSION_COOKIE_DOMAIN = '.onrender.com' if not DEBUG else None  # Share cookies across Render subdomains
+SESSION_SAVE_EVERY_REQUEST = True # Ensure session is saved on every request
+
+# CSRF settings for cross-origin requests
+CSRF_COOKIE_SAMESITE = 'None'     # Required for cross-site cookies
+CSRF_COOKIE_SECURE = not DEBUG    # True in production (HTTPS), False in development
+CSRF_COOKIE_HTTPONLY = False      # Allow JavaScript access to CSRF cookies
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+    # Production Render domains
+    "https://iubat-smartlibrary-backend.onrender.com",   # Your backend URL
+    "https://iubat-smartlibrary-frontend.onrender.com",  # Your frontend URL
+]

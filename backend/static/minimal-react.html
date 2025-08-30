@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal React Test</title>
+</head>
+<body>
+    <div id="react-root">Loading minimal React...</div>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script>
+        console.log('🔄 Testing minimal React...');
+        
+        const e = React.createElement;
+        
+        function MinimalApp() {
+            return e('div', { style: { padding: '20px', border: '2px solid green' } },
+                e('h1', null, '🎉 React is Working!'),
+                e('p', null, 'If you see this, React can mount successfully.'),
+                e('p', null, 'The issue is likely with the main app code.')
+            );
+        }
+        
+        const domContainer = document.getElementById('react-root');
+        const root = ReactDOM.createRoot(domContainer);
+        root.render(e(MinimalApp));
+        
+        console.log('✅ Minimal React test completed');
+    </script>
+</body>
+</html>

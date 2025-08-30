@@ -1,0 +1,17 @@
+{
+  "name": "iubat-smart-library",
+  "version": "1.0.0",
+  "description": "IUBAT Smart Library Management System",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd backend && python manage.py runserver"
+  },
+  "keywords": ["library", "management", "django", "react"],
+  "author": "IUBAT Team",
+  "license": "MIT",
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  }
+}
