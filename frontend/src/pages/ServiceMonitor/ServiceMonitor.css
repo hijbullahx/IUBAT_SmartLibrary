@@ -1,0 +1,25 @@
+.service-monitor {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.service-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.service-title {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* Message styles */
+.service-message {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}

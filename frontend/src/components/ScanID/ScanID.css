@@ -1,0 +1,44 @@
+.scan-form {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.student-input-large {
+  flex: 1;
+  padding: 12px 15px;
+  font-size: 1.1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.student-input-large:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.scan-btn {
+  padding: 12px 25px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.scan-btn:hover {
+  background-color: #2980b9;
+}
+
+.scan-btn:active {
+  transform: translateY(1px);
+}
