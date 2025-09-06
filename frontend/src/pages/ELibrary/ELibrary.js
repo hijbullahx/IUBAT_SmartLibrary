@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from './config/axios';
-import { API_ENDPOINTS } from './config/api';
+import axios from '../../config/axios';
+import { API_ENDPOINTS } from '../../config/api';
 
 function ELibrary({ scannedStudent, onReturnToService }) {
   const [pcs, setPcs] = useState([]);
