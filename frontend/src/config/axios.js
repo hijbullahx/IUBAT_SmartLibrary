@@ -5,7 +5,7 @@ import axios from 'axios';
 const getBaseURL = () => {
   if (process.env.NODE_ENV === 'production') {
     // Your actual backend Render URL
-    return process.env.REACT_APP_API_URL || 'https://iubat-smartlibrary-backend.onrender.com';
+    return import.meta.env.VITE_API_URL || 'https://iubat-smartlibrary-backend.onrender.com';
   }
   return 'http://localhost:8000';
 };
