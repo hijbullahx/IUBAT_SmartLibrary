@@ -204,18 +204,24 @@ function AdminDashboard() {
   const loadDailyReport = async () => {
     setLoading(true);
     try {
-      let url = API_ENDPOINTS.ADMIN_REPORTS_DAILY;
-      
-      // Add day parameter if selected
+      let startDate, endDate;
       if (selectedDay) {
-        url += `?day=${selectedDay}`;
+        startDate = selectedDay;
+        endDate = selectedDay;
+      } else {
+        // Default: last 7 days
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 6);
+        startDate = past.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
       }
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_TIME, {
+        params: { start_date: startDate, end_date: endDate }
+      });
       if (response.data.status === 'success') {
         setDailyReport(response.data.report || []);
-        const dayText = selectedDay ? `Day ${selectedDay}` : 'Last 7 Days';
+        const dayText = selectedDay ? `Day ${selectedDay}` : `Last 7 Days (${startDate} to ${endDate})`;
         setMessage(`Found ${response.data.report?.length || 0} entries for ${dayText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
@@ -230,18 +236,28 @@ function AdminDashboard() {
   const loadMonthlyReport = async () => {
     setLoading(true);
     try {
-      let url = API_ENDPOINTS.ADMIN_REPORTS_MONTHLY;
-      
-      // Add month parameter if selected
+      let startDate, endDate;
       if (selectedMonth) {
-        url += `?month=${selectedMonth}`;
+        // selectedMonth format: YYYY-MM
+        const [year, month] = selectedMonth.split('-').map(Number);
+        startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+        // Get last day of month
+        const lastDay = new Date(year, month, 0).getDate();
+        endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      } else {
+        // Default: last 30 days
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 29);
+        startDate = past.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
       }
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_TIME, {
+        params: { start_date: startDate, end_date: endDate }
+      });
       if (response.data.status === 'success') {
         setMonthlyReport(response.data.report || []);
-        const monthText = selectedMonth ? `${selectedMonth}` : 'Last 30 Days';
+        const monthText = selectedMonth ? `${selectedMonth}` : `Last 30 Days (${startDate} to ${endDate})`;
         setMessage(`Found ${response.data.report?.length || 0} entries for ${monthText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
@@ -256,18 +272,24 @@ function AdminDashboard() {
   const loadYearlyReport = async () => {
     setLoading(true);
     try {
-      let url = API_ENDPOINTS.ADMIN_REPORTS_YEARLY;
-      
-      // Add year parameter if selected
+      let startDate, endDate;
       if (selectedYear) {
-        url += `?year=${selectedYear}`;
+        startDate = `${selectedYear}-01-01`;
+        endDate = `${selectedYear}-12-31`;
+      } else {
+        // Default: last 365 days
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 364);
+        startDate = past.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
       }
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_TIME, {
+        params: { start_date: startDate, end_date: endDate }
+      });
       if (response.data.status === 'success') {
         setYearlyReport(response.data.report || []);
-        const yearText = selectedYear ? `Year ${selectedYear}` : 'Last 365 Days';
+        const yearText = selectedYear ? `Year ${selectedYear}` : `Last 365 Days (${startDate} to ${endDate})`;
         setMessage(`Found ${response.data.report?.length || 0} entries for ${yearText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
