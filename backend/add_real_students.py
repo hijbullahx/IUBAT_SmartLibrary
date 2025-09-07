@@ -91,11 +91,7 @@ def add_real_students():
         {'student_id': '22303089', 'name': 'Hasibur Rahman', 'department': 'Computer Science & Engineering (CSE)'},
         {'student_id': '22303296', 'name': 'Md.Rony Mia', 'department': 'Computer Science & Engineering (CSE)'},
         
-        # Future students from other departments can be added like this:
-        # {'student_id': '22113001', 'name': 'Example Student', 'department': 'Electrical & Electronic Engineering (EEE)'},
-        # {'student_id': '22143001', 'name': 'Example Student', 'department': 'Business Administration (BBA)'},
-        # {'student_id': '22313001', 'name': 'Example Student', 'department': 'English'},
-        # {'student_id': '22243001', 'name': 'Example Student', 'department': 'Civil Engineering'},
+        
     ]
     
     # Clear existing dummy data

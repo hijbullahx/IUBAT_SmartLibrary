@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   ADMIN_REPORTS_MONTHLY: '/api/admin/reports/monthly/',
   ADMIN_REPORTS_YEARLY: '/api/admin/reports/yearly/',
   ADMIN_REPORTS_DEPT_STATS: '/api/admin/reports/department-stats/',
+  ADMIN_REPORTS_ISSUES: '/api/admin/reports/issues/',
   ADMIN_STATS_LIVE: '/api/admin/stats/live/',
   PC_ANALYTICS: '/api/admin/analytics/pc/',
   ADMIN_TOGGLE_PC: '/api/admin/pc/toggle/',

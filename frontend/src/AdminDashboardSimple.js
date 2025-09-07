@@ -3,6 +3,35 @@ import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
 
 function AdminDashboard() {
+  // Issue reports state
+  const [issueReports, setIssueReports] = useState([]);
+  const [loadingIssues, setLoadingIssues] = useState(false);
+
+  // Mark issue as solved
+  const markIssueAsSolved = async (reportId) => {
+    try {
+      await axios.patch(`/api/admin/reports/issues/${reportId}/solve/`);
+      setIssueReports(prev => prev.filter(issue => issue.id !== reportId));
+    } catch (error) {
+      alert('Failed to mark as solved.');
+    }
+  };
+  // Load all issue reports for admin
+  const loadIssueReports = async () => {
+    setLoadingIssues(true);
+    try {
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_ISSUES);
+      if (response.data.status === 'success') {
+        setIssueReports(response.data.reports || []);
+      } else {
+        setMessage(`Error loading issues: ${response.data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      setMessage('Error loading issue reports. Please try again.');
+    } finally {
+      setLoadingIssues(false);
+    }
+  };
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -44,6 +73,7 @@ function AdminDashboard() {
   useEffect(() => {
     if (isLoggedIn) {
       loadDashboardData();
+      loadIssueReports();
     }
   }, [isLoggedIn]);
 
@@ -1022,7 +1052,7 @@ function AdminDashboard() {
                 </button>
               )}
             </div>
-            
+        
             {yearlyReport.length > 0 && (
               <div className="report-table">
                 <table>
@@ -1047,6 +1077,51 @@ function AdminDashboard() {
                         <td>{entry.pc_number}</td>
                         <td>{formatDateTime(entry.entry_time)}</td>
                         <td>{formatDateTime(entry.exit_time)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Reported Issues Section */}
+          <div className="report-card">
+            <h4>🛠️ Reported Issues by Students</h4>
+            {loadingIssues ? (
+              <div>Loading issues...</div>
+            ) : issueReports.length === 0 ? (
+              <div>No issues reported yet.</div>
+            ) : (
+              <div className="report-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Student Name</th>
+                      <th>Student ID</th>
+                      <th>Department</th>
+                      <th>Issue Type</th>
+                      <th>Description</th>
+                      <th>Reported At</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {issueReports
+                      .filter(issue => !issue.is_solved)
+                      .map((issue, idx) => (
+                      <tr key={idx}>
+                        <td>{issue.student_name}</td>
+                        <td>{issue.student_id}</td>
+                        <td>{issue.department}</td>
+                        <td>{issue.issue_type}</td>
+                        <td>{issue.description}</td>
+                        <td>{new Date(issue.created_at).toLocaleString()}</td>
+                        <td>
+                          <button onClick={() => markIssueAsSolved(issue.id)}>
+                            Mark as Solved
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
