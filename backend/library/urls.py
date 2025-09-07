@@ -1,8 +1,5 @@
-
 from django.urls import path
 from . import views
-
-app_name = "library"
 
 urlpatterns = [
     path('entry/library/', views.library_entry_exit, name='library_entry_exit'),
@@ -15,7 +12,9 @@ urlpatterns = [
     path('admin/logout/', views.admin_logout, name='admin_logout'),
     path('admin/reports/time-based/', views.time_based_report, name='time_based_report'),
     path('admin/reports/student-based/', views.student_based_report, name='student_based_report'),
-    # All time-based, daily, monthly, yearly reports are now handled by time_based_report
+    path('admin/reports/daily/', views.daily_report, name='daily_report'),
+    path('admin/reports/monthly/', views.monthly_report, name='monthly_report'),
+    path('admin/reports/yearly/', views.yearly_report, name='yearly_report'),
     path('admin/reports/department-stats/', views.department_statistics, name='department_statistics'),
     path('admin/stats/live/', views.live_admin_stats, name='live_admin_stats'),
     path('admin/analytics/pc/', views.get_pc_analytics, name='get_pc_analytics'),
