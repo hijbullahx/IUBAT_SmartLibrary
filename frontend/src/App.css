@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
   min-height: 100vh;
   color: #333;
 }
@@ -66,7 +66,7 @@ body {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 25px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -147,7 +147,7 @@ body {
 
 .student-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #ffffff;
   box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
   transform: translateY(-2px);
 }
@@ -332,7 +332,7 @@ body {
 /* E-Library Styles */
 .elibrary-container {
   padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f4f5f8 0%, #f1f1f1 100%);
   min-height: 100vh;
   color: white;
 }
@@ -503,7 +503,7 @@ body {
 }
 
 .toggle-btn.active:hover {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
 }
 
 .unified-form {
@@ -742,9 +742,9 @@ body {
 /* Admin Dashboard Styles */
 .admin-container {
   padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
   min-height: 100vh;
-  color: white;
+  color: rgb(43, 43, 43);
 }
 
 .admin-loading, .admin-error {
@@ -981,17 +981,17 @@ body {
   max-width: 400px;
   margin: 5rem auto;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(216, 216, 216);
   border-radius: 15px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
-  color: white;
+  color: rgb(27, 27, 27);
 }
 
 .admin-login h2 {
   margin-bottom: 2rem;
-  color: #fff;
+  color: #252525;
 }
 
 .admin-login form {
@@ -1013,7 +1013,7 @@ body {
   padding: 1rem;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #e6e6e6, #ffffff);
   color: white;
   font-weight: 600;
   font-size: 1rem;
@@ -1078,7 +1078,7 @@ body {
 
 /* PC Status in Service Menu */
 .pc-status {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #ebebeb, #f7f7f7);
   color: white;
   padding: 0.75rem 1rem;
   border-radius: 10px;
@@ -1154,7 +1154,7 @@ body {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
   color: white;
   padding: 1.5rem;
   border-radius: 10px;
@@ -1315,13 +1315,13 @@ body {
 
 .report-controls select.date-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #fcfcfc;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
 }
 
 .report-controls input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #f7f7f7;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
 }
 
@@ -1333,14 +1333,14 @@ body {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 5px;
-  background: #667eea;
+  background: #eaebec;
   color: white;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .report-controls button:hover:not(:disabled) {
-  background: #5a6fd8;
+  background: #eeeeee;
 }
 
 .report-controls button:disabled {
@@ -1371,7 +1371,7 @@ body {
 }
 
 .report-table th {
-  background: #667eea;
+  background: #dfdfdf;
   color: white;
   font-weight: 600;
 }
@@ -1424,7 +1424,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 80vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
   border-radius: 10px;
   margin: 20px;
 }
@@ -1915,7 +1915,7 @@ body {
 }
 
 .elibrary-header {
-  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  background: linear-gradient(135deg, #ffffff, #fdfdfd);
   color: white;
   padding: 25px 40px;
   border-radius: 15px;
@@ -2228,7 +2228,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
   padding: 20px;
 }
 
