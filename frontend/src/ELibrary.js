@@ -84,11 +84,11 @@ function ELibrary({ scannedStudent, onReturnToService }) {
   };
 
   const getPcStatusClass = (pc) => {
-    // Red for fault or in use by other students
+    // Red for out of order, blue for in use (anyone), green for available
     if (pc.is_dumb) return 'dumb';
     if (pc.status === 'in-use') {
-      if (pc.current_user === scannedStudent?.student_id) return 'in_use'; // yellow/blue for current user
-      return 'dumb'; // red for others
+      if (pc.current_user === scannedStudent?.student_id) return 'in_use'; // blue for current user
+      return 'in_use'; // blue for others
     }
     return 'available';
   };
@@ -216,10 +216,15 @@ function ELibrary({ scannedStudent, onReturnToService }) {
                           <div 
                             key={pc.pc_number} 
                             className={`pc-library ${getPcStatusClass(pc)} ${pc.status === 'available' && !currentUserPc ? 'clickable' : ''}`}
-                            onClick={() => currentUserPc ? null : handlePcSelect(pc)}
+                            onClick={() => {
+                              // Only allow selection if available and not in use by anyone
+                              if (pc.status === 'available' && !pc.is_dumb && !currentUserPc) {
+                                handlePcSelect(pc);
+                              }
+                            }}
                             style={{
                               cursor: pc.status === 'available' && !pc.is_dumb && !currentUserPc ? 'pointer' : 'not-allowed',
-                              opacity: currentUserPc && pc.pc_number !== currentUserPc.pc_number ? 0.6 : 1
+                              opacity: pc.status === 'in-use' && (!currentUserPc || pc.current_user !== scannedStudent?.student_id) ? 0.7 : 1
                             }}
                           >
                             {pc.pc_number}
