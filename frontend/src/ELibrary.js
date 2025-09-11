@@ -93,16 +93,6 @@ function ELibrary({ scannedStudent, onReturnToService }) {
     return 'available';
   };
 
-  // const getPcStatusText = (pc) => {
-  //   if (pc.is_dumb) return 'Out of Order';
-  //   if (pc.status === 'in-use') {
-  //     if (pc.current_user === scannedStudent?.student_id) {
-  //       return 'Your PC';
-  //     }
-  //     return 'In Use';
-  //   }
-  //   return 'Available';
-  // };
 
   useEffect(() => {
     loadPCs();
@@ -302,7 +292,9 @@ function ELibrary({ scannedStudent, onReturnToService }) {
       <div className={`message-box${message ? (message.toLowerCase().includes('error') ? ' error' : ' success') : ''}`} style={{ display: message ? 'block' : 'none' }}>
         <p>{message || ' '}</p>
       </div>
-
+git config user.name
+git config user.emailgit config user.name
+git config user.email
       <div className="back-section">
         <button onClick={onReturnToService} className="back-btn">
           ← Back to Service Monitor
