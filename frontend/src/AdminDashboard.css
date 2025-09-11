@@ -5,6 +5,17 @@
   padding: 0;
   box-sizing: border-box;
 }
+.fw-bold{
+  margin-bottom: 70px;
+  
+}
+.bottom-0{
+  width: 100%;
+  font-size: 20px;
+}
+.px-4{
+  margin-bottom: 100px!important;
+}
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,6 +28,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #f5f6fb;
 }
 
 /* Header Styles */
@@ -51,6 +63,13 @@ body {
   height: 50px;
   object-fit: contain;
 }
+.w{
+     width: 440px;
+    height: 60px;
+    border-radius: 15px;
+}
+
+
 
 .header h1 {
   color: #2c3e50;
@@ -62,6 +81,7 @@ body {
   display: flex;
   gap: 1rem;
 }
+
 
 .nav-buttons button {
   background: linear-gradient(135deg, #667eea, #764ba2);
@@ -84,6 +104,10 @@ body {
   background: linear-gradient(135deg, #2c3e50, #34495e);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(44, 62, 80, 0.4);
+}
+.small{
+  color: black;
+  margin-left: 65px;
 }
 
 /* Main Content */
@@ -151,6 +175,16 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
 }
+.form-control{
+  width: 80%!important;
+  line-height: 40px!important;
+   margin-left: 60px;
+   border-radius: 10px!important;
+}
+.btn-small{
+  margin-right: 55px!important;
+}
+
 
 .submit-btn {
   background: linear-gradient(135deg, #27ae60, #2ecc71);
@@ -554,6 +588,11 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
+}
+.form-control {
+  width: 80%;
+  line-height: 2rem;
+  
 }
 
 .stat-card {

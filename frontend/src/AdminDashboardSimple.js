@@ -3,6 +3,35 @@ import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
 
 function AdminDashboard() {
+  // Issue reports state
+  const [issueReports, setIssueReports] = useState([]);
+  const [loadingIssues, setLoadingIssues] = useState(false);
+
+  // Mark issue as solved
+  const markIssueAsSolved = async (reportId) => {
+    try {
+      await axios.patch(`/api/admin/reports/issues/${reportId}/solve/`);
+      setIssueReports(prev => prev.filter(issue => issue.id !== reportId));
+    } catch (error) {
+      alert('Failed to mark as solved.');
+    }
+  };
+  // Load all issue reports for admin
+  const loadIssueReports = async () => {
+    setLoadingIssues(true);
+    try {
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_ISSUES);
+      if (response.data.status === 'success') {
+        setIssueReports(response.data.reports || []);
+      } else {
+        setMessage(`Error loading issues: ${response.data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      setMessage('Error loading issue reports. Please try again.');
+    } finally {
+      setLoadingIssues(false);
+    }
+  };
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -44,6 +73,7 @@ function AdminDashboard() {
   useEffect(() => {
     if (isLoggedIn) {
       loadDashboardData();
+      loadIssueReports();
     }
   }, [isLoggedIn]);
 
@@ -204,18 +234,24 @@ function AdminDashboard() {
   const loadDailyReport = async () => {
     setLoading(true);
     try {
-      let url = API_ENDPOINTS.ADMIN_REPORTS_DAILY;
-      
-      // Add day parameter if selected
+      let startDate, endDate;
       if (selectedDay) {
-        url += `?day=${selectedDay}`;
+        startDate = selectedDay;
+        endDate = selectedDay;
+      } else {
+        // Default: last 7 days
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 6);
+        startDate = past.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
       }
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_TIME, {
+        params: { start_date: startDate, end_date: endDate }
+      });
       if (response.data.status === 'success') {
         setDailyReport(response.data.report || []);
-        const dayText = selectedDay ? `Day ${selectedDay}` : 'Last 7 Days';
+        const dayText = selectedDay ? `Day ${selectedDay}` : `Last 7 Days (${startDate} to ${endDate})`;
         setMessage(`Found ${response.data.report?.length || 0} entries for ${dayText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
@@ -230,18 +266,28 @@ function AdminDashboard() {
   const loadMonthlyReport = async () => {
     setLoading(true);
     try {
-      let url = API_ENDPOINTS.ADMIN_REPORTS_MONTHLY;
-      
-      // Add month parameter if selected
+      let startDate, endDate;
       if (selectedMonth) {
-        url += `?month=${selectedMonth}`;
+        // selectedMonth format: YYYY-MM
+        const [year, month] = selectedMonth.split('-').map(Number);
+        startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+        // Get last day of month
+        const lastDay = new Date(year, month, 0).getDate();
+        endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      } else {
+        // Default: last 30 days
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 29);
+        startDate = past.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
       }
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_TIME, {
+        params: { start_date: startDate, end_date: endDate }
+      });
       if (response.data.status === 'success') {
         setMonthlyReport(response.data.report || []);
-        const monthText = selectedMonth ? `${selectedMonth}` : 'Last 30 Days';
+        const monthText = selectedMonth ? `${selectedMonth}` : `Last 30 Days (${startDate} to ${endDate})`;
         setMessage(`Found ${response.data.report?.length || 0} entries for ${monthText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
@@ -256,18 +302,24 @@ function AdminDashboard() {
   const loadYearlyReport = async () => {
     setLoading(true);
     try {
-      let url = API_ENDPOINTS.ADMIN_REPORTS_YEARLY;
-      
-      // Add year parameter if selected
+      let startDate, endDate;
       if (selectedYear) {
-        url += `?year=${selectedYear}`;
+        startDate = `${selectedYear}-01-01`;
+        endDate = `${selectedYear}-12-31`;
+      } else {
+        // Default: last 365 days
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 364);
+        startDate = past.toISOString().slice(0, 10);
+        endDate = today.toISOString().slice(0, 10);
       }
-
-      const response = await axios.get(url);
-
+      const response = await axios.get(API_ENDPOINTS.ADMIN_REPORTS_TIME, {
+        params: { start_date: startDate, end_date: endDate }
+      });
       if (response.data.status === 'success') {
         setYearlyReport(response.data.report || []);
-        const yearText = selectedYear ? `Year ${selectedYear}` : 'Last 365 Days';
+        const yearText = selectedYear ? `Year ${selectedYear}` : `Last 365 Days (${startDate} to ${endDate})`;
         setMessage(`Found ${response.data.report?.length || 0} entries for ${yearText}`);
       } else {
         setMessage(`Error: ${response.data.message || 'Unknown error'}`);
@@ -1000,7 +1052,7 @@ function AdminDashboard() {
                 </button>
               )}
             </div>
-            
+        
             {yearlyReport.length > 0 && (
               <div className="report-table">
                 <table>
@@ -1025,6 +1077,51 @@ function AdminDashboard() {
                         <td>{entry.pc_number}</td>
                         <td>{formatDateTime(entry.entry_time)}</td>
                         <td>{formatDateTime(entry.exit_time)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Reported Issues Section */}
+          <div className="report-card">
+            <h4>🛠️ Reported Issues by Students</h4>
+            {loadingIssues ? (
+              <div>Loading issues...</div>
+            ) : issueReports.length === 0 ? (
+              <div>No issues reported yet.</div>
+            ) : (
+              <div className="report-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Student Name</th>
+                      <th>Student ID</th>
+                      <th>Department</th>
+                      <th>Issue Type</th>
+                      <th>Description</th>
+                      <th>Reported At</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {issueReports
+                      .filter(issue => !issue.is_solved)
+                      .map((issue, idx) => (
+                      <tr key={idx}>
+                        <td>{issue.student_name}</td>
+                        <td>{issue.student_id}</td>
+                        <td>{issue.department}</td>
+                        <td>{issue.issue_type}</td>
+                        <td>{issue.description}</td>
+                        <td>{new Date(issue.created_at).toLocaleString()}</td>
+                        <td>
+                          <button onClick={() => markIssueAsSolved(issue.id)}>
+                            Mark as Solved
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

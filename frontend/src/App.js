@@ -63,7 +63,7 @@ function App() {
           
           if (!entryMonitorLoggedInStudents.has(studentKey)) {
             // Student hasn't entered via entry monitor
-            setMessage(`${student.name}, please scan your ID at the entry monitor first to enter the library.`);
+            setMessage(`${student?.name || 'Student'}, please scan your ID at the entry monitor first to enter the library.`);
             setLastAction('entry_required');
             setStudentId('');
             
@@ -96,7 +96,7 @@ function App() {
           // Check if this student is already logged in from this entry monitor
           if (entryMonitorLoggedInStudents.has(studentKey)) {
             // Student already logged in, show message without calling API
-            setMessage(`${student.name} is already logged in to the library. Please use the service monitor inside for logout or e-library access.`);
+            setMessage(`${student?.name || 'Student'} is already logged in to the library. Please use the service monitor inside for logout or e-library access.`);
             setLastAction('already_logged_in');
             setStudentId('');
             
@@ -116,12 +116,12 @@ function App() {
               if (entryResponse.data.action === 'login') {
                 // Add student to logged-in set
                 setEntryMonitorLoggedInStudents(prev => new Set([...prev, studentKey]));
-                setMessage(`Welcome ${student.name}! ${entryResponse.data.message}`);
+                setMessage(`Welcome ${student?.name || 'Student'}! ${entryResponse.data.message}`);
                 setLastAction('login');
               } else {
                 // Student was already in the system, add to set but show already logged in message
                 setEntryMonitorLoggedInStudents(prev => new Set([...prev, studentKey]));
-                setMessage(`${student.name} is already logged in to the library. Please use the service monitor inside for logout or e-library access.`);
+                setMessage(`${student?.name || 'Student'} is already logged in to the library. Please use the service monitor inside for logout or e-library access.`);
                 setLastAction('already_logged_in');
                 
                 // Reverse the logout by calling API again to restore their login state
@@ -157,24 +157,23 @@ function App() {
       setShowElibrary(false);
       setShowGoodbye(false);
       setShowAdmin(false);
-      setShowServiceMenu(false);
-      setIsServiceMonitor(false);
-      // Reset states for entry monitor but keep logged-in tracking
-      setScannedStudent(null);
-      setStudentId('');
-      setMessage('');
-      setLastAction('');
+  setShowServiceMenu(false);
+  setIsServiceMonitor(false);
+  // Reset states for entry monitor but keep logged-in tracking
+  // Do NOT clear scannedStudent here; only clear on full library exit
+  setStudentId('');
+  setMessage('');
+  setLastAction('');
     } else if (view === 'service') {
-      setShowElibrary(false);
-      setShowGoodbye(false);
-      setShowAdmin(false);
-      setShowServiceMenu(false);
-      setIsServiceMonitor(true);
-      // Reset states for service monitor
-      setScannedStudent(null);
-      setStudentId('');
-      setMessage('');
-      setLastAction('');
+  setShowElibrary(false);
+  setShowGoodbye(false);
+  setShowAdmin(false);
+  setShowServiceMenu(false);
+  setIsServiceMonitor(true);
+  // Do NOT clear scannedStudent here; only clear on full library exit
+  setStudentId('');
+  setMessage('');
+  setLastAction('');
     } else if (view === 'admin') {
       setShowElibrary(false);
       setShowGoodbye(false);
@@ -195,18 +194,17 @@ function App() {
 
   const handleReturnFromGoodbye = () => {
     // Return to service monitor after goodbye (since logout happened from service monitor)
-    setStudentId('');
-    setMessage('');
-    setScannedStudent(null);
-    setShowGoodbye(false);
-    setShowElibrary(false);
-    setShowAdmin(false);
-    setLastAction('');
-    setShouldShowGoodbye(false);
-    setShowServiceMenu(false);
-    
-    // Set to service monitor mode so user can scan again for services
-    setIsServiceMonitor(true);
+  setStudentId('');
+  setMessage('');
+  setScannedStudent(null);
+  setShowGoodbye(false);
+  setShowElibrary(false);
+  setShowAdmin(false);
+  setLastAction('');
+  setShouldShowGoodbye(false);
+  setShowServiceMenu(false);
+  // Set to service monitor mode so user can scan again for services
+  setIsServiceMonitor(true);
   };
 
   const handleReturnToService = () => {
@@ -249,13 +247,13 @@ function App() {
         });
         
         // Clear states and return to service monitor scan interface immediately
-        setCurrentUserPc(null);
-        setScannedStudent(null);
-        setShowServiceMenu(false);
-        setIsServiceMonitor(true);
-        setStudentId('');
-        setMessage('');
-        setLastAction('');
+  setCurrentUserPc(null);
+  setScannedStudent(null);
+  setShowServiceMenu(false);
+  setIsServiceMonitor(true);
+  setStudentId('');
+  setMessage('');
+  setLastAction('');
         
       } catch (error) {
         setMessage(error.response?.data?.message || 'Error processing logout');
@@ -292,24 +290,21 @@ function App() {
     e.preventDefault();
     if (!complaint.trim()) return;
 
-    // Log complaint (can be extended to API call in future)
-    console.log('Complaint submitted:', {
-      studentId: scannedStudent?.student_id,
-      studentName: scannedStudent?.name,
-      type: complaintType,
-      message: complaint,
-      timestamp: new Date().toISOString()
-    });
-
-    // Clear complaint form
-    setComplaint('');
-    setComplaintType('pc');
-    
-    // Show success message
-    setMessage('Thank you! Your report has been submitted.');
-    setTimeout(() => {
-      setMessage('');
-    }, 3000);
+    try {
+      await axios.post('/api/admin/reports/issues/', {
+        student_id: scannedStudent?.student_id,
+        issue_type: complaintType,
+        description: complaint
+      });
+      setComplaint('');
+      setComplaintType('pc');
+      setMessage('Thank you! Your report has been submitted.');
+      setTimeout(() => {
+        setMessage('');
+      }, 3000);
+    } catch (error) {
+      setMessage('Failed to submit report. Please try again.');
+    }
   };
 
   // Function to check current user's PC status
@@ -550,7 +545,11 @@ function App() {
               <h2>IUBAT Smart Library - E-Library Section</h2>
               <div className="student-info-bar">
                 <div className="student-details">
-                  <span><strong>{scannedStudent.name}</strong> ({scannedStudent.student_id}) - {scannedStudent.department}</span>
+                  <span>
+                    <strong>{scannedStudent?.name || 'Student'}</strong>
+                    {scannedStudent?.student_id ? ` (${scannedStudent.student_id})` : ''}
+                    {scannedStudent?.department ? ` - ${scannedStudent.department}` : ''}
+                  </span>
                   {message && (
                     <div className="entry-status">
                       <span className={`status-badge ${lastAction}`}>
