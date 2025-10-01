@@ -50,7 +50,6 @@ def get_issue_reports(request):
     reports = IssueReport.objects.select_related('student').order_by('-created_at')
     data = [
         {
-            'id': r.id,
             'student_id': r.student.student_id,
             'student_name': r.student.name,
             'department': r.student.department,

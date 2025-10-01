@@ -45,6 +45,3 @@ class IssueReport(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     is_solved = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.get_issue_type_display()} by {self.student.name} ({self.student.student_id})" if hasattr(self, 'get_issue_type_display') else f"{self.issue_type} by {self.student.name} ({self.student.student_id})"
