@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from './config/axios';
 import { API_ENDPOINTS } from './config/api';
 import ELibrary from './ELibrary.js';
-import AdminDashboard from './AdminDashboardSimple.js';
+import AdminDashboard from './AdminDashboard.js';
 import GoodbyePage from './GoodbyePage.js';
 import './App.css';
 import IubatLogo from './assets/IUBAT2.png';
