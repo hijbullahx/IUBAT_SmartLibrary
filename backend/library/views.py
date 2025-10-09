@@ -1,3 +1,66 @@
+# PATCH endpoint to mark an issue as solved
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def solve_issue_report(request, report_id):
+    # Only admin can mark as solved
+    is_authenticated, admin_user = check_admin_auth(request)
+    if not is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+    if request.method != 'PATCH':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+    try:
+        report = IssueReport.objects.get(id=report_id)
+        report.is_solved = True
+        report.save()
+        return JsonResponse({'status': 'success', 'message': 'Issue marked as solved.'})
+    except IssueReport.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Report not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+from .models import IssueReport
+# Admin API: Get all issue reports
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def get_issue_reports(request):
+    if request.method == 'POST':
+        # Allow students to submit new issue reports
+        try:
+            data = json.loads(request.body)
+            student_id = data.get('student_id')
+            issue_type = data.get('issue_type')
+            description = data.get('description')
+            if not (student_id and issue_type and description):
+                return JsonResponse({'status': 'error', 'message': 'Missing required fields.'}, status=400)
+            from .models import Student
+            student = Student.objects.get(student_id=student_id)
+            IssueReport.objects.create(student=student, issue_type=issue_type, description=description)
+            return JsonResponse({'status': 'success', 'message': 'Report submitted.'})
+        except Student.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Student not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    # Only allow GET for admin
+    is_authenticated, admin_user = check_admin_auth(request)
+    if not is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+    reports = IssueReport.objects.select_related('student').order_by('-created_at')
+    data = [
+        {
+            'student_id': r.student.student_id,
+            'student_name': r.student.name,
+            'department': r.student.department,
+            'issue_type': r.issue_type,
+            'description': r.description,
+            'created_at': r.created_at.isoformat(),
+            'is_solved': getattr(r, 'is_solved', False),
+        }
+        for r in reports
+    ]
+    return JsonResponse({'status': 'success', 'reports': data})
 from django.http import JsonResponse
 from .models import Student, LibraryEntry, ELibraryEntry, PC
 from django.views.decorators.csrf import csrf_exempt
@@ -834,27 +897,24 @@ def get_pc_analytics(request):
             from django.db.models import Count
             from django.utils import timezone
             
-            # Get last 7 days
-            end_date = timezone.now()
-            start_date = end_date - timedelta(days=7)
-            
-            # Get daily PC usage
+            # Get today and previous 6 days (total 7 days, oldest to newest)
+            today = timezone.localtime(timezone.now()).replace(hour=0, minute=0, second=0, microsecond=0)
             daily_usage = []
-            for i in range(7):
-                day = start_date + timedelta(days=i)
+            for i in range(6, -1, -1):  # 6 days ago to today
+                day = today - timedelta(days=i)
                 day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
                 day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
-                
+
                 # Count unique PC sessions for this day
                 sessions_count = ELibraryEntry.objects.filter(
                     entry_time__range=[day_start, day_end]
                 ).count()
-                
+
                 # Count unique students for this day
                 students_count = ELibraryEntry.objects.filter(
                     entry_time__range=[day_start, day_end]
                 ).values('student').distinct().count()
-                
+
                 daily_usage.append({
                     'date': day.strftime('%Y-%m-%d'),
                     'day_name': day.strftime('%A'),
@@ -862,7 +922,7 @@ def get_pc_analytics(request):
                     'pc_sessions': sessions_count,
                     'unique_students': students_count
                 })
-            
+
             return JsonResponse({
                 'status': 'success',
                 'data': daily_usage  # This matches frontend expectation

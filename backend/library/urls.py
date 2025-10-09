@@ -1,5 +1,7 @@
+
 from django.urls import path
 from . import views
+from .views import get_issue_reports
 
 urlpatterns = [
     path('entry/library/', views.library_entry_exit, name='library_entry_exit'),
@@ -12,10 +14,9 @@ urlpatterns = [
     path('admin/logout/', views.admin_logout, name='admin_logout'),
     path('admin/reports/time-based/', views.time_based_report, name='time_based_report'),
     path('admin/reports/student-based/', views.student_based_report, name='student_based_report'),
-    path('admin/reports/daily/', views.daily_report, name='daily_report'),
-    path('admin/reports/monthly/', views.monthly_report, name='monthly_report'),
-    path('admin/reports/yearly/', views.yearly_report, name='yearly_report'),
     path('admin/reports/department-stats/', views.department_statistics, name='department_statistics'),
+    path('admin/reports/issues/', get_issue_reports, name='admin_issue_reports'),
+    path('admin/reports/issues/<int:report_id>/solve/', views.solve_issue_report, name='solve_issue_report'),
     path('admin/stats/live/', views.live_admin_stats, name='live_admin_stats'),
     path('admin/analytics/pc/', views.get_pc_analytics, name='get_pc_analytics'),
     path('admin/pc/toggle/', views.admin_toggle_pc_status, name='admin_toggle_pc_status'),

@@ -44,60 +44,55 @@ function ELibrary({ scannedStudent, onReturnToService }) {
   }, [scannedStudent]);
 
   const handlePcSelect = async (pc) => {
+    // Prevent if scannedStudent is not set
+    if (!scannedStudent) {
+      setMessage('No student selected. Please scan your ID first.');
+      return;
+    }
     // If user already has a PC, prevent new selection
     if (currentUserPc) {
       setMessage(`You are already using PC ${currentUserPc.pc_number}. Please check out first to select a different PC.`);
       return;
     }
-
     // Only allow selection of available PCs
     if (pc.status !== 'available' || pc.is_dumb) {
       setMessage(pc.is_dumb ? 'This PC is out of order' : 'This PC is currently in use');
       return;
     }
-
     try {
       // Auto check-in to selected PC
       await axios.post(API_ENDPOINTS.ELIBRARY_CHECKIN, {
         student_id: scannedStudent.student_id,
         pc_number: pc.pc_number
       });
-      
       setMessage(`Successfully checked in to PC ${pc.pc_number}!`);
-      
-      // Update current user PC immediately with the new assignment
-      const newUserPc = {
-        pc_number: pc.pc_number,
-        status: 'in-use',
-        current_user: scannedStudent.student_id,
-        is_dumb: pc.is_dumb
-      };
-      setCurrentUserPc(newUserPc);
-      
+      // Reload PC status to update UI for all users
+      await loadPCs();
       // Immediately return to service monitor after successful PC selection
       onReturnToService();
-      
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Error checking in to PC');
+      let msg = 'Error checking in to PC';
+      if (error.response && error.response.data) {
+        msg = error.response.data.message || JSON.stringify(error.response.data);
+      } else if (error.message) {
+        msg = error.message;
+      }
+      setMessage(msg);
+      // Log the error for debugging
+      console.error('PC check-in error:', error);
     }
   };
 
   const getPcStatusClass = (pc) => {
+    // Red for out of order, blue for in use (anyone), green for available
     if (pc.is_dumb) return 'dumb';
-    if (pc.status === 'in-use') return 'in_use';
+    if (pc.status === 'in-use') {
+      if (pc.current_user === scannedStudent?.student_id) return 'in_use'; // blue for current user
+      return 'in_use'; // blue for others
+    }
     return 'available';
   };
 
-  // const getPcStatusText = (pc) => {
-  //   if (pc.is_dumb) return 'Out of Order';
-  //   if (pc.status === 'in-use') {
-  //     if (pc.current_user === scannedStudent?.student_id) {
-  //       return 'Your PC';
-  //     }
-  //     return 'In Use';
-  //   }
-  //   return 'Available';
-  // };
 
   useEffect(() => {
     loadPCs();
@@ -130,12 +125,36 @@ function ELibrary({ scannedStudent, onReturnToService }) {
             <div className="alert-icon">💻</div>
             <div className="alert-text">
               <h3>You are currently using PC {currentUserPc.pc_number}</h3>
-              <p>You have an active session on PC {currentUserPc.pc_number}. Return to the Service Monitor to manage your session.</p>
+              <p>You have an active session on PC {currentUserPc.pc_number}. You can exit the E-Library or return to the Service Monitor.</p>
             </div>
             <div className="alert-actions">
               <button onClick={onReturnToService} className="continue-btn">
                 Return to Service Monitor
               </button>
+              {currentUserPc && (
+                <button onClick={async () => {
+                  try {
+                    const res = await axios.post(API_ENDPOINTS.ELIBRARY_CHECKOUT, {
+                      student_id: scannedStudent.student_id
+                    });
+                    setMessage(res.data.message || 'Checked out from E-Library.');
+                    setCurrentUserPc(null);
+                    await loadPCs(); // Reload PC status after checkout
+                    onReturnToService();
+                  } catch (error) {
+                    let msg = 'Error checking out from E-Library';
+                    if (error.response && error.response.data) {
+                      msg = error.response.data.message || JSON.stringify(error.response.data);
+                    } else if (error.message) {
+                      msg = error.message;
+                    }
+                    setMessage(msg);
+                    console.error('PC checkout error:', error);
+                  }
+                }} className="exit-btn" style={{marginLeft: '1rem', background: '#d9534f', color: 'white'}}>
+                  Exit E-Library
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -187,10 +206,15 @@ function ELibrary({ scannedStudent, onReturnToService }) {
                           <div 
                             key={pc.pc_number} 
                             className={`pc-library ${getPcStatusClass(pc)} ${pc.status === 'available' && !currentUserPc ? 'clickable' : ''}`}
-                            onClick={() => currentUserPc ? null : handlePcSelect(pc)}
+                            onClick={() => {
+                              // Only allow selection if available and not in use by anyone
+                              if (pc.status === 'available' && !pc.is_dumb && !currentUserPc) {
+                                handlePcSelect(pc);
+                              }
+                            }}
                             style={{
                               cursor: pc.status === 'available' && !pc.is_dumb && !currentUserPc ? 'pointer' : 'not-allowed',
-                              opacity: currentUserPc && pc.pc_number !== currentUserPc.pc_number ? 0.6 : 1
+                              opacity: pc.status === 'in-use' && (!currentUserPc || pc.current_user !== scannedStudent?.student_id) ? 0.7 : 1
                             }}
                           >
                             {pc.pc_number}
@@ -265,12 +289,12 @@ function ELibrary({ scannedStudent, onReturnToService }) {
         </div>
       </div>
 
-      {message && (
-        <div className={`message-box ${message.includes('Error') ? 'error' : 'success'}`}>
-          <p>{message}</p>
-        </div>
-      )}
-
+      <div className={`message-box${message ? (message.toLowerCase().includes('error') ? ' error' : ' success') : ''}`} style={{ display: message ? 'block' : 'none' }}>
+        <p>{message || ' '}</p>
+      </div>
+git config user.name
+git config user.emailgit config user.name
+git config user.email
       <div className="back-section">
         <button onClick={onReturnToService} className="back-btn">
           ← Back to Service Monitor
