@@ -1,0 +1,12 @@
+/* Migrated admin styles (trimmed) from AdminDashboard.css */
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.admin-container{ background: #f5f6fb; padding: 20px; }
+.admin-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.admin-sections{ display:grid; gap:16px; }
+.admin-section{ background:white; border-radius:8px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.06); }
+
+/* PC and stat summaries */
+.stat-card{padding:12px; border-radius:6px;}
+
+/* Simplified responsive */
+@media (max-width:768px){ .admin-sections{grid-template-columns:1fr} }
