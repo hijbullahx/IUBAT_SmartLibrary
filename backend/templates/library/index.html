@@ -2,24 +2,116 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-md-8">
-      <h1>Welcome to IUBAT Smart Library (MVT)</h1>
-      <p>This is the Bootstrap-based frontend replacement. Start migrating React components here.</p>
-      <div id="stats" class="card mb-3">
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Entry Monitor</h5>
+        </div>
         <div class="card-body">
-          <h5 class="card-title">Live Stats</h5>
-          <p class="card-text">Placeholder for library statistics (students checked in/out, active PCs, etc.)</p>
+          <form id="entry-form">
+            <div class="mb-3">
+              <label for="student_id" class="form-label">Student ID</label>
+              <input type="text" class="form-control" id="student_id" placeholder="Enter student ID" required>
+            </div>
+            <button class="btn btn-primary" id="entry-submit">Submit</button>
+          </form>
+
+          <div id="entry-result" class="mt-3" style="display:none">
+            <div class="alert" id="entry-alert"></div>
+            <div id="entry-name" class="fw-bold"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow mt-3">
+        <div class="card-body">
+          <h6>Quick links</h6>
+          <a class="btn btn-outline-secondary me-2" href="/library/elibrary/">E-Library</a>
+          <a class="btn btn-outline-primary" href="/library/admin/">Admin Dashboard</a>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card">
+
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Student Status</h5>
+        </div>
         <div class="card-body">
-          <h5 class="card-title">Admin</h5>
-          <p class="card-text">Login and admin actions will go here.</p>
-          <a class="btn btn-primary" href="/admin/">Open Django Admin</a>
+          <form id="lookup-form" class="d-flex">
+            <input type="text" id="lookup_student_id" class="form-control me-2" placeholder="Student ID to lookup">
+            <button class="btn btn-secondary" id="lookup-btn">Lookup</button>
+          </form>
+
+          <div id="lookup-result" class="mt-3" style="display:none">
+            <ul class="list-group" id="lookup-list"></ul>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('entry-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const id = document.getElementById('student_id').value.trim();
+  if(!id) return;
+  const btn = document.getElementById('entry-submit');
+  btn.disabled = true;
+  try{
+    const r = await fetch('/api/entry/library/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({student_id: id})
+    });
+    const data = await r.json();
+    const resultDiv = document.getElementById('entry-result');
+    const alertDiv = document.getElementById('entry-alert');
+    const nameDiv = document.getElementById('entry-name');
+    resultDiv.style.display = 'block';
+    if(data.status === 'success'){
+      alertDiv.className = 'alert alert-success';
+      alertDiv.textContent = data.message || 'Success';
+      nameDiv.textContent = data.student_name ? 'Student: ' + data.student_name : '';
+    } else {
+      alertDiv.className = 'alert alert-danger';
+      alertDiv.textContent = data.message || 'Error';
+      nameDiv.textContent = '';
+    }
+  }catch(err){
+    console.error(err);
+  } finally { btn.disabled = false; }
+});
+
+document.getElementById('lookup-form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const id = document.getElementById('lookup_student_id').value.trim();
+  if(!id) return;
+  const list = document.getElementById('lookup-list');
+  list.innerHTML = '';
+  try{
+    const r = await fetch('/api/students/' + encodeURIComponent(id) + '/');
+    if(r.status === 200){
+      const d = await r.json();
+      const li = document.createElement('li');
+      li.className = 'list-group-item';
+      li.textContent = `${d.student.name} (${d.student.student_id}) — ${d.student.department}`;
+      list.appendChild(li);
+      document.getElementById('lookup-result').style.display = 'block';
+    } else {
+      const d = await r.json();
+      const li = document.createElement('li');
+      li.className = 'list-group-item text-danger';
+      li.textContent = d.message || 'Not found';
+      list.appendChild(li);
+      document.getElementById('lookup-result').style.display = 'block';
+    }
+  }catch(err){
+    console.error(err);
+  }
+});
+</script>
 {% endblock %}

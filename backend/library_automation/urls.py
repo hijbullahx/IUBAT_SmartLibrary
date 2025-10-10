@@ -44,6 +44,10 @@ urlpatterns = [
     # MVT-based Bootstrap frontend for migration/testing
     path('library/', TemplateView.as_view(template_name='library/index.html'), name='library_home'),
     path('library/mvt/', TemplateView.as_view(template_name='library/index.html'), name='library_mvt'),
+    path('library/elibrary/', TemplateView.as_view(template_name='library/elibrary.html'), name='library_elibrary'),
+    path('library/students/', TemplateView.as_view(template_name='library/students.html'), name='library_students'),
+    path('library/report-issue/', TemplateView.as_view(template_name='library/report_issue.html'), name='library_report_issue'),
+    path('library/admin-login/', TemplateView.as_view(template_name='library/admin_login.html'), name='library_admin_login'),
     path('library/admin/', library_views.admin_dashboard_page, name='library_admin'),
     path('api-info/', api_root, name='api_root'),  # API info moved to /api-info/
     path('debug-info/', debug_info, name='debug_info'),  # Debug endpoint

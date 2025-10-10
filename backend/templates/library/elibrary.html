@@ -1,10 +1,100 @@
 {% extends 'library/base.html' %}
-{% load static %}
 
 {% block content %}
-  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
-  <div class="elibrary-container">
-    <h1>E-Library</h1>
-    <p>This page will be migrated from the React ELibrary component.</p>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">E-Library - PC Status</h5>
+        </div>
+        <div class="card-body">
+          <div id="pc-list" class="row"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header"><h6 class="mb-0">Checkin / Checkout</h6></div>
+        <div class="card-body">
+          <form id="checkin-form">
+            <div class="mb-2">
+              <input id="ci-student" class="form-control" placeholder="Student ID">
+            </div>
+            <div class="mb-2">
+              <input id="ci-pc" class="form-control" placeholder="PC number">
+            </div>
+            <button class="btn btn-success mb-2" id="ci-btn">Check In</button>
+          </form>
+
+          <form id="checkout-form">
+            <div class="mb-2">
+              <input id="co-student" class="form-control" placeholder="Student ID">
+            </div>
+            <button class="btn btn-danger" id="co-btn">Check Out</button>
+          </form>
+
+          <div id="elib-message" class="mt-3" style="display:none"></div>
+        </div>
+      </div>
+    </div>
   </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function fetchPCs(){
+  const container = document.getElementById('pc-list');
+  container.innerHTML = '';
+  try{
+    const r = await fetch('/api/elibrary/pc_status/');
+    const d = await r.json();
+    if(d.status === 'success'){
+      d.pcs.forEach(pc => {
+        const col = document.createElement('div'); col.className='col-md-4 mb-3';
+        const card = document.createElement('div'); card.className='card';
+        const body = document.createElement('div'); body.className='card-body';
+        const title = document.createElement('h6'); title.className='card-title'; title.textContent = 'PC ' + pc.pc_number;
+        const pstatus = document.createElement('p'); pstatus.textContent = 'Status: ' + pc.status;
+        body.appendChild(title); body.appendChild(pstatus);
+        if(pc.current_user){
+          const user = document.createElement('p'); user.textContent = `User: ${pc.current_user} (${pc.current_user_name})`;
+          body.appendChild(user);
+        }
+        card.appendChild(body); col.appendChild(card); container.appendChild(col);
+      })
+    }
+  }catch(e){ console.error(e); }
+}
+
+document.getElementById('ci-btn').addEventListener('click', async function(e){
+  e.preventDefault();
+  const sid = document.getElementById('ci-student').value.trim();
+  const pc = document.getElementById('ci-pc').value.trim();
+  const msg = document.getElementById('elib-message');
+  try{
+    const r = await fetch('/api/entry/elibrary/checkin/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({student_id: sid, pc_number: pc})});
+    const d = await r.json();
+    msg.style.display='block'; msg.className = d.status === 'success' ? 'alert alert-success' : 'alert alert-danger'; msg.textContent = d.message;
+    fetchPCs();
+  }catch(e){ console.error(e); }
+});
+
+document.getElementById('co-btn').addEventListener('click', async function(e){
+  e.preventDefault();
+  const sid = document.getElementById('co-student').value.trim();
+  const msg = document.getElementById('elib-message');
+  try{
+    const r = await fetch('/api/entry/elibrary/checkout/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({student_id: sid})});
+    const d = await r.json();
+    msg.style.display='block'; msg.className = d.status === 'success' ? 'alert alert-success' : 'alert alert-danger'; msg.textContent = d.message;
+    fetchPCs();
+  }catch(e){ console.error(e); }
+});
+
+// initial load
+fetchPCs();
+// refresh periodically
+setInterval(fetchPCs, 15000);
+</script>
 {% endblock %}
