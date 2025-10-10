@@ -90,3 +90,5 @@ Thumbs.db
 # Cache
 .cache
 .parcel-cache
+# Ignore problematic Windows reserved files
+/backend/nul
