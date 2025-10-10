@@ -1,0 +1,25 @@
+{% extends 'library/base.html' %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-8">
+      <h1>Welcome to IUBAT Smart Library (MVT)</h1>
+      <p>This is the Bootstrap-based frontend replacement. Start migrating React components here.</p>
+      <div id="stats" class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Live Stats</h5>
+          <p class="card-text">Placeholder for library statistics (students checked in/out, active PCs, etc.)</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Admin</h5>
+          <p class="card-text">Login and admin actions will go here.</p>
+          <a class="btn btn-primary" href="/admin/">Open Django Admin</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
