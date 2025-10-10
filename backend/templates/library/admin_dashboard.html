@@ -2,49 +2,131 @@
 {% load static %}
 
 {% block content %}
-  <link rel="stylesheet" href="{% static 'css/admin.css' %}">
-  <div class="admin-container">
-    <div class="admin-header">
-      <h2>Admin Dashboard (MVT)</h2>
-      <div>
-        <a class="btn btn-secondary" href="/admin/">Django Admin</a>
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
+  </div>
+
+  <!-- Content Row -->
+  <div class="row">
+    <!-- Students in Library Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Students in Library</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.students_in_library }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-users fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="admin-sections">
-      <div class="admin-section">
-        <h3>Live Stats</h3>
-        <p id="live-stats">Data will be loaded via AJAX from /api/ endpoints.</p>
+    <!-- Students in E-Library Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Using E-Library</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.students_in_elibrary }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-laptop fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="admin-section">
-        <h3>PC Management</h3>
-        <p>PC status and actions will be migrated here.</p>
+    <!-- PCs Available Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Available PCs</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.pc_stats.available }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-desktop fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="admin-section">
-        <h3>Reports</h3>
-        <p>Time-based and student-based reports will be implemented here.</p>
+    <!-- Total PCs Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total PCs</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.pc_stats.total }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-server fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- PC Details Table -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">PC Details</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th>PC Number</th>
+              <th>Status</th>
+              <th>Student</th>
+              <th>Entry Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pc in pc_details %}
+            <tr>
+              <td>{{ pc.pc_number }}</td>
+              <td>{{ pc.status }}</td>
+              <td>{{ pc.user_info.student_name if pc.user_info else '-' }}</td>
+              <td>{{ pc.user_info.entry_time if pc.user_info else '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include small script to refresh live stats via API -->
+  {% block extra_js %}
   <script>
-    // Example: simple AJAX fetch to load live stats
-    async function fetchLiveStats(){
+    async function refreshLiveStats(){
       try{
         const r = await fetch('/api/admin/stats/live/');
         if(r.ok){
-          const data = await r.json();
-          document.getElementById('live-stats').textContent = JSON.stringify(data);
-        } else {
-          document.getElementById('live-stats').textContent = 'Error loading live stats';
+          const d = await r.json();
+          // Basic update: replace numbers in cards and table
+          document.querySelectorAll('.card .h5.mb-0.font-weight-bold.text-gray-800')[0].textContent = d.stats.students_in_library;
+          document.querySelectorAll('.card .h5.mb-0.font-weight-bold.text-gray-800')[1].textContent = d.stats.students_in_elibrary;
+          document.querySelectorAll('.card .h5.mb-0.font-weight-bold.text-gray-800')[2].textContent = d.stats.pc_stats.available;
+          document.querySelectorAll('.card .h5.mb-0.font-weight-bold.text-gray-800')[3].textContent = d.stats.pc_stats.total;
         }
-      }catch(e){
-        document.getElementById('live-stats').textContent = 'Network error';
-      }
+      }catch(e){ console.error(e); }
     }
-    fetchLiveStats();
+    // Refresh every 30 seconds
+    setInterval(refreshLiveStats, 30000);
   </script>
+  {% endblock %}
 
 {% endblock %}

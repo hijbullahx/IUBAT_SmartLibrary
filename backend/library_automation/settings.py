@@ -171,14 +171,11 @@ USE_TZ = True
 STATIC_URL = '/library/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Frontend build directory (relative to backend folder)
-FRONTEND_BUILD_DIR = os.path.normpath(os.path.join(BASE_DIR, '..', 'frontend', 'build'))
-
-# Additional directories to search for static files. Include the React build's
-# `static` folder so Django can serve the JS/CSS/media files directly.
+# Additional directories to search for static files used by server-rendered
+# templates and admin UI. Keep this minimal now that the React frontend is
+# removed from this branch.
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # legacy/static folder in backend
-    os.path.join(FRONTEND_BUILD_DIR, 'static'),  # React build static assets
+    os.path.join(BASE_DIR, 'static'),  # backend static assets (css, images, etc.)
 ]
 
 # Default primary key field type
@@ -187,15 +184,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS settings for React frontend
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React development server
-    "http://127.0.0.1:3000",  # Alternative React dev server
-    "http://localhost:3001",  # React development server (alt port)
-    "http://localhost:3002",  # React development server (alt port)
-    "http://127.0.0.1:3001",  # Alternative React dev server (alt port)
-    "http://127.0.0.1:3002",  # Alternative React dev server (alt port)
-    # Production Render domains
-    "https://iubat-smartlibrary-frontend.onrender.com",  # Your frontend URL
-    "https://iubat-smartlibrary-backend.onrender.com",   # Your backend URL
+    # Keep only production/back-end origins here. For local development the
+    # `CORS_ALLOW_ALL_ORIGINS = DEBUG` setting allows access.
+    "https://iubat-smartlibrary-backend.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
