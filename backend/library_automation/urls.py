@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
+from django.urls import include
+from library import views as library_views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse, HttpResponse
@@ -95,6 +97,7 @@ urlpatterns = [
     path('api/', include('library.urls')),
     # MVT-based Bootstrap frontend for migration/testing
     path('library/mvt/', TemplateView.as_view(template_name='library/index.html'), name='library_mvt'),
+    path('library/admin/', library_views.admin_dashboard_page, name='library_admin'),
     path('api-info/', api_root, name='api_root'),  # API info moved to /api-info/
     path('debug-info/', debug_info, name='debug_info'),  # Debug endpoint
     path('test-react/', ReactAppView.as_view(), name='test_react'),  # Test endpoint

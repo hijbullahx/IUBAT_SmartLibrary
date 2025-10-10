@@ -73,6 +73,8 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+import json as _json
 
 def check_admin_auth(request):
     """Check if user is authenticated via session cookies or auth token"""
@@ -887,6 +889,76 @@ def live_admin_stats(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=405)
+
+
+def admin_dashboard_page(request):
+    """Server-rendered admin dashboard. Requires Django superuser session.
+    Renders initial stats and PC details so the page is usable without JS first-load.
+    """
+    # Require superuser session; redirect to Django admin login if not authenticated
+    if not (request.user.is_authenticated and request.user.is_superuser):
+        return redirect(f'/admin/login/?next=/library/admin/')
+
+    # Compute stats (same logic as live_admin_stats)
+    students_in_library = LibraryEntry.objects.filter(exit_time__isnull=True).count()
+    students_in_elibrary = ELibraryEntry.objects.filter(exit_time__isnull=True).count()
+    students_only_main = students_in_library - students_in_elibrary
+
+    all_pcs = PC.objects.all()
+    total_pcs = all_pcs.count()
+
+    active_elibrary_sessions = ELibraryEntry.objects.filter(exit_time__isnull=True).select_related('student', 'pc')
+
+    pc_stats = {
+        'total': total_pcs,
+        'available': 0,
+        'in_use': 0,
+        'dumb': 0
+    }
+
+    pc_details = []
+    for pc in all_pcs:
+        current_session = active_elibrary_sessions.filter(pc=pc).first()
+        if pc.is_dumb:
+            status = 'dumb'
+            pc_stats['dumb'] += 1
+            user_info = None
+        elif current_session:
+            status = 'in_use'
+            pc_stats['in_use'] += 1
+            user_info = {
+                'student_id': current_session.student.student_id,
+                'student_name': current_session.student.name,
+                'department': current_session.student.department,
+                'entry_time': current_session.entry_time.isoformat()
+            }
+        else:
+            status = 'available'
+            pc_stats['available'] += 1
+            user_info = None
+
+        pc_details.append({
+            'pc_number': pc.pc_number,
+            'status': status,
+            'is_dumb': pc.is_dumb,
+            'user_info': user_info
+        })
+
+    stats = {
+        'students_in_library': students_in_library,
+        'students_in_elibrary': students_in_elibrary,
+        'students_only_main': students_only_main,
+        'pc_stats': pc_stats
+    }
+
+    context = {
+        'stats_json': _json.dumps(stats),
+        'pc_details_json': _json.dumps(pc_details),
+        'stats': stats,
+        'pc_details': pc_details,
+    }
+
+    return render(request, 'library/admin_dashboard.html', context)
 
 @csrf_exempt
 def get_pc_analytics(request):
