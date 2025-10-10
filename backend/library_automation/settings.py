@@ -25,7 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-development-key-please-change-in-production")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
+# For local LAN testing and to capture tracebacks during setup, force DEBUG=True
+# (temporary; revert this in production).
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost', 
@@ -36,6 +38,22 @@ ALLOWED_HOSTS = [
     'iubat-smartlibrary-backend.onrender.com',  # Your actual backend domain
     # Add your specific Render domain here when you get it
 ]
+
+# Try to auto-detect a LAN IP and add it to ALLOWED_HOSTS to simplify local network
+# testing (useful for development/testing on a LAN). This won't override explicit
+# ALLOWED_HOSTS if you set them via environment in production.
+try:
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # doesn't need to be reachable; used only to determine the default outbound IP
+    s.connect(("8.8.8.8", 80))
+    local_ip = s.getsockname()[0]
+    s.close()
+    if local_ip and local_ip not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(local_ip)
+except Exception:
+    # If auto-detection fails, do nothing. You can still set ALLOWED_HOSTS manually.
+    pass
 
 
 # Application definition
@@ -147,12 +165,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images) - Includes React build
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
+# Serve static files under the /library path so the React build (which uses
+# PUBLIC_URL=/library) can reference assets like /library/static/js/...
+STATIC_URL = '/library/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Additional directories to search for static files
+# Frontend build directory (relative to backend folder)
+FRONTEND_BUILD_DIR = os.path.normpath(os.path.join(BASE_DIR, '..', 'frontend', 'build'))
+
+# Additional directories to search for static files. Include the React build's
+# `static` folder so Django can serve the JS/CSS/media files directly.
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # React build files
+    os.path.join(BASE_DIR, 'static'),  # legacy/static folder in backend
+    os.path.join(FRONTEND_BUILD_DIR, 'static'),  # React build static assets
 ]
 
 # Default primary key field type

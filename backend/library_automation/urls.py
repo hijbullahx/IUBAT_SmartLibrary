@@ -57,9 +57,21 @@ class ReactAppView(TemplateView):
             # Fallback to API root if React build not found
             return api_root(request)
         except Exception as e:
-            print(f"❌ Error serving React app: {e}")
+            # Write full traceback to a debug file so external HTTP requests can
+            # surface the underlying issue (temporary during debug).
             import traceback
-            traceback.print_exc()
+            tb = traceback.format_exc()
+            try:
+                log_path = os.path.join(settings.BASE_DIR, 'debug_error.log')
+                with open(log_path, 'a', encoding='utf-8') as fh:
+                    fh.write('\n--- ReactAppView Exception ---\n')
+                    fh.write(tb)
+            except Exception:
+                pass
+            # If DEBUG, return the traceback in the response for easier debugging.
+            if getattr(settings, 'DEBUG', False):
+                return HttpResponse('<pre>' + tb.replace('<','&lt;') + '</pre>', content_type='text/html', status=500)
+            # Otherwise fallback to API root
             return api_root(request)
 
 def debug_info(request):
@@ -83,12 +95,10 @@ urlpatterns = [
     path('api-info/', api_root, name='api_root'),  # API info moved to /api-info/
     path('debug-info/', debug_info, name='debug_info'),  # Debug endpoint
     path('test-react/', ReactAppView.as_view(), name='test_react'),  # Test endpoint
+    # Serve the React app only under the /library path. This keeps API routes
+    # (which live under /api/) separate and avoids interfering with other URLs.
+    re_path(r'^library(?:/.*)?$', ReactAppView.as_view(), name='react_app'),
 ]
 
-# Serve static files FIRST - this is critical
+# Serve static files FIRST - this is critical (STATIC_URL now points to /library/static/)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-# React App - catch all remaining routes (put this LAST)
-urlpatterns += [
-    re_path(r'^.*$', ReactAppView.as_view(), name='react_app'),
-]
