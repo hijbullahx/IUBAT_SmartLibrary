@@ -12,61 +12,49 @@ A modern, full-stack solution for managing physical library entry/exit and e-lib
 - Live occupancy monitoring
 - Student database with 43 IUBAT university students
 
-### E-Library PC Management
-- PC availability status monitoring
-- Student-PC assignment system
-- Check-in and check-out functionality
-- PC usage time tracking
-- Hardware status management (operational/out-of-order)
+# IUBAT Smart Library System
 
-### Administrative Interface
-- Secure admin authentication
-- Comprehensive reporting system
-- Time-based activity analysis
-- Student-specific usage reports
-- System statistics dashboard
-- Database management utilities
+A full-stack digital library management system for IUBAT University, supporting both physical library entry/exit and e-library PC usage. The project is designed for real-time tracking, robust administration, and a seamless experience for students and staff.
+
+---
+
+## Features
+
+- **Library Entry Management:** Student ID verification, real-time entry/exit tracking, live occupancy, and a student database.
+- **E-Library PC Management:** PC availability monitoring, student-PC assignment, check-in/out, usage time tracking, and hardware status.
+- **Administrative Tools:** Secure admin authentication, reporting, activity analysis, student usage reports, statistics dashboard, and database utilities.
+- **Issue Reporting:** Students can submit complaints/issues; admins can mark them as solved.
 
 ---
 
 ## Technology Stack
 
-### Backend
-- **Framework:** Django 4.2.23 with Django REST Framework
-- **Database:** SQLite (development) / PostgreSQL (production)
-- **Authentication:** Session-based admin authentication
-- **CORS:** Cross-origin resource sharing for frontend integration
-- **Middleware:** WhiteNoise for static file serving
-
-### Frontend
-- **Framework:** React.js with modern CSS styling
-- **HTTP Client:** Fetch API for backend communication
-- **UI Design:** Responsive design with gradient styling
-- **Integration:** Inline CSS for production deployment
+- **Backend:** Django 4.2.23, Django REST Framework, SQLite (dev) / PostgreSQL (prod), CORS, WhiteNoise for static files.
+- **Frontend:** React.js (served as static files), responsive CSS, Fetch API for backend communication.
+- **Authentication:** Session-based admin authentication.
+- **Deployment:** Designed for Render.com, with CORS and CSRF settings for secure cross-origin requests.
 
 ---
 
-## Database Schema
+## Project Structure
 
-### Student Model
-- `student_id` - Primary identifier (8-digit format)
-- `name` - Full student name
-- `department` - Academic department affiliation
+- **backend/**
+  - `manage.py`: Django management script.
+  - `library_automation/`: Django project settings, URLs, WSGI/ASGI.
+  - `library/`: Main app with models, views, admin, migrations, management commands.
+  - `static/` and `staticfiles/`: Static assets (CSS, JS, images) for both admin and frontend.
+  - `templates/`: HTML templates for server-rendered pages.
+  - `db.sqlite3`: Development database.
 
-### LibraryEntry Model
-- `student` - Foreign key reference to Student
-- `entry_time` - Timestamp of library entry
-- `exit_time` - Timestamp of library exit (nullable for current occupants)
+---
 
-### ELibraryEntry Model
-- `student` - Foreign key reference to Student
-- `pc` - Foreign key reference to PC
-- `entry_time` - PC session start timestamp
-- `exit_time` - PC session end timestamp (nullable for active sessions)
+## Main Models
 
-### PC Model
-- `pc_number` - PC identifier 
-- `is_dumb` - Hardware status indicator (True if out-of-order)
+- **Student:** ID, name, department.
+- **PC:** PC number, status (dumb/active).
+- **LibraryEntry:** Tracks student entry/exit times.
+- **ELibraryEntry:** Tracks student PC usage.
+- **IssueReport:** Student complaints/issues, type, description, status.
 
 ---
 
@@ -78,10 +66,13 @@ A modern, full-stack solution for managing physical library entry/exit and e-lib
    - Run migrations: `python manage.py migrate`
    - Start server: `python manage.py runserver`
 3. **Frontend:**
-   - Install dependencies: `npm install`
-   - Start development server: `npm start`
+   - (If React source is present) Install dependencies: `npm install`
+   - Start dev server: `npm start`
+   - (Or serve static build from Django)
 
 ---
 
 ## License
+
 MIT License
+   - Run migrations: `python manage.py migrate`
